@@ -12,7 +12,7 @@ namespace Strawberry::Codec
 	    : mFrame(nullptr)
 	{
 	    mFrame = av_frame_alloc();
-	    Assert(mFrame != nullptr);
+	    Standard::Assert(mFrame != nullptr);
 	}
 
 
@@ -20,9 +20,9 @@ namespace Strawberry::Codec
 	Frame::Frame(const Frame& other)
 	    : mFrame(nullptr)
 	{
-	    Assert(other.mFrame != nullptr);
+	    Standard::Assert(other.mFrame != nullptr);
 	    mFrame = av_frame_clone(other.mFrame);
-	    Assert(mFrame != nullptr);
+		Standard::Assert(mFrame != nullptr);
 	}
 
 
@@ -30,10 +30,10 @@ namespace Strawberry::Codec
 	Frame& Frame::operator=(const Frame& other)
 	{
 	    if (this == &other) return (*this);
-	    Assert(other.mFrame != nullptr);
+		Standard::Assert(other.mFrame != nullptr);
 	    if (mFrame) av_frame_free(&mFrame);
 	    mFrame = av_frame_clone(other.mFrame);
-	    Assert(mFrame != nullptr);
+		Standard::Assert(mFrame != nullptr);
 	    return (*this);
 	}
 
@@ -44,7 +44,7 @@ namespace Strawberry::Codec
 	{
 	    av_frame_unref(mFrame);
 	    av_frame_move_ref(mFrame, other.mFrame);
-	    Assert(mFrame != nullptr);
+		Standard::Assert(mFrame != nullptr);
 	    other.mFrame = nullptr;
 	}
 
@@ -54,7 +54,7 @@ namespace Strawberry::Codec
 	{
 	    av_frame_unref(mFrame);
 	    av_frame_move_ref(mFrame, other.mFrame);
-	    Assert(mFrame != nullptr);
+		Standard::Assert(mFrame != nullptr);
 	    other.mFrame = nullptr;
 	    return (*this);
 	}

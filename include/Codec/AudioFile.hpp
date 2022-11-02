@@ -18,6 +18,13 @@ extern "C"
 
 
 
+namespace
+{
+	using Strawberry::Standard::Option;
+}
+
+
+
 namespace Strawberry::Codec
 {
 	class AudioFile

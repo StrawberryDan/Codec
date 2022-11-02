@@ -6,6 +6,11 @@
 
 
 
+using Strawberry::Standard::Assert;
+using Strawberry::Standard::Take;
+
+
+
 namespace Strawberry::Codec
 {
 	Decoder::Decoder()

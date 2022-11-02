@@ -7,6 +7,12 @@
 
 
 
+using Strawberry::Standard::Assert;
+using Strawberry::Standard::Take;
+using Strawberry::Standard::Replace;
+
+
+
 namespace Strawberry::Codec
 {
 	AudioFile::AudioFile(const std::string& path)

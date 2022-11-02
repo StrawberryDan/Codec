@@ -10,6 +10,10 @@
 
 
 
+using Strawberry::Standard::Assert;
+
+
+
 namespace Strawberry::Codec
 {
 	OpusEncoder::OpusEncoder()

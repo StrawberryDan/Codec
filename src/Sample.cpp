@@ -23,7 +23,7 @@ namespace Strawberry::Codec
 	    : mLeft(std::move(left))
 	    , mRight(std::move(right))
 	{
-	    Assert(mLeft.size() == mRight.size());
+	    Standard::Assert(mLeft.size() == mRight.size());
 	}
 
 
@@ -32,7 +32,7 @@ namespace Strawberry::Codec
 	    : mLeft()
 	    , mRight()
 	{
-	    Assert(size % sizeof(Sample) == 0);
+	    Standard::Assert(size % sizeof(Sample) == 0);
 	    mLeft.resize(size / sizeof(Sample));
 	    mRight.resize(size / sizeof(Sample));
 	    memcpy(mLeft.data(), left, size);
@@ -83,7 +83,7 @@ namespace Strawberry::Codec
 	    {
 	        sizeCheck += split.Size();
 	    }
-	    Assert(sizeCheck == Size());
+	    Standard::Assert(sizeCheck == Size());
 
 	    return {splits, leaf};
 	}

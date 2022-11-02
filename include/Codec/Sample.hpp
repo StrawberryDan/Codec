@@ -18,10 +18,6 @@ struct SplitSamples;
 
 namespace Strawberry::Codec
 {
-	using namespace Strawberry::Standard;
-
-
-
 	class Samples
 	{
 	public:
@@ -44,7 +40,7 @@ namespace Strawberry::Codec
 	    void Append(const Samples& other);
 	    void Append(Samples&& other);
 
-	    [[nodiscard]] inline std::size_t Size() const { Assert(mLeft.size() == mRight.size()); return mLeft.size(); }
+	    [[nodiscard]] inline std::size_t Size() const { Standard::Assert(mLeft.size() == mRight.size()); return mLeft.size(); }
 
 	    [[nodiscard]] SplitSamples Split(std::size_t count) const;
 
