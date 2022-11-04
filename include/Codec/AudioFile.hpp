@@ -18,13 +18,6 @@ extern "C"
 
 
 
-namespace
-{
-	using Strawberry::Standard::Option;
-}
-
-
-
 namespace Strawberry::Codec
 {
 	class AudioFile
@@ -42,16 +35,16 @@ namespace Strawberry::Codec
 	    inline       AVFormatContext* operator->()       { return mFile; }
 	    inline const AVFormatContext* operator->() const { return mFile; }
 
-	    Option<Frame> ReadFrame();
+	    Standard::Option<Frame> ReadFrame();
 
 	    [[nodiscard]] inline bool IsEof() const { return mIsEof; }
 
 	private:
-	    Option<Packet> ReadPacket();
+		Standard::Option<Packet> ReadPacket();
 
 	    AVFormatContext* mFile;
 	    const AVCodec* mCodec;
-	    Option<int> mStreamIndex;
+		Standard::Option<int> mStreamIndex;
 	    bool mIsEof;
 
 	    Decoder             mDecoder;

@@ -72,7 +72,7 @@ namespace Strawberry::Codec
 
 
 
-	Option<Frame> AudioFile::ReadFrame()
+	Standard::Option<Frame> AudioFile::ReadFrame()
 	{
 	    if (!mLeftoverFrames.empty())
 	    {
@@ -112,7 +112,7 @@ namespace Strawberry::Codec
 
 
 
-	Option<Packet> AudioFile::ReadPacket()
+	Standard::Option<Packet> AudioFile::ReadPacket()
 	{
 	    Packet packet;
 
