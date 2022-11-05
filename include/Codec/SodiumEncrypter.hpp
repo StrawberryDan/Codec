@@ -26,6 +26,9 @@ namespace Strawberry::Codec
 	    explicit SodiumEncrypter(Key key);
 
 	    EncryptedPacket Encrypt(Nonce nonce, const Packet& packet);
+
+
+
 	private:
 	    Key mKey;
 	};
