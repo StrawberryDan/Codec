@@ -1,24 +1,52 @@
+find_package(PkgConfig REQUIRED)
+
+
+
+pkg_check_modules(FFMPEG REQUIRED
+        libavcodec
+        libavdevice
+        libavfilter
+        libavformat
+        libavutil
+        libpostproc
+        libswresample
+        libswscale)
+
+
+
+find_library(SODIUM_LIBRARY REQUIRED
+        NAMES libsodium.a)
+
+
+
 add_library(Codec STATIC
         include/Codec/AudioFile.hpp
-        src/AudioFile.cpp
-        src/Packet.cpp
-        include/Codec/Packet.hpp
-        src/Decoder.cpp
         include/Codec/Decoder.hpp
-        src/Frame.cpp
         include/Codec/Frame.hpp
-        src/Resampler.cpp
-        include/Codec/Resampler.hpp
-        src/OpusEncoder.cpp
-        include/Codec/OpusEncoder.hpp
-        include/Codec/Sample.hpp
-        src/Sample.cpp
-        src/Muxer.cpp
         include/Codec/Muxer.hpp
+        include/Codec/OpusEncoder.hpp
+        include/Codec/Packet.hpp
+        include/Codec/Resampler.hpp
+        include/Codec/Sample.hpp
+        include/Codec/SodiumEncrypter.hpp
+        src/AudioFile.cpp
+        src/Decoder.cpp
+        src/Frame.cpp
+        src/Muxer.cpp
+        src/OpusEncoder.cpp
+        src/Packet.cpp
+        src/Resampler.cpp
+        src/Sample.cpp
         src/SodiumEncrypter.cpp
-        include/Codec/SodiumEncrypter.hpp)
-target_include_directories(Codec PUBLIC include)
-target_link_libraries(Codec PUBLIC FFMPEG sodium Standard)
+        )
+
+target_include_directories(Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(Codec PUBLIC Standard ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
+target_link_directories(Codec PUBLIC ${FFMPEG_LIBRARY_DIRS})
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    target_link_libraries(Codec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
+endif()
 
 add_executable(Codec_Test test/Main.cpp)
 target_include_directories(Codec_Test PRIVATE Codec)
