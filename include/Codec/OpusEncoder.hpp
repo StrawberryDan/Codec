@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <vector>
 #include <optional>
-#include "Sample.hpp"
 #include "Packet.hpp"
+#include "Frame.hpp"
 
 
 
@@ -25,8 +25,7 @@ namespace Strawberry::Codec
 	    OpusEncoder();
 	    ~OpusEncoder();
 
-	    std::vector<Packet> Encode(const Samples& samples);
-	    std::vector<Packet> Finish();
+	    std::vector<Packet> Encode(const Frame& frame);
 
 	    inline       AVCodecContext* operator*()        { return mContext; }
 	    inline const AVCodecContext* operator*()  const { return mContext; }
@@ -39,6 +38,5 @@ namespace Strawberry::Codec
 	    AVCodecContext* mContext;
 	    AVCodecParameters *mParameters;
 	    int64_t mPTS;
-	    Samples mSampleBuffer;
 	};
 }

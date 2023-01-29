@@ -65,11 +65,4 @@ namespace Strawberry::Codec
 	{
 	    av_frame_free(&mFrame);
 	}
-
-
-
-	Samples Frame::GetSamples() const
-	{
-	    return {mFrame->data[0], mFrame->data[1], static_cast<size_t>(mFrame->nb_samples * sizeof(Sample))};
-	}
 }

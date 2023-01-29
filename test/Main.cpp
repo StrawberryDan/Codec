@@ -16,23 +16,26 @@ int main()
 
     AudioFile file("data/music.mp3");
     OpusEncoder encoder;
-    Samples samples;
+	std::vector<Frame> frames;
     while (!file.IsEof())
     {
         auto frame = file.ReadFrame();
-        if (frame)
-        {
-            auto someSamples = frame->GetSamples();
-            samples.Append(std::move(someSamples));
-        }
+		if (frame)
+		{
+			frames.push_back(frame.Unwrap());
+		}
     }
 
 
-    std::vector<Packet> packets = encoder.Encode(samples);
-    {
-        auto final = encoder.Finish();
-        packets.insert(packets.end(), final.begin(), final.end());
-    }
+	std::vector<Packet> packets;
+	for (const auto& frame : frames)
+	{
+		auto somePackets = encoder.Encode(frame);
+		for (const auto p : somePackets)
+		{
+			packets.push_back(p);
+		}
+	}
 
 
     SodiumEncrypter::Key key;

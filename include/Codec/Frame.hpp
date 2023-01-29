@@ -2,7 +2,6 @@
 
 
 
-#include "Sample.hpp"
 #include <vector>
 
 
@@ -32,7 +31,7 @@ namespace Strawberry::Codec
 	    inline       AVFrame* operator->()       { return mFrame; }
 	    inline const AVFrame* operator->() const { return mFrame; }
 
-	    Samples GetSamples() const;
+
 
 	private:
 	    AVFrame* mFrame;

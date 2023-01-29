@@ -38,7 +38,6 @@ add_library(Strawberry_Codec STATIC
         include/Codec/OpusEncoder.hpp
         include/Codec/Packet.hpp
         include/Codec/Resampler.hpp
-        include/Codec/Sample.hpp
         include/Codec/SodiumEncrypter.hpp
         src/AudioFile.cpp
         src/Decoder.cpp
@@ -47,7 +46,6 @@ add_library(Strawberry_Codec STATIC
         src/OpusEncoder.cpp
         src/Packet.cpp
         src/Resampler.cpp
-        src/Sample.cpp
         src/SodiumEncrypter.cpp
         )
 
