@@ -2,13 +2,13 @@
 
 
 
-#include "Standard/Assert.hpp"
+#include "Core/Assert.hpp"
 
 
 
 namespace Strawberry::Codec
 {
-	using namespace Strawberry::Standard;
+	using namespace Strawberry::Core;
 
 
 

@@ -3,7 +3,7 @@
 
 
 #include <vector>
-#include "Standard/Assert.hpp"
+#include "Core/Assert.hpp"
 
 
 
@@ -40,7 +40,7 @@ namespace Strawberry::Codec
 	    void Append(const Samples& other);
 	    void Append(Samples&& other);
 
-	    [[nodiscard]] inline std::size_t Size() const { Standard::Assert(mLeft.size() == mRight.size()); return mLeft.size(); }
+	    [[nodiscard]] inline std::size_t Size() const { Core::Assert(mLeft.size() == mRight.size()); return mLeft.size(); }
 
 	    [[nodiscard]] SplitSamples Split(std::size_t count) const;
 

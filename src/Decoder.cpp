@@ -1,13 +1,13 @@
 #include "Codec/Decoder.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Utilities.hpp"
 
 
 #include <iostream>
 
 
 
-using Strawberry::Standard::Assert;
-using Strawberry::Standard::Take;
+using Strawberry::Core::Assert;
+using Strawberry::Core::Take;
 
 
 

@@ -2,7 +2,7 @@
 
 
 
-#include "Standard/Assert.hpp"
+#include "Core/Assert.hpp"
 #include <cstring>
 #include <utility>
 
@@ -23,7 +23,7 @@ namespace Strawberry::Codec
 	    : mLeft(std::move(left))
 	    , mRight(std::move(right))
 	{
-	    Standard::Assert(mLeft.size() == mRight.size());
+	    Core::Assert(mLeft.size() == mRight.size());
 	}
 
 
@@ -32,7 +32,7 @@ namespace Strawberry::Codec
 	    : mLeft()
 	    , mRight()
 	{
-	    Standard::Assert(size % sizeof(Sample) == 0);
+	    Core::Assert(size % sizeof(Sample) == 0);
 	    mLeft.resize(size / sizeof(Sample));
 	    mRight.resize(size / sizeof(Sample));
 	    memcpy(mLeft.data(), left, size);
@@ -83,7 +83,7 @@ namespace Strawberry::Codec
 	    {
 	        sizeCheck += split.Size();
 	    }
-	    Standard::Assert(sizeCheck == Size());
+	    Core::Assert(sizeCheck == Size());
 
 	    return {splits, leaf};
 	}

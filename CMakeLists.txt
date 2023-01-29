@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.00)
+project(Strawberry_Codec)
+set(CMAKE_CXX_STANDARD 20)
 find_package(PkgConfig REQUIRED)
 
 
@@ -16,6 +19,13 @@ pkg_check_modules(FFMPEG REQUIRED
 
 find_library(SODIUM_LIBRARY REQUIRED
         NAMES libsodium.a)
+
+
+
+set(STRAWBERRY_CORE_SRC_DIR "" CACHE PATH "Set to the location of Strawberry Core source code to use instead of normal searching")
+if(NOT ${STRAWBERRY_CORE_SRC_DIR} STREQUAL "")
+    add_subdirectory(${STRAWBERRY_CORE_SRC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Strawberry_Core)
+endif()
 
 
 
@@ -41,7 +51,7 @@ add_library(Codec STATIC
         )
 
 target_include_directories(Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
-target_link_libraries(Codec PUBLIC Standard ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
+target_link_libraries(Codec PUBLIC Strawberry_Core ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
 target_link_directories(Codec PUBLIC ${FFMPEG_LIBRARY_DIRS})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

@@ -1,5 +1,5 @@
 #include "Codec/AudioFile.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Utilities.hpp"
 
 
 
@@ -7,9 +7,9 @@
 
 
 
-using Strawberry::Standard::Assert;
-using Strawberry::Standard::Take;
-using Strawberry::Standard::Replace;
+using Strawberry::Core::Assert;
+using Strawberry::Core::Take;
+using Strawberry::Core::Replace;
 
 
 
@@ -72,7 +72,7 @@ namespace Strawberry::Codec
 
 
 
-	Standard::Option<Frame> AudioFile::ReadFrame()
+	Core::Option<Frame> AudioFile::ReadFrame()
 	{
 	    if (!mLeftoverFrames.empty())
 	    {
@@ -112,7 +112,7 @@ namespace Strawberry::Codec
 
 
 
-	Standard::Option<Packet> AudioFile::ReadPacket()
+	Core::Option<Packet> AudioFile::ReadPacket()
 	{
 	    Packet packet;
 

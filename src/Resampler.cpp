@@ -1,13 +1,13 @@
 #include "Codec/Resampler.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Utilities.hpp"
 
 
-#include "Standard/Assert.hpp"
+#include "Core/Assert.hpp"
 
 
 
-using Strawberry::Standard::Assert;
-using Strawberry::Standard::Take;
+using Strawberry::Core::Assert;
+using Strawberry::Core::Take;
 
 
 

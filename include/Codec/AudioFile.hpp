@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include "Standard/Option.hpp"
+#include "Core/Option.hpp"
 #include "Packet.hpp"
 #include "Decoder.hpp"
 #include "Resampler.hpp"
@@ -35,16 +35,16 @@ namespace Strawberry::Codec
 	    inline       AVFormatContext* operator->()       { return mFile; }
 	    inline const AVFormatContext* operator->() const { return mFile; }
 
-	    Standard::Option<Frame> ReadFrame();
+	    Core::Option<Frame> ReadFrame();
 
 	    [[nodiscard]] inline bool IsEof() const { return mIsEof; }
 
 	private:
-		Standard::Option<Packet> ReadPacket();
+		Core::Option<Packet> ReadPacket();
 
 	    AVFormatContext* mFile;
 	    const AVCodec* mCodec;
-		Standard::Option<int> mStreamIndex;
+		Core::Option<int> mStreamIndex;
 	    bool mIsEof;
 
 	    Decoder             mDecoder;
