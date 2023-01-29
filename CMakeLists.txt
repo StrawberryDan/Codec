@@ -29,7 +29,7 @@ endif()
 
 
 
-add_library(Codec STATIC
+add_library(Strawberry_Codec STATIC
         include/Codec/AudioFile.hpp
         include/Codec/Decoder.hpp
         include/Codec/Frame.hpp
@@ -50,14 +50,15 @@ add_library(Codec STATIC
         src/SodiumEncrypter.cpp
         )
 
-target_include_directories(Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
-target_link_libraries(Codec PUBLIC Strawberry_Core ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
-target_link_directories(Codec PUBLIC ${FFMPEG_LIBRARY_DIRS})
+target_include_directories(Strawberry_Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(Strawberry_Codec PUBLIC Strawberry_Core ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
+target_link_directories(Strawberry_Codec PUBLIC ${FFMPEG_LIBRARY_DIRS})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    target_link_libraries(Codec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
+    target_link_libraries(Strawberry_Codec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
 endif()
 
-add_executable(Codec_Test test/Main.cpp)
-target_include_directories(Codec_Test PRIVATE Codec)
-target_link_libraries(Codec_Test PRIVATE Codec)
+
+
+add_executable(Strawberry_Codec_Test test/Main.cpp)
+target_link_libraries(Strawberry_Codec_Test PRIVATE Strawberry_Codec)
