@@ -31,6 +31,7 @@ endif()
 
 add_library(Strawberry_Codec STATIC
         include/Codec/AudioFile.hpp
+        include/Codec/CodecParameters.hpp
         include/Codec/Decoder.hpp
         include/Codec/Frame.hpp
         include/Codec/Muxer.hpp
