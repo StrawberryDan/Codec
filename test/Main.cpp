@@ -16,16 +16,27 @@ int main()
 
     AudioFile file("data/music.mp3");
     OpusEncoder encoder;
-	std::vector<Frame> frames;
+	std::vector<Packet> packets;
     while (!file.IsEof())
     {
-        auto frame = file.ReadFrame();
-		if (frame)
+        auto packet = file.ReadPacket();
+		if (packet)
 		{
-			frames.push_back(frame.Unwrap());
+			packets.push_back(packet.Unwrap());
 		}
     }
 
+
+	std::vector<Frame> frames;
+	Decoder decoder(file.GetCodec(), file.GetCodecParameters());
+	for (const auto& packet : packets)
+	{
+		auto someFrames = decoder.DecodePacket(packet);
+		for (auto& f : someFrames)
+		{
+			frames.push_back(std::move(f));
+		}
+	}
 
 	Resampler resampler(48000, AV_CHANNEL_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, encoder.Parameters());
 	for (auto& frame : frames)
@@ -33,9 +44,7 @@ int main()
 		frame = resampler.Resample(frame);
 	}
 
-
-
-	std::vector<Packet> packets;
+	packets.clear();
 	for (const auto& frame : frames)
 	{
 		auto somePackets = encoder.Encode(frame);

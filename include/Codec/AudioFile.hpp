@@ -35,19 +35,17 @@ namespace Strawberry::Codec
 		inline       AVFormatContext* operator->()       { return mFile; }
 		inline const AVFormatContext* operator->() const { return mFile; }
 
-		Core::Option<Frame> ReadFrame();
+		Core::Option<Packet> ReadPacket();
 
 		[[nodiscard]] inline bool IsEof() const { return mIsEof; }
 
-	private:
-		Core::Option<Packet> ReadPacket();
+		const AVCodec*           GetCodec() const;
+		const AVCodecParameters* GetCodecParameters() const;
 
+	private:
 		AVFormatContext* mFile;
 		const AVCodec* mCodec;
 		Core::Option<int> mStreamIndex;
 		bool mIsEof;
-
-		Core::Option<Decoder>   mDecoder;
-		std::vector<Frame>      mLeftoverFrames;
 	};
 }

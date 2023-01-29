@@ -20,7 +20,6 @@ namespace Strawberry::Codec
 		, mCodec(nullptr)
 		, mStreamIndex{}
 		, mIsEof(false)
-		, mDecoder()
 	{
 		auto result = avformat_open_input(&mFile, path.c_str(), nullptr, nullptr);
 		Assert(result == 0);
@@ -36,10 +35,10 @@ namespace Strawberry::Codec
 			mStreamIndex = result;
 		}
 
-		result = av_seek_frame(mFile, *mStreamIndex, 0, 0);
+		result = avformat_seek_file(
+				mFile, *mStreamIndex,
+				0, 0, std::numeric_limits<int64_t>::max(), 0);
 		Assert(result >= 0);
-
-		mDecoder   = Decoder(mCodec, mFile->streams[*mStreamIndex]->codecpar);
 	}
 
 
@@ -70,46 +69,6 @@ namespace Strawberry::Codec
 
 
 
-	Core::Option<Frame> AudioFile::ReadFrame()
-	{
-		if (!mLeftoverFrames.empty())
-		{
-			auto frame = std::move(*mLeftoverFrames.begin());
-			mLeftoverFrames.erase(mLeftoverFrames.begin());
-			return frame;
-		}
-
-		if (IsEof())
-		{
-			return {};
-		}
-
-		auto packet = ReadPacket();
-		if (!packet)
-		{
-			return {};
-		}
-
-		auto someFrames = mDecoder->DecodePacket(*packet);
-
-		if (someFrames.empty())
-		{
-			return {};
-		}
-		else if (someFrames.size() == 1)
-		{
-			return someFrames[0];
-		}
-		else
-		{
-			auto result = std::move(someFrames[0]);
-			mLeftoverFrames.insert(mLeftoverFrames.end(), someFrames.begin() + 1, someFrames.end());
-			return result;
-		}
-	}
-
-
-
 	Core::Option<Packet> AudioFile::ReadPacket()
 	{
 		Packet packet;
@@ -134,5 +93,20 @@ namespace Strawberry::Codec
 			case 0:
 				return packet;
 		}
+	}
+
+
+
+	const AVCodec* AudioFile::GetCodec() const
+	{
+		auto codecID = mFile->streams[*mStreamIndex]->codecpar->codec_id;
+		return avcodec_find_decoder(codecID);
+	}
+
+
+
+	const AVCodecParameters* AudioFile::GetCodecParameters() const
+	{
+		return mFile->streams[*mStreamIndex]->codecpar;
 	}
 }
