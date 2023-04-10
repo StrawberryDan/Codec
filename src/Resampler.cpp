@@ -48,7 +48,12 @@ namespace Strawberry::Codec
 
 	Resampler& Resampler::operator=(Resampler&& other) noexcept
 	{
-		mSwrContext = Take(other.mSwrContext);
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+
 		return (*this);
 	}
 
