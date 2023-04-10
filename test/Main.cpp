@@ -12,19 +12,19 @@ using namespace Strawberry::Codec;
 
 int main()
 {
-    av_log_set_level(AV_LOG_DEBUG);
+	av_log_set_level(AV_LOG_DEBUG);
 
-    AudioFile file("data/music.mp3");
-    OpusEncoder encoder;
+	AudioFile file("data/music.mp3");
+	OpusEncoder encoder;
 	std::vector<Packet> packets;
-    while (!file.IsEof())
-    {
-        auto packet = file.ReadPacket();
+	while (!file.IsEof())
+	{
+		auto packet = file.ReadPacket();
 		if (packet)
 		{
 			packets.push_back(packet.Unwrap());
 		}
-    }
+	}
 
 
 	std::vector<Frame> frames;
@@ -55,25 +55,25 @@ int main()
 	}
 
 
-    SodiumEncrypter::Key key;
-    crypto_secretbox_keygen(key.data());
-    std::vector<SodiumEncrypter::EncryptedPacket> encrypted;
-    SodiumEncrypter encrypter(key);
-    for (const auto& packet : packets)
-    {
-        encrypted.push_back(encrypter.Encrypt({ 0 }, packet));
-    }
+	SodiumEncrypter::Key key;
+	crypto_secretbox_keygen(key.data());
+	std::vector<SodiumEncrypter::EncryptedPacket> encrypted;
+	SodiumEncrypter encrypter(key);
+	for (const auto& packet : packets)
+	{
+		encrypted.push_back(encrypter.Encrypt({ 0 }, packet));
+	}
 
 
-    Muxer muxer("output.opus");
-    muxer.OpenStream(encoder.Parameters());
-    muxer.WriteHeader();
-    for (auto& packet : packets)
-    {
-        muxer.WritePacket(packet);
-    }
-    muxer.WriteTrailer();
-    muxer.Flush();
+	Muxer muxer("output.opus");
+	muxer.OpenStream(encoder.Parameters());
+	muxer.WriteHeader();
+	for (auto& packet : packets)
+	{
+		muxer.WritePacket(packet);
+	}
+	muxer.WriteTrailer();
+	muxer.Flush();
 
-    return 0;
+	return 0;
 }
