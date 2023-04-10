@@ -18,10 +18,9 @@ namespace Strawberry::Codec
 
 
 	Frame::Frame(const Frame& other)
-			: mFrame(nullptr)
+		: mFrame(av_frame_clone(other.mFrame))
 	{
 		Core::Assert(other.mFrame != nullptr);
-		mFrame = av_frame_clone(other.mFrame);
 		Core::Assert(mFrame != nullptr);
 	}
 
@@ -29,18 +28,19 @@ namespace Strawberry::Codec
 
 	Frame& Frame::operator=(const Frame& other)
 	{
-		if (this == &other) return (*this);
-		Core::Assert(other.mFrame != nullptr);
-		if (mFrame) av_frame_free(&mFrame);
-		mFrame = av_frame_clone(other.mFrame);
-		Core::Assert(mFrame != nullptr);
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, other);
+		}
+
 		return (*this);
 	}
 
 
 
 	Frame::Frame(Frame&& other) noexcept
-			: Frame()
+		: Frame()
 	{
 		av_frame_unref(mFrame);
 		av_frame_move_ref(mFrame, other.mFrame);
@@ -52,10 +52,12 @@ namespace Strawberry::Codec
 
 	Frame& Frame::operator=(Frame&& other) noexcept
 	{
-		av_frame_unref(mFrame);
-		av_frame_move_ref(mFrame, other.mFrame);
-		Core::Assert(mFrame != nullptr);
-		other.mFrame = nullptr;
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+
 		return (*this);
 	}
 
