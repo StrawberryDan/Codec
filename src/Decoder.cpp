@@ -81,7 +81,8 @@ namespace Strawberry::Codec
 			{
 				frames.push_back(std::move(frame));
 			}
-		} while (receiveResult == 0);
+		}
+		while (receiveResult == 0);
 
 		return frames;
 	}
