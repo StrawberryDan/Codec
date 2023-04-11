@@ -56,15 +56,17 @@ namespace Strawberry::Codec
 
 
 
-	void Muxer::OpenStream(AVCodecParameters* codecParameters)
+	void Muxer::OpenStream(const AVCodecParameters* codecParameters)
 	{
 	    Assert(mStage == Opened);
 	    auto encoder = avcodec_find_encoder(codecParameters->codec_id);
-	    Assert(codecParameters != nullptr);
+
 	    auto stream = avformat_new_stream(mAVFormatContext, encoder);
 	    Assert(stream != nullptr);
+
 	    auto result = avcodec_parameters_copy(stream->codecpar, codecParameters);
 	    Assert(result >= 0);
+
 	    mStreams.push_back(stream);
 	}
 

@@ -28,7 +28,7 @@ namespace Strawberry::Codec
 	    Muxer& operator=(Muxer&& other) noexcept ;
 	    ~Muxer();
 
-	    void OpenStream(AVCodecParameters* codecParameters);
+	    void OpenStream(const AVCodecParameters* codecParameters);
 	    void WriteHeader();
 	    void WritePacket(Packet& packet);
 	    void WriteTrailer();
