@@ -15,22 +15,17 @@ extern "C"
 
 
 
-using Strawberry::Core::Assert;
-
-
-
 namespace Strawberry::Codec
 {
 	OpusEncoder::OpusEncoder()
 		: mContext(nullptr)
 		, mParameters(nullptr)
-		, mPTS(0)
 	{
-		auto opusCodec = avcodec_find_encoder(AV_CODEC_ID_OPUS);
-		Assert(opusCodec != nullptr);
-		Assert(av_codec_is_encoder(opusCodec));
+		const AVCodec* opusCodec = avcodec_find_encoder(AV_CODEC_ID_OPUS);
+		Core::Assert(opusCodec != nullptr);
+		Core::Assert(av_codec_is_encoder(opusCodec));
 		mContext = avcodec_alloc_context3(opusCodec);
-		Assert(mContext != nullptr);
+		Core::Assert(mContext != nullptr);
 		mContext->strict_std_compliance = -2;
 		mContext->sample_rate = opusCodec->supported_samplerates[0];
 		mContext->time_base   = AVRational{1, mContext->sample_rate};
@@ -38,13 +33,13 @@ namespace Strawberry::Codec
 		mContext->ch_layout   = AV_CHANNEL_LAYOUT_STEREO;
 
 		auto result = avcodec_open2(mContext, opusCodec, nullptr);
-		Assert(result == 0);
-		Assert(avcodec_is_open(mContext));
+		Core::Assert(result == 0);
+		Core::Assert(avcodec_is_open(mContext));
 
 		mParameters = avcodec_parameters_alloc();
-		Assert(mParameters != nullptr);
+		Core::Assert(mParameters != nullptr);
 		result = avcodec_parameters_from_context(mParameters, mContext);
-		Assert(result >= 0);
+		Core::Assert(result >= 0);
 
 		mFrameResizer.Emplace(mContext->frame_size);
 	}
@@ -69,14 +64,14 @@ namespace Strawberry::Codec
 		for (auto& resizedFrame : frames)
 		{
 			auto send = avcodec_send_frame(mContext, *resizedFrame);
-			Assert(send == 0);
+			Core::Assert(send == 0);
 
 			int receive;
 			do
 			{
 				Packet packet;
 				receive = avcodec_receive_packet(mContext, *packet);
-				Assert(receive == 0 || receive == AVERROR(EAGAIN));
+				Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
 
 				if (receive == 0)
 				{

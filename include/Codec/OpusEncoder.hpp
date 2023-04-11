@@ -33,7 +33,6 @@ namespace Strawberry::Codec
 	private:
 		AVCodecContext*					mContext;
 		AVCodecParameters*				mParameters;
-		int64_t 						mPTS;
 		Core::Option<AudioFrameResizer>	mFrameResizer;
 	};
 }
