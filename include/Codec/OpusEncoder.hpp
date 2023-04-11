@@ -2,11 +2,12 @@
 
 
 
+#include "AudioFrameResizer.hpp"
+#include "Core/Option.hpp"
+#include "Frame.hpp"
+#include "Packet.hpp"
 #include <cstdint>
 #include <vector>
-#include <optional>
-#include "Packet.hpp"
-#include "Frame.hpp"
 
 
 
@@ -30,8 +31,9 @@ namespace Strawberry::Codec
 
 
 	private:
-		AVCodecContext* mContext;
-		AVCodecParameters *mParameters;
-		int64_t mPTS;
+		AVCodecContext*					mContext;
+		AVCodecParameters*				mParameters;
+		int64_t 						mPTS;
+		Core::Option<AudioFrameResizer>	mFrameResizer;
 	};
 }
