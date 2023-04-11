@@ -1,53 +1,66 @@
 #include "Codec/Packet.hpp"
 
 
+#include "Core/Assert.hpp"
+
+
 
 namespace Strawberry::Codec
 {
 	Packet::Packet()
-	    : mAVPacket(nullptr)
-	{
-	    mAVPacket = av_packet_alloc();
-	}
+		: mAVPacket(av_packet_alloc())
+	{}
 
 
 
 	Packet::Packet(const Packet& other)
-	    : mAVPacket(nullptr)
+		: mAVPacket(av_packet_clone(other.mAVPacket))
 	{
-	    mAVPacket = av_packet_clone(other.mAVPacket);
+		int error = av_packet_make_writable(mAVPacket);
+		Core::Assert(error == 0);
 	}
 
 
 
 	Packet& Packet::operator=(const Packet& other)
 	{
-	    if (this == &other) return (*this);
-	    if (mAVPacket) av_packet_free(&mAVPacket);
-	    mAVPacket = av_packet_clone(other.mAVPacket);
-	    return (*this);
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, other);
+		}
+
+		return *this;
 	}
 
 
 
-	Packet::Packet(Packet&& other)
-	 noexcept     : Packet()
+	Packet::Packet(Packet&& other) noexcept
+		: Packet()
 	{
-	    av_packet_move_ref(mAVPacket, other.mAVPacket);
+		av_packet_move_ref(mAVPacket, other.mAVPacket);
 	}
 
 
 
-	Packet& Packet::operator=(Packet&& other)
-	 noexcept {
-	    av_packet_move_ref(mAVPacket, other.mAVPacket);
-	    return (*this);
+	Packet& Packet::operator=(Packet&& other) noexcept
+	{
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+
+		return (*this);
 	}
 
 
 
 	Packet::~Packet()
 	{
-	    if (mAVPacket) av_packet_free(&mAVPacket);
+		if (mAVPacket)
+		{
+			av_packet_free(&mAVPacket);
+		}
 	}
 }
