@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <utility>
 
 
 
@@ -18,22 +19,31 @@ namespace Strawberry::Codec
 	class Frame
 	{
 	public:
-	    Frame();
-	    Frame(const Frame& other);
-	    Frame& operator=(const Frame& other);
-	    Frame(Frame&& other) noexcept ;
-	    Frame& operator=(Frame&& other) noexcept ;
-	    ~Frame();
+		Frame();
+		Frame(const Frame& other);
+		Frame& operator=(const Frame& other);
+		Frame(Frame&& other) noexcept ;
+		Frame& operator=(Frame&& other) noexcept ;
+		~Frame();
 
 
-	    inline       AVFrame* operator*()        { return mFrame; }
-	    inline const AVFrame* operator*()  const { return mFrame; }
-	    inline       AVFrame* operator->()       { return mFrame; }
-	    inline const AVFrame* operator->() const { return mFrame; }
+		void Append(const Frame& other);
+		std::pair<Frame, Frame> Split(size_t pos) const;
+
+
+		inline       AVFrame* operator*()        { return mFrame; }
+		inline const AVFrame* operator*()  const { return mFrame; }
+		inline       AVFrame* operator->()       { return mFrame; }
+		inline const AVFrame* operator->() const { return mFrame; }
 
 
 
 	private:
-	    AVFrame* mFrame;
+		Frame(AVFrame* frame);
+
+
+
+	private:
+		AVFrame* mFrame;
 	};
 }
