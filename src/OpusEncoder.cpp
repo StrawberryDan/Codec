@@ -36,7 +36,6 @@ namespace Strawberry::Codec
 		mContext->time_base   = AVRational{1, mContext->sample_rate};
 		mContext->sample_fmt  = opusCodec->sample_fmts[0];
 		mContext->ch_layout   = AV_CHANNEL_LAYOUT_STEREO;
-		mContext->bit_rate    = CalculateBitrate(mContext);
 
 		auto result = avcodec_open2(mContext, opusCodec, nullptr);
 		Assert(result == 0);
@@ -87,14 +86,5 @@ namespace Strawberry::Codec
 	AVCodecParameters* OpusEncoder::Parameters() const
 	{
 		return mParameters;
-	}
-
-
-
-	int OpusEncoder::CalculateBitrate(AVCodecContext* context)
-	{
-		auto sampleSize = av_samples_get_buffer_size(nullptr, context->ch_layout.nb_channels, 1, context->sample_fmt, 1);
-		auto trueBitrate = context->sample_rate * sampleSize * 8;
-		return std::clamp(trueBitrate, 500, 512000);1
 	}
 }

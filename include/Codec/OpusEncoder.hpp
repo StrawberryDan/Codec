@@ -30,11 +30,6 @@ namespace Strawberry::Codec
 
 
 	private:
-		static int CalculateBitrate(AVCodecContext* context);
-
-
-
-	private:
 		AVCodecContext* mContext;
 		AVCodecParameters *mParameters;
 		int64_t mPTS;
