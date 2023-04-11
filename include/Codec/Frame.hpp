@@ -28,7 +28,7 @@ namespace Strawberry::Codec
 
 
 		void Append(const Frame& other);
-		std::pair<Frame, Frame> Split(size_t pos) const;
+		[[nodiscard]] std::pair<Frame, Frame> Split(size_t pos) const;
 
 
 		inline       AVFrame* operator*()        { return mFrame; }
