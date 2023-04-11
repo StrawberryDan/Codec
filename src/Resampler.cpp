@@ -71,9 +71,9 @@ namespace Strawberry::Codec
 		Assert(mSwrContext != nullptr);
 
 		Frame output;
-		output->ch_layout = TARGET_CHANNEL_LAYOUT;
-		output->format = TARGET_SAMPLE_FORMAT;
-		output->sample_rate = TARGET_SAMPLE_RATE;
+		output->ch_layout	= TARGET_CHANNEL_LAYOUT;
+		output->format		= TARGET_SAMPLE_FORMAT;
+		output->sample_rate	= TARGET_SAMPLE_RATE;
 		auto result = swr_convert_frame(mSwrContext, *output, *input);
 		Assert(result == 0);
 
@@ -89,7 +89,7 @@ namespace Strawberry::Codec
 		output.reserve(input.size());
 		for (const auto& frame : input)
 		{
-			output.push_back(Resample(frame));
+			output.emplace_back(std::move(Resample(frame)));
 		}
 		return output;
 	}

@@ -14,7 +14,7 @@ int main()
 {
 	av_log_set_level(AV_LOG_DEBUG);
 
-	AudioFile file("data/music.mp3");
+	AudioFile file("data/selen.mp3");
 	OpusEncoder encoder;
 	std::vector<Packet> packets;
 	while (!file.IsEof())
@@ -38,30 +38,22 @@ int main()
 		}
 	}
 
+
 	Resampler resampler(48000, AV_CHANNEL_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, encoder.Parameters());
 	for (auto& frame : frames)
 	{
 		frame = resampler.Resample(frame);
 	}
 
+
 	packets.clear();
-	for (const auto& frame : frames)
+	for (auto& frame : frames)
 	{
 		auto somePackets = encoder.Encode(frame);
 		for (const auto p : somePackets)
 		{
 			packets.push_back(p);
 		}
-	}
-
-
-	SodiumEncrypter::Key key;
-	crypto_secretbox_keygen(key.data());
-	std::vector<SodiumEncrypter::EncryptedPacket> encrypted;
-	SodiumEncrypter encrypter(key);
-	for (const auto& packet : packets)
-	{
-		encrypted.push_back(encrypter.Encrypt({ 0 }, packet));
 	}
 
 
@@ -74,6 +66,16 @@ int main()
 	}
 	muxer.WriteTrailer();
 	muxer.Flush();
+
+
+	SodiumEncrypter::Key key;
+	crypto_secretbox_keygen(key.data());
+	std::vector<SodiumEncrypter::EncryptedPacket> encrypted;
+	SodiumEncrypter encrypter(key);
+	for (const auto& packet : packets)
+	{
+		encrypted.push_back(encrypter.Encrypt({ 0 }, packet));
+	}
 
 	return 0;
 }
