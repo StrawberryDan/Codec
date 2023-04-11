@@ -31,6 +31,10 @@ namespace Strawberry::Codec
 		std::vector<Frame> Resample(const std::vector<Frame>& input);
 
 	private:
-		SwrContext* mSwrContext;
+		const unsigned int			mTargetSampleRate;
+		const AVChannelLayout		mTargetChannelLayout;
+		const AVSampleFormat		mTargetSampleFormat;
+		const AVCodecParameters*	mCodecParameters;
+		SwrContext* 				mSwrContext;
 	};
 }

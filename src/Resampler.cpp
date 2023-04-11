@@ -20,7 +20,11 @@ static constexpr AVSampleFormat  TARGET_SAMPLE_FORMAT  = AV_SAMPLE_FMT_FLTP;
 namespace Strawberry::Codec
 {
 	Resampler::Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat, const AVCodecParameters* codecParameters)
-		: mSwrContext(nullptr)
+		: mTargetSampleRate(targetSampleRate)
+		, mTargetChannelLayout(targetLayout)
+		, mTargetSampleFormat(targetFormat)
+		, mCodecParameters(codecParameters)
+		, mSwrContext(nullptr)
 	{
 		auto source_channel_layout = codecParameters->ch_layout;
 		auto result = swr_alloc_set_opts2(
@@ -39,7 +43,11 @@ namespace Strawberry::Codec
 
 
 	Resampler::Resampler(Resampler&& other) noexcept
-		: mSwrContext(Take(other.mSwrContext))
+		: mTargetSampleRate(other.mTargetSampleRate)
+		, mTargetChannelLayout(std::move(other.mTargetChannelLayout))
+		, mTargetSampleFormat(other.mTargetSampleFormat)
+		, mCodecParameters(other.mCodecParameters)
+		, mSwrContext(Take(other.mSwrContext))
 	{
 
 	}
@@ -71,9 +79,9 @@ namespace Strawberry::Codec
 		Assert(mSwrContext != nullptr);
 
 		Frame output;
-		output->ch_layout	= TARGET_CHANNEL_LAYOUT;
-		output->format		= TARGET_SAMPLE_FORMAT;
-		output->sample_rate	= TARGET_SAMPLE_RATE;
+		output->ch_layout	= mTargetChannelLayout;
+		output->format		= mTargetSampleFormat;
+		output->sample_rate	= mTargetSampleRate;
 		auto result = swr_convert_frame(mSwrContext, *output, *input);
 		Assert(result == 0);
 
