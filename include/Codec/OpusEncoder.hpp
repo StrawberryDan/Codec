@@ -6,6 +6,7 @@
 #include "Core/Option.hpp"
 #include "Frame.hpp"
 #include "Packet.hpp"
+#include "Resampler.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -33,6 +34,7 @@ namespace Strawberry::Codec
 	private:
 		AVCodecContext*					mContext;
 		AVCodecParameters*				mParameters;
+		Core::Option<Resampler>			mFrameResampler;
 		Core::Option<AudioFrameResizer>	mFrameResizer;
 	};
 }

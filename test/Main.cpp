@@ -39,13 +39,6 @@ int main()
 	}
 
 
-	Resampler resampler(48000, AV_CHANNEL_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, encoder.Parameters());
-	for (auto& frame : frames)
-	{
-		frame = resampler.Resample(frame);
-	}
-
-
 	packets.clear();
 	for (auto& frame : frames)
 	{
