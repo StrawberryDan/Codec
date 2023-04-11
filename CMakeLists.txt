@@ -31,6 +31,7 @@ endif()
 
 add_library(Strawberry_Codec STATIC
         include/Codec/AudioFile.hpp
+        include/Codec/AudioFrameResizer.hpp
         include/Codec/CodecParameters.hpp
         include/Codec/Decoder.hpp
         include/Codec/Frame.hpp
@@ -40,14 +41,14 @@ add_library(Strawberry_Codec STATIC
         include/Codec/Resampler.hpp
         include/Codec/SodiumEncrypter.hpp
         src/AudioFile.cpp
+        src/AudioFrameResizer.cpp
         src/Decoder.cpp
         src/Frame.cpp
         src/Muxer.cpp
         src/OpusEncoder.cpp
         src/Packet.cpp
         src/Resampler.cpp
-        src/SodiumEncrypter.cpp
-        )
+        src/SodiumEncrypter.cpp)
 
 target_include_directories(Strawberry_Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
 target_link_libraries(Strawberry_Codec PUBLIC Strawberry_Core ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
