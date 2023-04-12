@@ -3,9 +3,6 @@ project(Strawberry_Codec)
 set(CMAKE_CXX_STANDARD 20)
 find_package(PkgConfig REQUIRED)
 
-add_compile_options(-fsanitize=address)
-add_link_options   (-fsanitize=address)
-
 pkg_check_modules(FFMPEG REQUIRED
         libavcodec
         libavdevice
