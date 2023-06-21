@@ -1,8 +1,8 @@
 #include "Codec/Resampler.hpp"
-#include "Core/Utilities.hpp"
+#include "Strawberry/Core/Utilities.hpp"
 
 
-#include "Core/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 
 
 

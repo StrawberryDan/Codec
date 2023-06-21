@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include "Core/Option.hpp"
+#include "Strawberry/Core/Option.hpp"
 #include "Packet.hpp"
 #include "Decoder.hpp"
 #include "Resampler.hpp"

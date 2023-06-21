@@ -2,14 +2,14 @@
 
 
 
-#include <Core/Assert.hpp>
+#include "Strawberry/Core/Assert.hpp"
 
 
 
 namespace Strawberry::Codec
 {
 	AudioFrameResizer::AudioFrameResizer(size_t sampleCount)
-		: mSampleCount(sampleCount)
+		: mTargetSampleCount(sampleCount)
 	{}
 
 
@@ -19,17 +19,17 @@ namespace Strawberry::Codec
 		mFrameBuffer.push_back(std::move(frame));
 
 		std::vector<Frame> resized;
-		while (BufferedSampleCount() > mSampleCount)
+		while (BufferedSampleCount() > mTargetSampleCount)
 		{
 			Frame rFrame;
 			rFrame->format = mFrameBuffer[0]->format;
 			rFrame->ch_layout = mFrameBuffer[0]->ch_layout;
 
-			while (rFrame->nb_samples < mSampleCount)
+			while (rFrame->nb_samples < mTargetSampleCount)
 			{
 				auto nextBufferedFrame = mFrameBuffer.begin();
 
-				size_t remainingSamplesNeeded = mSampleCount - rFrame->nb_samples;
+				size_t remainingSamplesNeeded = mTargetSampleCount - rFrame->nb_samples;
 				if (remainingSamplesNeeded >= (*nextBufferedFrame)->nb_samples)
 				{
 					// Merge this frame in

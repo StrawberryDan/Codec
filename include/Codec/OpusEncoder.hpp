@@ -3,7 +3,7 @@
 
 
 #include "AudioFrameResizer.hpp"
-#include "Core/Option.hpp"
+#include "Strawberry/Core/Option.hpp"
 #include "Frame.hpp"
 #include "Packet.hpp"
 #include "Resampler.hpp"
