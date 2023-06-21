@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.00)
-project(Strawberry_Codec)
+project(StrawberryCodec)
 set(CMAKE_CXX_STANDARD 20)
 find_package(PkgConfig REQUIRED)
+
 
 pkg_check_modules(FFMPEG REQUIRED
         libavcodec
@@ -14,20 +15,14 @@ pkg_check_modules(FFMPEG REQUIRED
         libswscale)
 
 
-
 find_library(SODIUM_LIBRARY REQUIRED
         NAMES libsodium.a)
 
 
-
-set(STRAWBERRY_CORE_SRC_DIR "" CACHE PATH "Set to the location of Strawberry Core source code to use instead of normal searching")
-if(NOT ${STRAWBERRY_CORE_SRC_DIR} STREQUAL "")
-    add_subdirectory(${STRAWBERRY_CORE_SRC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Strawberry_Core)
-endif()
+add_subdirectory(../Core ${CMAKE_CURRENT_BINARY_DIR}/Core)
 
 
-
-add_library(Strawberry_Codec STATIC
+add_library(StrawberryCodec STATIC
         include/Codec/AudioFile.hpp
         include/Codec/AudioFrameResizer.hpp
         include/Codec/CodecParameters.hpp
@@ -48,15 +43,16 @@ add_library(Strawberry_Codec STATIC
         src/Resampler.cpp
         src/SodiumEncrypter.cpp)
 
-target_include_directories(Strawberry_Codec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
-target_link_libraries(Strawberry_Codec PUBLIC Strawberry_Core ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
-target_link_directories(Strawberry_Codec PUBLIC ${FFMPEG_LIBRARY_DIRS})
+
+target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
+target_link_directories(StrawberryCodec PUBLIC ${FFMPEG_LIBRARY_DIRS})
+
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    target_link_libraries(Strawberry_Codec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
+    target_link_libraries(StrawberryCodec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
 endif()
 
 
-
-add_executable(Strawberry_Codec_Test test/Main.cpp)
-target_link_libraries(Strawberry_Codec_Test PRIVATE Strawberry_Codec)
+add_executable(StrawberryCodecTest test/Main.cpp)
+target_link_libraries(StrawberryCodecTest PRIVATE StrawberryCodec)
