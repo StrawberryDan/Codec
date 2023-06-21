@@ -3,10 +3,10 @@
 
 
 #include "AudioFrameResizer.hpp"
-#include "Strawberry/Core/Option.hpp"
 #include "Frame.hpp"
 #include "Packet.hpp"
 #include "Resampler.hpp"
+#include "Strawberry/Core/Option.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -20,7 +20,8 @@ namespace Strawberry::Codec
 		OpusEncoder();
 		~OpusEncoder();
 
-		std::vector<Packet> Encode(const Frame& frame);
+		std::vector<Packet>  Encode(const Frame& frame);
+		Core::Option<Packet> Flush();
 
 		inline       AVCodecContext* operator*()        { return mContext; }
 		inline const AVCodecContext* operator*()  const { return mContext; }

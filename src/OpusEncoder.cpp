@@ -87,6 +87,18 @@ namespace Strawberry::Codec
 
 
 
+	Core::Option<Packet> OpusEncoder::Flush()
+	{
+		auto lastFrame = mFrameResizer->Flush();
+		if (!lastFrame) return {};
+
+		auto output = Encode({lastFrame.Unwrap()});
+		Core::Assert(output.size() == 1);
+		return std::move(output[0]);
+	}
+
+
+
 	AVCodecParameters* OpusEncoder::Parameters() const
 	{
 		return mParameters;
