@@ -53,6 +53,21 @@ namespace Strawberry::Codec
 
 
 
+	Core::Option<Frame> AudioFrameResizer::Flush()
+	{
+		if (mFrameBuffer.empty()) return {};
+
+		Frame frame;
+		for (const auto& stashFrame : mFrameBuffer)
+		{
+			frame.Append(stashFrame);
+		}
+		mFrameBuffer.clear();
+		return frame;
+	}
+
+
+
 	size_t AudioFrameResizer::BufferedSampleCount() const
 	{
 		size_t samples = 0;

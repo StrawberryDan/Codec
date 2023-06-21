@@ -19,24 +19,18 @@ namespace Strawberry::Codec
 		/// Constructor
 		/// @param sampleCount The number of samples output audio frames should have
 		AudioFrameResizer(size_t sampleCount);
-
-
 		/// Processes an input frame and outputs some number
 		/// output audio frames with the size given in the constructor.
 		/// @param frame The input frame
 		std::vector<Frame> Process(Frame frame);
-
-
-		///
+		/// Flush the frame buffer and return the result
 		Core::Option<Frame> Flush();
-
 
 
 	private:
 		/// Returns the number of samples contained in all the frames
 		/// in the frame buffer.
 		size_t BufferedSampleCount() const;
-
 
 
 	private:
