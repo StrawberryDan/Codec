@@ -14,11 +14,11 @@
 
 namespace Strawberry::Codec
 {
-	class OpusEncoder
+	class Encoder
 	{
 	public:
-		OpusEncoder();
-		~OpusEncoder();
+		Encoder(AVCodecID codecID, AVChannelLayout channelLayout);
+		~Encoder();
 
 		std::vector<Packet>  Encode(const Frame& frame);
 		Core::Option<Packet> Flush();

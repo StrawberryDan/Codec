@@ -1,4 +1,4 @@
-#include "Codec/OpusEncoder.hpp"
+#include "Codec/Encoder.hpp"
 
 
 
@@ -17,22 +17,22 @@ extern "C"
 
 namespace Strawberry::Codec
 {
-	OpusEncoder::OpusEncoder()
+	Encoder::Encoder(AVCodecID codecID, AVChannelLayout channelLayout)
 		: mContext(nullptr)
 		, mParameters(nullptr)
 	{
-		const AVCodec* opusCodec = avcodec_find_encoder(AV_CODEC_ID_OPUS);
-		Core::Assert(opusCodec != nullptr);
-		Core::Assert(av_codec_is_encoder(opusCodec));
-		mContext = avcodec_alloc_context3(opusCodec);
+		const AVCodec* codec = avcodec_find_encoder(codecID);
+		Core::Assert(codec != nullptr);
+		Core::Assert(av_codec_is_encoder(codec));
+		mContext = avcodec_alloc_context3(codec);
 		Core::Assert(mContext != nullptr);
 		mContext->strict_std_compliance = -2;
-		mContext->sample_rate = opusCodec->supported_samplerates[0];
+		mContext->sample_rate = codec->supported_samplerates[0];
 		mContext->time_base   = AVRational{1, mContext->sample_rate};
-		mContext->sample_fmt  = opusCodec->sample_fmts[0];
-		mContext->ch_layout   = AV_CHANNEL_LAYOUT_STEREO;
+		mContext->sample_fmt  = codec->sample_fmts[0];
+		mContext->ch_layout   = channelLayout;
 
-		auto result = avcodec_open2(mContext, opusCodec, nullptr);
+		auto result = avcodec_open2(mContext, codec, nullptr);
 		Core::Assert(result == 0);
 		Core::Assert(avcodec_is_open(mContext));
 
@@ -47,7 +47,7 @@ namespace Strawberry::Codec
 
 
 
-	OpusEncoder::~OpusEncoder()
+	Encoder::~Encoder()
 	{
 		avcodec_parameters_free(&mParameters);
 		avcodec_close(mContext);
@@ -56,7 +56,7 @@ namespace Strawberry::Codec
 
 
 
-	std::vector<Packet> OpusEncoder::Encode(const Frame& frame)
+	std::vector<Packet> Encoder::Encode(const Frame& frame)
 	{
 		std::vector<Packet> packets;
 
@@ -87,7 +87,7 @@ namespace Strawberry::Codec
 
 
 
-	Core::Option<Packet> OpusEncoder::Flush()
+	Core::Option<Packet> Encoder::Flush()
 	{
 		auto lastFrame = mFrameResizer->Flush();
 		if (!lastFrame) return {};
@@ -99,7 +99,7 @@ namespace Strawberry::Codec
 
 
 
-	AVCodecParameters* OpusEncoder::Parameters() const
+	AVCodecParameters* Encoder::Parameters() const
 	{
 		return mParameters;
 	}

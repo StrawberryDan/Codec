@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Codec/AudioFile.hpp"
-#include "Codec/OpusEncoder.hpp"
+#include "Codec/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"
 
@@ -15,7 +15,7 @@ int main()
 	av_log_set_level(AV_LOG_DEBUG);
 
 	AudioFile file("data/selen.mp3");
-	OpusEncoder encoder;
+	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	std::vector<Packet> packets;
 	while (!file.IsEof())
 	{

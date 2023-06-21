@@ -31,7 +31,7 @@ add_library(StrawberryCodec STATIC
         include/Codec/Decoder.hpp
         include/Codec/Frame.hpp
         include/Codec/Muxer.hpp
-        include/Codec/OpusEncoder.hpp
+		include/Codec/Encoder.hpp
         include/Codec/Packet.hpp
         include/Codec/Resampler.hpp
         include/Codec/SodiumEncrypter.hpp
@@ -40,7 +40,7 @@ add_library(StrawberryCodec STATIC
         src/Decoder.cpp
         src/Frame.cpp
         src/Muxer.cpp
-        src/OpusEncoder.cpp
+		src/Encoder.cpp
         src/Packet.cpp
         src/Resampler.cpp
         src/SodiumEncrypter.cpp)
