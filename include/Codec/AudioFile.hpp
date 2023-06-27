@@ -39,8 +39,8 @@ namespace Strawberry::Codec
 
 		[[nodiscard]] inline bool IsEof() const { return mIsEof; }
 
-		const AVCodec*           GetCodec() const;
-		const AVCodecParameters* GetCodecParameters() const;
+		[[nodiscard]] const AVCodec*           GetCodec() const;
+		[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
 
 	private:
 		AVFormatContext* mFile;
