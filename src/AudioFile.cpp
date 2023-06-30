@@ -71,6 +71,8 @@ namespace Strawberry::Codec
 
 	Core::Option<Packet> AudioFile::ReadPacket()
 	{
+		if (IsEof()) return {};
+
 		Packet packet;
 
 		// Read packet, ignoring those from other streams
