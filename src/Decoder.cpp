@@ -38,8 +38,8 @@ namespace Strawberry::Codec
 
 
 	Decoder::Decoder(Decoder&& other) noexcept
-		: mCodecContext(Take(other.mCodecContext))
-		, mParameters(Take(other.mParameters))
+		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
+		, mParameters(std::exchange(other.mParameters, nullptr))
 	{
 
 	}
@@ -48,17 +48,24 @@ namespace Strawberry::Codec
 
 	Decoder& Decoder::operator=(Decoder&& other) noexcept
 	{
-		mCodecContext = Take(other.mCodecContext);
-		mParameters = Take(other.mParameters);
-		return (*this);
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+
+		return *this;
 	}
 
 
 
 	Decoder::~Decoder()
 	{
-		avcodec_close(mCodecContext);
-		avcodec_free_context(&mCodecContext);
+		if (mCodecContext)
+		{
+			avcodec_close(mCodecContext);
+			avcodec_free_context(&mCodecContext);
+		}
 	}
 
 
