@@ -20,7 +20,6 @@ namespace Strawberry::Codec
 	class Decoder
 	{
 	public:
-	    Decoder();
 	    Decoder(const AVCodec* codec, const AVCodecParameters* parameters);
 	    Decoder(const Decoder& other) = delete;
 	    Decoder& operator=(const Decoder& other) = delete;

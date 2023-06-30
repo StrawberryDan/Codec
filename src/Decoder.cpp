@@ -13,13 +13,6 @@ using Strawberry::Core::Take;
 
 namespace Strawberry::Codec
 {
-	Decoder::Decoder()
-		: mCodecContext(nullptr)
-		, mParameters{}
-	{}
-
-
-
 	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)
 		, mParameters(parameters)
