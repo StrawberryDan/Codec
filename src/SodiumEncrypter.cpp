@@ -21,11 +21,10 @@ namespace Strawberry::Codec
 
 
 
-	SodiumEncrypter::EncryptedPacket SodiumEncrypter::Encrypt(Nonce nonce, const Packet& packet)
+	SodiumEncrypter::EncryptedPacket SodiumEncrypter::Encrypt(Nonce nonce, const Core::IO::DynamicByteBuffer& packet)
 	{
-		Encrypted ciphertext;
-		ciphertext.resize(crypto_secretbox_MACBYTES + packet->size);
-		auto result = crypto_secretbox_easy(ciphertext.data(), packet->data, packet->size, nonce.data(), mKey.data());
+		auto ciphertext = Core::IO::DynamicByteBuffer::Zeroes(crypto_secretbox_MACBYTES + packet.Size());
+		auto result = crypto_secretbox_easy(ciphertext.Data(), packet.Data(), packet.Size(), nonce.data(), mKey.data());
 		Assert(result >= 0);
 		return {nonce, ciphertext};
 	}

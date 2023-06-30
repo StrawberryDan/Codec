@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 #include <cstdint>
-#include "Packet.hpp"
+#include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "sodium.h"
 
 
@@ -17,7 +17,7 @@ namespace Strawberry::Codec
 	public:
 		using Key             = std::array<uint8_t, crypto_secretbox_KEYBYTES>;
 		using Nonce           = std::array<uint8_t, crypto_secretbox_NONCEBYTES>;
-		using Encrypted       = std::vector<uint8_t>;
+		using Encrypted       = Core::IO::DynamicByteBuffer;
 		using EncryptedPacket = std::pair<Nonce, Encrypted>;
 
 
@@ -25,7 +25,7 @@ namespace Strawberry::Codec
 	public:
 	    explicit SodiumEncrypter(Key key);
 
-	    EncryptedPacket Encrypt(Nonce nonce, const Packet& packet);
+	    EncryptedPacket Encrypt(Nonce nonce, const Core::IO::DynamicByteBuffer& packet);
 
 
 
