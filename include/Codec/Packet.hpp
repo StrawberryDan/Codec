@@ -25,6 +25,8 @@ namespace Strawberry::Codec
 		Packet& operator=(Packet&& other) noexcept ;
 		~Packet();
 
+		inline operator bool() const { return mAVPacket && mAVPacket->data && mAVPacket->size > 0; }
+
 		inline       AVPacket* operator*()       { return mAVPacket; }
 		inline const AVPacket* operator*() const { return mAVPacket; }
 
