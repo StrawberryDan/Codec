@@ -2,6 +2,10 @@
 
 
 
+#include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+
+
+
 extern "C"
 {
 #include "libavformat/avformat.h"
@@ -26,6 +30,9 @@ namespace Strawberry::Codec
 
 		inline       AVPacket* operator->()       { return mAVPacket; }
 		inline const AVPacket* operator->() const { return mAVPacket; }
+
+		Core::IO::DynamicByteBuffer AsBytes() const;
+
 	private:
 		AVPacket* mAVPacket;
 	};
