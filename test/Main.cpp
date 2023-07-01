@@ -15,7 +15,6 @@ int main()
 	av_log_set_level(AV_LOG_DEBUG);
 
 	AudioFile file("data/selen.mp3");
-	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	std::vector<Packet> packets;
 	while (!file.IsEof())
 	{
@@ -40,6 +39,7 @@ int main()
 
 
 	packets.clear();
+	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	for (auto& frame : frames)
 	{
 		auto somePackets = encoder.Encode(frame);
