@@ -25,7 +25,7 @@ namespace Strawberry::Codec
 				&mSwrContext,
 				&targetLayout,
 				targetFormat,
-				targetSampleRate,
+				static_cast<int>(targetSampleRate),
 				&codecParameters->ch_layout,
 				static_cast<AVSampleFormat>(codecParameters->format),
 				codecParameters->sample_rate,
@@ -38,7 +38,7 @@ namespace Strawberry::Codec
 
 	Resampler::Resampler(Resampler&& other) noexcept
 		: mTargetSampleRate(other.mTargetSampleRate)
-		, mTargetChannelLayout(std::move(other.mTargetChannelLayout))
+		, mTargetChannelLayout(other.mTargetChannelLayout)
 		, mTargetSampleFormat(other.mTargetSampleFormat)
 		, mCodecParameters(other.mCodecParameters)
 		, mSwrContext(Take(other.mSwrContext))
@@ -75,7 +75,7 @@ namespace Strawberry::Codec
 		Frame output;
 		output->ch_layout	= mTargetChannelLayout;
 		output->format		= mTargetSampleFormat;
-		output->sample_rate	= mTargetSampleRate;
+		output->sample_rate	= static_cast<int>(mTargetSampleRate);
 		auto result = swr_convert_frame(mSwrContext, *output, *input);
 		Assert(result == 0);
 
