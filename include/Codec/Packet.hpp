@@ -19,6 +19,7 @@ namespace Strawberry::Codec
 	{
 	public:
 		Packet();
+		Packet(const uint8_t* data, size_t len);
 		Packet(const Packet& other);
 		Packet& operator=(const Packet& other);
 		Packet(Packet&& other) noexcept ;

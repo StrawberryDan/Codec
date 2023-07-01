@@ -12,6 +12,15 @@ namespace Strawberry::Codec
 	{}
 
 
+	Packet::Packet(const uint8_t *data, size_t len)
+		: Packet()
+	{
+		auto avData = av_malloc(len);
+		memcpy(avData, data, len);
+		auto result = av_packet_from_data(mAVPacket, static_cast<uint8_t*>(avData), static_cast<int>(len));
+		Core::Assert(result == 0);
+	}
+
 
 	Packet::Packet(const Packet& other)
 		: mAVPacket(av_packet_clone(other.mAVPacket))
