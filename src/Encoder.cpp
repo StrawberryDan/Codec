@@ -41,7 +41,7 @@ namespace Strawberry::Codec
 		result = avcodec_parameters_from_context(mParameters, mContext);
 		Core::Assert(result >= 0);
 
-		mFrameResampler.Emplace(mContext->sample_rate, mContext->ch_layout, mContext->sample_fmt, mParameters);
+		mFrameResampler.Emplace(mContext->sample_rate, mContext->ch_layout, mContext->sample_fmt);
 		mFrameResizer.Emplace(mContext->frame_size);
 	}
 

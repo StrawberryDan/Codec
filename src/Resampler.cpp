@@ -13,26 +13,12 @@ using Strawberry::Core::Take;
 
 namespace Strawberry::Codec
 {
-	Resampler::Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat, const AVCodecParameters* codecParameters)
+	Resampler::Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat)
 		: mTargetSampleRate(targetSampleRate)
 		, mTargetChannelLayout(targetLayout)
 		, mTargetSampleFormat(targetFormat)
-		, mCodecParameters(codecParameters)
 		, mSwrContext(nullptr)
-	{
-		auto source_channel_layout = codecParameters->ch_layout;
-		auto result = swr_alloc_set_opts2(
-				&mSwrContext,
-				&targetLayout,
-				targetFormat,
-				static_cast<int>(targetSampleRate),
-				&codecParameters->ch_layout,
-				static_cast<AVSampleFormat>(codecParameters->format),
-				codecParameters->sample_rate,
-				0,
-				nullptr);
-		Assert(result == 0);
-	}
+	{}
 
 
 
@@ -40,11 +26,8 @@ namespace Strawberry::Codec
 		: mTargetSampleRate(other.mTargetSampleRate)
 		, mTargetChannelLayout(other.mTargetChannelLayout)
 		, mTargetSampleFormat(other.mTargetSampleFormat)
-		, mCodecParameters(other.mCodecParameters)
 		, mSwrContext(Take(other.mSwrContext))
-	{
-
-	}
+	{}
 
 
 
@@ -63,21 +46,38 @@ namespace Strawberry::Codec
 
 	Resampler::~Resampler()
 	{
-		swr_free(&mSwrContext);
+		if (mSwrContext) swr_free(&mSwrContext);
 	}
 
 
 
 	Frame Resampler::Resample(const Frame& input)
 	{
+		auto result = swr_alloc_set_opts2(
+				&mSwrContext,
+				&mTargetChannelLayout,
+				mTargetSampleFormat,
+				static_cast<int>(mTargetSampleRate),
+				&input->ch_layout,
+				static_cast<AVSampleFormat>(input->format),
+				input->sample_rate,
+				0,
+				nullptr);
+		Assert(result == 0);
+
 		Assert(mSwrContext != nullptr);
 
 		Frame output;
 		output->ch_layout	= mTargetChannelLayout;
 		output->format		= mTargetSampleFormat;
 		output->sample_rate	= static_cast<int>(mTargetSampleRate);
-		auto result = swr_convert_frame(mSwrContext, *output, *input);
+		result = swr_convert_frame(mSwrContext, *output, *input);
 		Assert(result == 0);
+		Assert(output->ch_layout.nb_channels == mTargetChannelLayout.nb_channels);
+		Assert(output->ch_layout.order == mTargetChannelLayout.order);
+		Assert(output->format == mTargetSampleFormat);
+		Assert(output->sample_rate == mTargetSampleRate);
+
 
 		return output;
 	}

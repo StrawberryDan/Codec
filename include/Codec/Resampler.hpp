@@ -20,7 +20,7 @@ namespace Strawberry::Codec
 	class Resampler
 	{
 	public:
-		Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat, const AVCodecParameters* codecParameters);
+		Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat);
 		Resampler(const Resampler& other) = delete;
 		Resampler& operator=(const Resampler& other) = delete;
 		Resampler(Resampler&& other) noexcept ;
@@ -34,7 +34,6 @@ namespace Strawberry::Codec
 		const unsigned int			mTargetSampleRate;
 		const AVChannelLayout		mTargetChannelLayout;
 		const AVSampleFormat		mTargetSampleFormat;
-		const AVCodecParameters*	mCodecParameters;
 		SwrContext* 				mSwrContext;
 	};
 }
