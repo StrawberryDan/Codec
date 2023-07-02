@@ -39,7 +39,9 @@ namespace Strawberry::Codec
 
 
 		Core::Option<Filter*> AddInput(const std::string& args);
+		Filter*               GetInput(unsigned int index);
 		Core::Option<Filter*> AddOutput(const std::string& args);
+		Filter*               GetOutput(unsigned int index);
 
 
 		Core::Option<Filter*> AddFilter(const std::string& filter, const std::string& name, const std::string& args);

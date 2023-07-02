@@ -83,6 +83,12 @@ namespace Strawberry::Codec
 	}
 
 
+	Filter* FilterGraph::GetInput(unsigned int index)
+	{
+		return &mInputs[index];
+	}
+
+
 	Core::Option<Filter*> FilterGraph::AddOutput(const std::string& args)
 	{
 		Filter filter;
@@ -102,6 +108,12 @@ namespace Strawberry::Codec
 
 		mInputs.emplace_back(std::move(filter));
 		return &mInputs.back();
+	}
+
+
+	Filter* FilterGraph::GetOutput(unsigned int index)
+	{
+		return &mOutputs[index];
 	}
 
 
