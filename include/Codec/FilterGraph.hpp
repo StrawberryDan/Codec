@@ -72,7 +72,7 @@ namespace Strawberry::Codec
 
 
 	private:
-		std::mutex mMutex;
+		std::mutex mGraphInteractionMutex;
 
 		MediaType mMediaType;
 		AVFilterGraph* mFilterGraph;

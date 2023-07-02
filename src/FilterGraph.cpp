@@ -218,7 +218,7 @@ namespace Strawberry::Codec
 				auto frame = mInputFrameBuffers[i].Lock()->Pop();
 				if (frame)
 				{
-					std::unique_lock<std::mutex> lock(mMutex);
+					std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 					auto result = av_buffersrc_add_frame(*mInputs[i], **frame);
 					Core::Assert(result == 0);
 				}
@@ -229,7 +229,7 @@ namespace Strawberry::Codec
 			for (int i = 0; i < mOutputs.size(); i++)
 			{
 				Frame frame;
-				std::unique_lock<std::mutex> lock(mMutex);
+				std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 				auto result = av_buffersink_get_frame(*mOutputs[i], *frame);
 				Core::Assert(result == 0 || AVERROR(EAGAIN));
 
@@ -249,7 +249,7 @@ namespace Strawberry::Codec
 
 		if (mWarmingUp) return true;
 
-		std::unique_lock<std::mutex> lock(mMutex);
+		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 		Frame frame;
 		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(*mOutputs[index]), *frame, AV_BUFFERSINK_FLAG_PEEK);
 		switch (result)
