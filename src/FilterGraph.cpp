@@ -274,7 +274,7 @@ namespace Strawberry::Codec
 	{
 		while (mRunning)
 		{
-			for (int i = 0; i < mInputs.size(); i++)
+			for (auto [i, source] : GetInputPairs())
 			{
 				auto frame = mInputFrameBuffers[i].Lock()->Pop();
 				if (frame)
@@ -282,24 +282,24 @@ namespace Strawberry::Codec
 					std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 					if (Configure())
 					{
-						Core::Assert(mInputs.at(i).GetSampleRate()    == (*frame)->sample_rate);
-						Core::Assert(mInputs.at(i).GetSampleFormat()  == (*frame)->format);
-						Core::Assert(mInputs.at(i).GetChannelCount()  == (*frame)->ch_layout.nb_channels);
-						Core::Assert(mInputs.at(i).GetChannelLayout() == (*frame)->channel_layout);
-						mInputs.at(i).SendFrame(*frame);
+						Core::Assert(source->GetSampleRate()    == (*frame)->sample_rate);
+						Core::Assert(source->GetSampleFormat()  == (*frame)->format);
+						Core::Assert(source->GetChannelCount()  == (*frame)->ch_layout.nb_channels);
+						Core::Assert(source->GetChannelLayout() == (*frame)->channel_layout);
+						source->SendFrame(*frame);
 					}
 				}
 			}
 
 			mWarmingUp = false;
 
-			for (int i = 0; i < mOutputs.size(); i++)
+			for (auto [i, sink] : GetOutputPairs())
 			{
 
 				std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 				if (Configure())
 				{
-					auto frame = mOutputs.at(i).ReadFrame();
+					auto frame = sink->ReadFrame();
 
 					if (frame)
 					{
