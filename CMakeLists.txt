@@ -48,7 +48,9 @@ add_library(StrawberryCodec STATIC
 		include/Codec/FilterGraph.hpp
 		src/Filter.cpp
 		include/Codec/Filter.hpp
-		include/Codec/Constants.hpp)
+		include/Codec/Constants.hpp
+		src/AudioMixer.cpp
+		include/Codec/AudioMixer.hpp)
 
 
 target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
