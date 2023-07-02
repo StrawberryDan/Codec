@@ -54,6 +54,9 @@ namespace Strawberry::Codec
 		if (mFilterGraph)
 		{
 			Stop();
+			mInputs.clear();
+			mOutputs.clear();
+			mFilters.clear();
 			avfilter_graph_free(&mFilterGraph);
 		}
 	}

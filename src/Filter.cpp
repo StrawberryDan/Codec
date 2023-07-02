@@ -32,7 +32,7 @@ namespace Strawberry::Codec
 
 	Filter::~Filter()
 	{
-
+		avfilter_free(mFilterContext);
 	}
 
 
