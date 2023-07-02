@@ -104,7 +104,6 @@ namespace Strawberry::Codec
 		filter.mChannelLayout = channelLayout;
 
 		mInputs.emplace(index, std::move(filter));
-		mInputFrameBuffers.emplace_back();
 		return &mInputs.at(index);
 	}
 
@@ -119,6 +118,7 @@ namespace Strawberry::Codec
 	void FilterGraph::RemoveInput(unsigned int index)
 	{
 		mInputs.erase(index);
+		mInputFrameBuffers.erase(index);
 		mConfigurationDirty = true;
 	}
 
@@ -146,7 +146,6 @@ namespace Strawberry::Codec
 		if (result < 0) return {};
 
 		mOutputs.emplace(index, std::move(filter));
-		mOutputFrameBuffers.emplace_back();
 		return &mOutputs.at(index);
 	}
 
@@ -316,7 +315,7 @@ namespace Strawberry::Codec
 
 		if (mWarmingUp) return true;
 
-		for (auto& buffer : mInputFrameBuffers)
+		for (auto& [i, buffer] : mInputFrameBuffers)
 		{
 			if (buffer.Lock()->Size() > 0) return true;
 		}

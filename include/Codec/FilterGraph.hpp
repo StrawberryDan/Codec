@@ -91,7 +91,7 @@ namespace Strawberry::Codec
 		std::map<unsigned int, BufferSink> mOutputs;
 		std::vector<Core::Option<Frame>> mNextOutputs;
 
-		using FrameBuffer = std::vector<Core::Mutex<Core::Collection::DynamicCircularBuffer<Frame>>>;
+		using FrameBuffer = std::map<unsigned int, Core::Mutex<Core::Collection::DynamicCircularBuffer<Frame>>>;
 		FrameBuffer mInputFrameBuffers;
 		FrameBuffer mOutputFrameBuffers;
 
