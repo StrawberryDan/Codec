@@ -58,11 +58,15 @@ namespace Strawberry::Codec
 		Core::Option<Frame> RecvFrame(unsigned int outputIndex);
 
 
+	protected:
+		void                      Stop();
+
+
 	private:
 		Core::Mutex<bool>         mRunning;
 		Core::Option<std::thread> mThread;
 		void                      Run();
-		void                      Stop();
+
 
 
 	private:
