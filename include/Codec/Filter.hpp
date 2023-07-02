@@ -49,7 +49,7 @@ namespace Strawberry::Codec
 		explicit BufferSource(std::mutex* graphMutex);
 
 
-		void SendFrame(Codec::Frame& frame);
+		void SendFrame(Codec::Frame frame);
 
 
 		uint64_t GetSampleRate() const;

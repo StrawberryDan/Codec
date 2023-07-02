@@ -72,7 +72,7 @@ namespace Strawberry::Codec
 			: Filter(graphMutex) {}
 
 
-	void BufferSource::SendFrame(Frame& frame)
+	void BufferSource::SendFrame(Frame frame)
 	{
 		auto result = av_buffersrc_add_frame(mFilterContext, *frame);
 		Core::Assert(result == 0);
