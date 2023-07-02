@@ -3,11 +3,18 @@
 #include "Codec/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"
+#include "Strawberry/Core/Logging.hpp"
+
+
+extern "C"
+{
+#include "libavfilter/avfilter.h"
+}
 
 
 
 using namespace Strawberry::Codec;
-
+using namespace Strawberry;
 
 
 int main()
@@ -28,10 +35,10 @@ int main()
 
 	std::vector<Frame> frames;
 	Decoder decoder(file.GetCodec(), file.GetCodecParameters());
-	for (const auto& packet : packets)
+	for (const auto& packet: packets)
 	{
 		auto someFrames = decoder.DecodePacket(packet);
-		for (auto& f : someFrames)
+		for (auto& f: someFrames)
 		{
 			frames.push_back(std::move(f));
 		}
@@ -40,10 +47,10 @@ int main()
 
 	packets.clear();
 	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
-	for (auto& frame : frames)
+	for (auto& frame: frames)
 	{
 		auto somePackets = encoder.Encode(frame);
-		for (const auto p : somePackets)
+		for (const auto p: somePackets)
 		{
 			packets.push_back(p);
 		}
@@ -53,22 +60,12 @@ int main()
 	Muxer muxer("output.opus");
 	muxer.OpenStream(encoder.Parameters());
 	muxer.WriteHeader();
-	for (auto& packet : packets)
+	for (auto& packet: packets)
 	{
 		muxer.WritePacket(packet);
 	}
 	muxer.WriteTrailer();
 	muxer.Flush();
-
-
-	SodiumEncrypter::Key key;
-	crypto_secretbox_keygen(key.data());
-	std::vector<SodiumEncrypter::EncryptedPacket> encrypted;
-	SodiumEncrypter encrypter(key);
-	for (const auto& packet : packets)
-	{
-		encrypted.push_back(encrypter.Encrypt({ 0 }, packet));
-	}
 
 	return 0;
 }
