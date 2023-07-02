@@ -21,32 +21,32 @@ namespace Strawberry::Codec
 			: mMediaType(type), mFilterGraph(avfilter_graph_alloc()) {}
 
 
-	FilterGraph::FilterGraph(FilterGraph&& rhs)
-	{
-		auto wasRunning = *rhs.mRunning.Lock();
-		if (wasRunning) rhs.Stop();
+//	FilterGraph::FilterGraph(FilterGraph&& rhs)
+//	{
+//		auto wasRunning = *rhs.mRunning.Lock();
+//		if (wasRunning) rhs.Stop();
+//
+//		mMediaType = rhs.mMediaType;
+//		mFilterGraph = std::exchange(rhs.mFilterGraph, nullptr);
+//		mInputs = std::move(rhs.mInputs);
+//		mOutputs = std::move(rhs.mOutputs);
+//		mInputFrameBuffers = std::move(rhs.mInputFrameBuffers);
+//		mOutputFrameBuffers = std::move(rhs.mOutputFrameBuffers);
+//
+//		if (wasRunning) Start();
+//	}
 
-		mMediaType = rhs.mMediaType;
-		mFilterGraph = std::exchange(rhs.mFilterGraph, nullptr);
-		mInputs = std::move(rhs.mInputs);
-		mOutputs = std::move(rhs.mOutputs);
-		mInputFrameBuffers = std::move(rhs.mInputFrameBuffers);
-		mOutputFrameBuffers = std::move(rhs.mOutputFrameBuffers);
 
-		if (wasRunning) Start();
-	}
-
-
-	FilterGraph& FilterGraph::operator=(FilterGraph&& rhs)
-	{
-		if (this != &rhs)
-		{
-			std::destroy_at(this);
-			std::construct_at(this, std::move(rhs));
-		}
-
-		return *this;
-	}
+//	FilterGraph& FilterGraph::operator=(FilterGraph&& rhs)
+//	{
+//		if (this != &rhs)
+//		{
+//			std::destroy_at(this);
+//			std::construct_at(this, std::move(rhs));
+//		}
+//
+//		return *this;
+//	}
 
 
 	FilterGraph::~FilterGraph()
@@ -64,6 +64,8 @@ namespace Strawberry::Codec
 
 	Core::Option<Filter*> FilterGraph::AddInput(const std::string& args)
 	{
+		mConfigurationDirty = true;
+
 		Filter filter;
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
@@ -95,6 +97,8 @@ namespace Strawberry::Codec
 
 	Core::Option<Filter*> FilterGraph::AddOutput(const std::string& args)
 	{
+		mConfigurationDirty = true;
+
 		Filter filter;
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
@@ -140,6 +144,8 @@ namespace Strawberry::Codec
 	Core::Option<Filter*>
 	FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
 	{
+		mConfigurationDirty = true;
+
 		Core::Assert(!name.starts_with("input-"));
 		Core::Assert(!name.starts_with("output-"));
 
@@ -167,10 +173,18 @@ namespace Strawberry::Codec
 	}
 
 
-	void FilterGraph::Configure()
+	bool FilterGraph::Configure()
 	{
-		auto result = avfilter_graph_config(mFilterGraph, nullptr);
-		Core::Assert(result >= 0);
+		if (mConfigurationDirty)
+		{
+			Stop();
+			auto result = avfilter_graph_config(mFilterGraph, nullptr);
+			Start();
+			mConfigurationValid = result >= 0;
+			mConfigurationDirty = false;
+		}
+
+		return mConfigurationValid;
 	}
 
 
@@ -182,32 +196,40 @@ namespace Strawberry::Codec
 
 	Core::Option<Frame> FilterGraph::RecvFrame(unsigned int outputIndex)
 	{
-		Core::Assert(*mRunning.Lock());
+		if (!Configure()) return {};
+
 		auto result = mOutputFrameBuffers[outputIndex].Lock()->Pop();
-		//if (result) Core::Logging::Debug("{}:{}\t{}\tTaking a frame from output buffer {} with size {}", __FILE__, __LINE__,
-		//								reinterpret_cast<void*>(this), outputIndex, mOutputFrameBuffers[outputIndex].Lock()->Size() + 1);
+		while (!result)
+		{
+			std::this_thread::yield();
+			result = mOutputFrameBuffers[outputIndex].Lock()->Pop();
+		}
+
 		return result;
 	}
 
 
 	void FilterGraph::Run()
 	{
-		while (*mRunning.Lock())
+		while (mRunning)
 		{
 			for (int i = 0; i < mInputs.size(); i++)
 			{
 				auto frame = mInputFrameBuffers[i].Lock()->Pop();
 				if (frame)
 				{
+					std::unique_lock<std::mutex> lock(mMutex);
 					auto result = av_buffersrc_add_frame(*mInputs[i], **frame);
 					Core::Assert(result == 0);
 				}
 			}
 
+			mWarmingUp = false;
 
 			for (int i = 0; i < mOutputs.size(); i++)
 			{
 				Frame frame;
+				std::unique_lock<std::mutex> lock(mMutex);
 				auto result = av_buffersink_get_frame(*mOutputs[i], *frame);
 				Core::Assert(result == 0 || AVERROR(EAGAIN));
 
@@ -220,23 +242,45 @@ namespace Strawberry::Codec
 	}
 
 
+	bool FilterGraph::OutputAvailable(unsigned int index)
+	{
+		if (!Configure()) return false;
+		Core::Assert(mRunning);
+
+		if (mWarmingUp) return true;
+
+		std::unique_lock<std::mutex> lock(mMutex);
+		Frame frame;
+		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(*mOutputs[index]), *frame, AV_BUFFERSINK_FLAG_PEEK);
+		switch (result)
+		{
+			case 0: return true;
+			case AVERROR(EAGAIN): break;
+			default: Core::Unreachable();
+		}
+
+		if (mOutputFrameBuffers[index].Lock()->Size() > 0) return true;
+
+		return false;
+	}
+
+
 	void FilterGraph::Start()
 	{
-		auto running = mRunning.Lock();
-		if (!*running)
+		if (!mRunning)
 		{
-			*running = true;
+			mRunning = true;
 			mThread.Emplace(std::bind(&FilterGraph::Run, this));
+			mWarmingUp = true;
 		}
 	}
 
 
 	void FilterGraph::Stop()
 	{
-		auto running = *mRunning.Lock();
-		if (running)
+		if (mRunning)
 		{
-			*mRunning.Lock() = false;
+			mRunning = false;
 			mThread->join();
 			mThread.Reset();
 		}

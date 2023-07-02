@@ -18,7 +18,9 @@ namespace Strawberry::Codec
 	AudioMixer::AudioMixer(unsigned int channelCount)
 		: FilterGraph(MediaType::Audio)
 	{
-		AddFilter("amix", "mixer", fmt::format("inputs={}", channelCount)).Unwrap();
+		auto mixer = AddFilter("amix", "mixer", fmt::format("inputs={}", channelCount)).Unwrap();
+		auto output = AddOutput("").Unwrap();
+		mixer->Link(*output, 0, 0);
 	}
 
 
@@ -45,15 +47,9 @@ namespace Strawberry::Codec
 
 	Core::Option<Frame> AudioMixer::RecvFrame()
 	{
-		if (GetOutputCount() == 0)
-		{
-			Stop();
-			auto output = AddOutput("").Unwrap();
-			auto mixer = GetFilter("mixer").Unwrap();
-			mixer->Link(*output, 0, 0);
-			Configure();
-			Start();
-		}
+#if !NDEBUG
+		Configure();
+#endif // !NDEBUG
 
 		auto result = FilterGraph::RecvFrame(0);
 		return result;

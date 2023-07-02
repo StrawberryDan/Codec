@@ -33,8 +33,8 @@ namespace Strawberry::Codec
 		FilterGraph(MediaType type);
 		FilterGraph(const FilterGraph&) = delete;
 		FilterGraph& operator=(const FilterGraph&) = delete;
-		FilterGraph(FilterGraph&&);
-		FilterGraph& operator=(FilterGraph&&);
+		FilterGraph(FilterGraph&&) = delete;
+		FilterGraph& operator=(FilterGraph&&) = delete;
 		~FilterGraph();
 
 
@@ -50,8 +50,9 @@ namespace Strawberry::Codec
 		Core::Option<Filter*> GetFilter(const std::string& name);
 
 
-		void Configure();
+		bool Configure();
 		void Start();
+		bool OutputAvailable(unsigned int index);
 
 
 		void SendFrame(unsigned int inputIndex, Frame frame);
@@ -63,21 +64,29 @@ namespace Strawberry::Codec
 
 
 	private:
-		Core::Mutex<bool>         mRunning;
+		std::atomic<bool>         mRunning;
 		Core::Option<std::thread> mThread;
 		void                      Run();
+		std::atomic<bool>         mWarmingUp;
 
 
 
 	private:
+		std::mutex mMutex;
+
 		MediaType mMediaType;
 		AVFilterGraph* mFilterGraph;
 		std::unordered_map<std::string, Filter> mFilters;
 		std::vector<Filter> mInputs;
 		std::vector<Filter> mOutputs;
+		std::vector<Core::Option<Frame>> mNextOutputs;
 
 		using FrameBuffer = std::vector<Core::Mutex<Core::Collection::DynamicCircularBuffer<Frame>>>;
 		FrameBuffer mInputFrameBuffers;
 		FrameBuffer mOutputFrameBuffers;
+
+
+		bool mConfigurationValid = false;
+		bool mConfigurationDirty = true;
 	};
 }

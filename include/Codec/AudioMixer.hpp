@@ -23,5 +23,8 @@ namespace Strawberry::Codec
 
 		void SendFrame(unsigned int channel, Frame frame);
 		Core::Option<Frame> RecvFrame();
+
+
+		bool OutputAvailable() { return FilterGraph::OutputAvailable(0); }
 	};
 }
