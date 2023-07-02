@@ -151,10 +151,6 @@ namespace Strawberry::Codec
 												   mFilterGraph);
 		if (result < 0) return {};
 
-#if NDEBUG
-		Configure();
-#endif // NDEBUG
-
 		mFilters[name] = std::move(filter);
 		return &mFilters[name];
 	}
@@ -187,7 +183,10 @@ namespace Strawberry::Codec
 	Core::Option<Frame> FilterGraph::RecvFrame(unsigned int outputIndex)
 	{
 		Core::Assert(*mRunning.Lock());
-		return mOutputFrameBuffers[outputIndex].Lock()->Pop();
+		auto result = mOutputFrameBuffers[outputIndex].Lock()->Pop();
+		//if (result) Core::Logging::Debug("{}:{}\t{}\tTaking a frame from output buffer {} with size {}", __FILE__, __LINE__,
+		//								reinterpret_cast<void*>(this), outputIndex, mOutputFrameBuffers[outputIndex].Lock()->Size() + 1);
+		return result;
 	}
 
 
