@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <vector>
 #include <thread>
+#include <map>
 /// Strawberry Libraries
 #include "Strawberry/Core/Mutex.hpp"
 #include "Strawberry/Core/Option.hpp"
@@ -38,16 +39,25 @@ namespace Strawberry::Codec
 		~FilterGraph();
 
 
-		Core::Option<Filter*> AddInput(const std::string& args);
-		Filter*               GetInput(unsigned int index);
-		Core::Option<Filter*> AddOutput(const std::string& args);
-		Filter*               GetOutput(unsigned int index);
-		size_t                GetInputCount() const;
-		size_t                GetOutputCount() const;
+		Core::Option<BufferSource*>
+		AddAudioInput(unsigned int index, uint64_t sampleRate, uint64_t sampleFormat,
+					  uint64_t channelCount,
+					  uint64_t channelLayout);
+		BufferSource*               GetInput(unsigned int index);
+		void                        RemoveInput(unsigned int index);
+		Core::Option<BufferSink*>   AddOutput(unsigned int index, const std::string& args);
+		BufferSink*                 GetOutput(unsigned int index);
+		size_t                      GetInputCount() const;
+		size_t                      GetOutputCount() const;
+
+
+		std::vector<std::pair<unsigned int, BufferSource*>> GetInputPairs();
+		std::vector<std::pair<unsigned int, BufferSink*>>   GetOutputPairs();
 
 
 		Core::Option<Filter*> AddFilter(const std::string& filter, const std::string& name, const std::string& args);
 		Core::Option<Filter*> GetFilter(const std::string& name);
+		void                  RemoveFilter(const std::string& name);
 
 
 		bool Configure();
@@ -77,8 +87,8 @@ namespace Strawberry::Codec
 		MediaType mMediaType;
 		AVFilterGraph* mFilterGraph;
 		std::unordered_map<std::string, Filter> mFilters;
-		std::vector<Filter> mInputs;
-		std::vector<Filter> mOutputs;
+		std::map<unsigned int, BufferSource> mInputs;
+		std::map<unsigned int, BufferSink> mOutputs;
 		std::vector<Core::Option<Frame>> mNextOutputs;
 
 		using FrameBuffer = std::vector<Core::Mutex<Core::Collection::DynamicCircularBuffer<Frame>>>;
@@ -86,7 +96,7 @@ namespace Strawberry::Codec
 		FrameBuffer mOutputFrameBuffers;
 
 
-		bool mConfigurationValid = false;
-		bool mConfigurationDirty = true;
+		std::atomic<bool> mConfigurationValid = false;
+		std::atomic<bool> mConfigurationDirty = true;
 	};
 }

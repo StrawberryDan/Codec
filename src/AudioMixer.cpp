@@ -15,30 +15,34 @@ extern "C"
 
 namespace Strawberry::Codec
 {
-	AudioMixer::AudioMixer(unsigned int channelCount)
+	AudioMixer::AudioMixer()
 		: FilterGraph(MediaType::Audio)
 	{
-		auto mixer = AddFilter("amix", "mixer", fmt::format("inputs={}", channelCount)).Unwrap();
-		auto output = AddOutput("").Unwrap();
-		mixer->Link(*output, 0, 0);
+		auto output = AddOutput(0, "").Unwrap();
+		SetUpMixer(0);
 	}
 
 
 	void AudioMixer::SendFrame(unsigned int channel, Frame frame)
 	{
-		Core::Assert(channel <= GetInputCount());
-		if (channel == GetInputCount())
+		if (channel >= mMixerSize)
 		{
-			Stop();
-			Filter* newInput = nullptr;
-			if (frame->channel_layout != 0)
-				newInput = AddInput(fmt::format("sample_fmt={}:sample_rate={}:channel_layout={}", frame->format, frame->sample_rate, frame->channel_layout)).Unwrap();
-			else
-				newInput = AddInput(fmt::format("sample_fmt={}:channels={}:sample_rate={}", frame->format, frame->ch_layout.nb_channels, frame->sample_rate)).Unwrap();
-			auto formatter = AddFilter("aformat", fmt::format("formatter-{}", GetInputCount() - 1), "channel_layouts=stereo").Unwrap();
+			SetUpMixer(channel + 1);
+		}
+
+
+		BufferSource* source = GetInput(channel);
+		if (GetInput(channel) == nullptr || source->GetSampleRate() != frame->sample_rate || source->GetSampleFormat() != frame->format || source->GetChannelCount() != frame->ch_layout.nb_channels || source->GetChannelLayout() != frame->channel_layout)
+		{
+			if (GetInput(channel))
+				RemoveInput(channel);
+			Filter* newInput = AddAudioInput(channel, frame->sample_rate, frame->format, frame->ch_layout.nb_channels, frame->channel_layout).Unwrap();
+			// RemoveFilter(fmt::format("formatter-{}", channel));
+			// auto formatter = AddFilter("aformat", fmt::format("formatter-{}", GetInputCount() - 1), "channel_layouts=stereo").Unwrap();
 			auto mixer = GetFilter("mixer").Unwrap();
-			newInput->Link(*formatter, 0, 0);
-			formatter->Link(*mixer, 0, GetInputCount() - 1);
+			newInput->Link(*mixer, 0, channel);
+			// newInput->Link(*formatter, 0, 0);
+			// formatter->Link(*mixer, 0, channel);
 		}
 
 		FilterGraph::SendFrame(channel, std::move(frame));
@@ -53,5 +57,21 @@ namespace Strawberry::Codec
 
 		auto result = FilterGraph::RecvFrame(0);
 		return result;
+	}
+
+
+	void AudioMixer::SetUpMixer(unsigned int inputCount)
+	{
+		inputCount = std::max<unsigned int>(2, inputCount);
+		RemoveFilter("mixer");
+		auto mixer = AddFilter("amix", "mixer", fmt::format("inputs={}", inputCount)).Unwrap();
+		mixer->Link(*GetOutput(0), 0, 0);
+
+		for (auto& [i, input] : GetInputPairs())
+		{
+			input->Link(*mixer, 0, i);
+		}
+
+		mMixerSize = inputCount;
 	}
 }

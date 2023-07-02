@@ -6,16 +6,21 @@
 #include "Strawberry/Core/Assert.hpp"
 /// Standard Library
 #include <memory>
+#include <Strawberry/Core/Option.hpp>
 
 
 namespace Strawberry::Codec
 {
-	Filter::Filter()
-			: mFilterContext(nullptr) {}
+	Filter::Filter(std::mutex* graphMutex)
+			: mFilterContext(nullptr)
+			, mGraphMutex(graphMutex) {
+		Core::Assert(graphMutex != nullptr);
+	}
 
 
 	Filter::Filter(Filter&& rhs)
-			: mFilterContext(std::exchange(rhs.mFilterContext, nullptr)) {}
+			: mFilterContext(std::exchange(rhs.mFilterContext, nullptr))
+			, mGraphMutex(rhs.mGraphMutex){}
 
 
 	Filter& Filter::operator=(Filter&& rhs)
@@ -50,7 +55,40 @@ namespace Strawberry::Codec
 
 	void Filter::Link(Filter& consumer, unsigned int srcPad, unsigned int dstPad)
 	{
+		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = avfilter_link(**this, srcPad, *consumer, dstPad);
 		Core::Assert(result == 0);
 	}
+
+
+	BufferSource::BufferSource(std::mutex* graphMutex)
+			: Filter(graphMutex) {}
+
+
+	uint64_t BufferSource::GetSampleRate() const
+	{
+		return mSampleRate;
+	}
+
+
+	uint64_t BufferSource::GetSampleFormat() const
+	{
+		return mSampleFormat;
+	}
+
+
+	uint64_t BufferSource::GetChannelCount() const
+	{
+		return mChannelCount;
+	}
+
+
+	uint64_t BufferSource::GetChannelLayout() const
+	{
+		return mChannelLayout;
+	}
+
+
+	BufferSink::BufferSink(std::mutex* graphMutex)
+			: Filter(graphMutex) {}
 }

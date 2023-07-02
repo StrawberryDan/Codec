@@ -18,7 +18,7 @@ namespace Strawberry::Codec
 			: private FilterGraph
 	{
 	public:
-		AudioMixer(unsigned int channelCount);
+		AudioMixer();
 
 
 		void SendFrame(unsigned int channel, Frame frame);
@@ -26,5 +26,10 @@ namespace Strawberry::Codec
 
 
 		bool OutputAvailable() { return FilterGraph::OutputAvailable(0); }
+
+
+	private:
+		void SetUpMixer(unsigned int inputCount);
+		unsigned int mMixerSize = 2;
 	};
 }

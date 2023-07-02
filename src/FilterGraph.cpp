@@ -62,11 +62,14 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Option<Filter*> FilterGraph::AddInput(const std::string& args)
+	Core::Option<BufferSource*>
+	FilterGraph::AddAudioInput(unsigned int index, uint64_t sampleRate, uint64_t sampleFormat,
+							   uint64_t channelCount,
+							   uint64_t channelLayout)
 	{
 		mConfigurationDirty = true;
 
-		Filter filter;
+		BufferSource filter(&mGraphInteractionMutex);
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
@@ -79,27 +82,51 @@ namespace Strawberry::Codec
 			default:
 				Core::Unreachable();
 		}
+
+		std::string args;
+		if (channelLayout != 0)
+		{
+			args = fmt::format("sample_rate={}:sample_fmt={}:channel_layout={}:channels={}", sampleRate,
+									sampleFormat, channelLayout, channelCount);
+		}
+		else
+		{
+			args = fmt::format("sample_rate={}:sample_fmt={}:channels={}", sampleRate,
+							   sampleFormat, channelCount);
+		}
+
 		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("input-{}", mInputs.size()).c_str(),
 												   args.c_str(), nullptr, mFilterGraph);
 		if (result < 0) return {};
+		filter.mSampleRate = sampleRate;
+		filter.mSampleFormat = sampleFormat;
+		filter.mChannelCount = channelCount;
+		filter.mChannelLayout = channelLayout;
 
-		mInputs.emplace_back(std::move(filter));
+		mInputs.emplace(index, std::move(filter));
 		mInputFrameBuffers.emplace_back();
-		return &mInputs.back();
+		return &mInputs.at(index);
 	}
 
 
-	Filter* FilterGraph::GetInput(unsigned int index)
+	BufferSource* FilterGraph::GetInput(unsigned int index)
 	{
-		return &mInputs[index];
+		if (!mInputs.contains(index)) return nullptr;
+		return &mInputs.at(index);
 	}
 
 
-	Core::Option<Filter*> FilterGraph::AddOutput(const std::string& args)
+	void FilterGraph::RemoveInput(unsigned int index)
+	{
+		mInputs.erase(index);
+	}
+
+
+	Core::Option<BufferSink*> FilterGraph::AddOutput(unsigned int index, const std::string& args)
 	{
 		mConfigurationDirty = true;
 
-		Filter filter;
+		BufferSink filter(&mGraphInteractionMutex);
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
@@ -117,15 +144,16 @@ namespace Strawberry::Codec
 												   nullptr, mFilterGraph);
 		if (result < 0) return {};
 
-		mOutputs.emplace_back(std::move(filter));
+		mOutputs.emplace(index, std::move(filter));
 		mOutputFrameBuffers.emplace_back();
-		return &mOutputs.back();
+		return &mOutputs.at(index);
 	}
 
 
-	Filter* FilterGraph::GetOutput(unsigned int index)
+	BufferSink* FilterGraph::GetOutput(unsigned int index)
 	{
-		return &mOutputs[index];
+		if (!mOutputs.contains(index)) return nullptr;
+		return &mOutputs.at(index);
 	}
 
 
@@ -141,15 +169,39 @@ namespace Strawberry::Codec
 	}
 
 
+	std::vector<std::pair<unsigned int, BufferSource*>> FilterGraph::GetInputPairs()
+	{
+		std::vector<std::pair<unsigned int, BufferSource*>> result;
+		for (auto& [i, buffer] : mInputs)
+		{
+			result.emplace_back(i, &buffer);
+		}
+		return result;
+	}
+
+
+	std::vector<std::pair<unsigned int, BufferSink*>> FilterGraph::GetOutputPairs()
+	{
+		std::vector<std::pair<unsigned int, BufferSink*>> result;
+		for (auto& [i, buffer] : mOutputs)
+		{
+			result.emplace_back(i, &buffer);
+		}
+		return result;
+	}
+
+
 	Core::Option<Filter*>
 	FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
 	{
+		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
+
 		mConfigurationDirty = true;
 
 		Core::Assert(!name.starts_with("input-"));
 		Core::Assert(!name.starts_with("output-"));
 
-		Filter filter;
+		Filter filter(&mGraphInteractionMutex);
 
 		auto filterPtr = avfilter_get_by_name(filterId.c_str());
 		if (!filterPtr) return {};
@@ -157,19 +209,28 @@ namespace Strawberry::Codec
 												   mFilterGraph);
 		if (result < 0) return {};
 
-		mFilters[name] = std::move(filter);
-		return &mFilters[name];
+		mFilters.emplace(name, std::move(filter));
+		return &mFilters.at(name);
 	}
 
 
 	Core::Option<Filter*> FilterGraph::GetFilter(const std::string& name)
 	{
+		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
+
 		if (mFilters.contains(name))
 		{
-			return &mFilters[name];
+			return &mFilters.at(name);
 		}
 
 		return {};
+	}
+
+
+	void FilterGraph::RemoveFilter(const std::string& name)
+	{
+		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
+		mFilters.erase(name);
 	}
 
 
@@ -219,8 +280,16 @@ namespace Strawberry::Codec
 				if (frame)
 				{
 					std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-					auto result = av_buffersrc_add_frame(*mInputs[i], **frame);
-					Core::Assert(result == 0);
+					if (Configure())
+					{
+						Core::Assert(mInputs.at(i).GetSampleRate()    == (*frame)->sample_rate);
+						Core::Assert(mInputs.at(i).GetSampleFormat()  == (*frame)->format);
+						Core::Assert(mInputs.at(i).GetChannelCount()  == (*frame)->ch_layout.nb_channels);
+						Core::Assert(mInputs.at(i).GetChannelLayout() == (*frame)->channel_layout);
+
+						auto result = av_buffersrc_add_frame(*mInputs.at(i), **frame);
+						Core::Assert(result == 0);
+					}
 				}
 			}
 
@@ -230,12 +299,15 @@ namespace Strawberry::Codec
 			{
 				Frame frame;
 				std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-				auto result = av_buffersink_get_frame(*mOutputs[i], *frame);
-				Core::Assert(result == 0 || AVERROR(EAGAIN));
-
-				if (result == 0)
+				if (Configure())
 				{
-					mOutputFrameBuffers[i].Lock()->Push(std::move(frame));
+					auto result = av_buffersink_get_frame(*mOutputs.at(i), *frame);
+					Core::Assert(result == 0 || AVERROR(EAGAIN));
+
+					if (result == 0)
+					{
+						mOutputFrameBuffers[i].Lock()->Push(std::move(frame));
+					}
 				}
 			}
 		}
@@ -251,7 +323,7 @@ namespace Strawberry::Codec
 
 		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 		Frame frame;
-		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(*mOutputs[index]), *frame, AV_BUFFERSINK_FLAG_PEEK);
+		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(*mOutputs.at(index)), *frame, AV_BUFFERSINK_FLAG_PEEK);
 		switch (result)
 		{
 			case 0: return true;
