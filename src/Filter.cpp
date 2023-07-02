@@ -2,6 +2,8 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Codec/Filter.hpp"
+/// Strawberry Libraries
+#include "Strawberry/Core/Assert.hpp"
 /// Standard Library
 #include <memory>
 
@@ -52,5 +54,6 @@ namespace Strawberry::Codec
 	void Filter::Link(Filter& consumer, unsigned int srcPad, unsigned int dstPad)
 	{
 		auto result = avfilter_link(**this, srcPad, *consumer, dstPad);
+		Core::Assert(result == 0);
 	}
 }
