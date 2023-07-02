@@ -119,6 +119,9 @@ namespace Strawberry::Codec
 
 	Core::Option<Filter*> FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
 	{
+		Core::Assert(!name.starts_with("input-"));
+		Core::Assert(!name.starts_with("output-"));
+
 		Filter filter;
 
 		auto filterPtr = avfilter_get_by_name(filterId.c_str());
