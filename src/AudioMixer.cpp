@@ -39,7 +39,7 @@ namespace Strawberry::Codec
 			formatter->Link(*mixer, 0, GetInputCount() - 1);
 		}
 
-		FilterGraph::SendFrame(channel, frame);
+		FilterGraph::SendFrame(channel, std::move(frame));
 	}
 
 
