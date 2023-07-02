@@ -18,9 +18,7 @@ extern "C"
 namespace Strawberry::Codec
 {
 	FilterGraph::FilterGraph(MediaType type)
-		: mMediaType(type)
-		, mFilterGraph(avfilter_graph_alloc())
-	{}
+			: mMediaType(type), mFilterGraph(avfilter_graph_alloc()) {}
 
 
 	FilterGraph::FilterGraph(FilterGraph&& rhs)
@@ -28,11 +26,11 @@ namespace Strawberry::Codec
 		auto wasRunning = *rhs.mRunning.Lock();
 		if (wasRunning) rhs.Stop();
 
-		mMediaType          = rhs.mMediaType;
-		mFilterGraph        = std::exchange(rhs.mFilterGraph, nullptr);
-		mInputs             = std::move(rhs.mInputs);
-		mOutputs            = std::move(rhs.mOutputs);
-		mInputFrameBuffers  = std::move(rhs.mInputFrameBuffers);
+		mMediaType = rhs.mMediaType;
+		mFilterGraph = std::exchange(rhs.mFilterGraph, nullptr);
+		mInputs = std::move(rhs.mInputs);
+		mOutputs = std::move(rhs.mOutputs);
+		mInputFrameBuffers = std::move(rhs.mInputFrameBuffers);
 		mOutputFrameBuffers = std::move(rhs.mOutputFrameBuffers);
 
 		if (wasRunning) Start();
@@ -67,11 +65,17 @@ namespace Strawberry::Codec
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
-			case MediaType::Audio: filterPtr = avfilter_get_by_name("abuffer"); break;
-			case MediaType::Video: filterPtr = avfilter_get_by_name("buffer");  break;
-			default: Core::Unreachable();
+			case MediaType::Audio:
+				filterPtr = avfilter_get_by_name("abuffer");
+				break;
+			case MediaType::Video:
+				filterPtr = avfilter_get_by_name("buffer");
+				break;
+			default:
+				Core::Unreachable();
 		}
-		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("input-{}", mInputs.size()).c_str(), args.c_str(), nullptr, mFilterGraph);
+		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("input-{}", mInputs.size()).c_str(),
+												   args.c_str(), nullptr, mFilterGraph);
 		if (result < 0) return {};
 
 #if NDEBUG
@@ -95,11 +99,18 @@ namespace Strawberry::Codec
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
-			case MediaType::Audio: filterPtr = avfilter_get_by_name("abuffersink"); break;
-			case MediaType::Video: filterPtr = avfilter_get_by_name("buffersink");  break;
-			default: Core::Unreachable();
+			case MediaType::Audio:
+				filterPtr = avfilter_get_by_name("abuffersink");
+				break;
+			case MediaType::Video:
+				filterPtr = avfilter_get_by_name("buffersink");
+				break;
+			default:
+				Core::Unreachable();
 		}
-		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("output-{}", mInputs.size()).c_str(), args.c_str(), nullptr, mFilterGraph);
+		auto result = avfilter_graph_create_filter(&*filter, filterPtr,
+												   fmt::format("output-{}", mInputs.size()).c_str(), args.c_str(),
+												   nullptr, mFilterGraph);
 		if (result < 0) return {};
 
 #if NDEBUG
@@ -117,7 +128,20 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Option<Filter*> FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
+	size_t FilterGraph::GetInputCount() const
+	{
+		return mInputs.size();
+	}
+
+
+	size_t FilterGraph::GetOutputCount() const
+	{
+		return mOutputs.size();
+	}
+
+
+	Core::Option<Filter*>
+	FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
 	{
 		Core::Assert(!name.starts_with("input-"));
 		Core::Assert(!name.starts_with("output-"));
@@ -126,7 +150,8 @@ namespace Strawberry::Codec
 
 		auto filterPtr = avfilter_get_by_name(filterId.c_str());
 		if (!filterPtr) return {};
-		auto result = avfilter_graph_create_filter(&*filter, filterPtr, name.c_str(), args.c_str(), nullptr, mFilterGraph);
+		auto result = avfilter_graph_create_filter(&*filter, filterPtr, name.c_str(), args.c_str(), nullptr,
+												   mFilterGraph);
 		if (result < 0) return {};
 
 #if NDEBUG
