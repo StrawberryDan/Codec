@@ -32,10 +32,9 @@ namespace Strawberry::Codec
 		void Link(Filter& consumer, unsigned int srcPad, unsigned int dstPad);
 
 
-	private:
-		std::mutex*      mGraphMutex;
 	protected:
 		AVFilterContext* mFilterContext;
+		std::mutex*      mGraphMutex;
 	};
 
 

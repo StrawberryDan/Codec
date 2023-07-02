@@ -44,7 +44,11 @@ namespace Strawberry::Codec
 
 	Filter::~Filter()
 	{
-		avfilter_free(mFilterContext);
+		if (mFilterContext)
+		{
+			std::unique_lock<std::mutex> lock(*mGraphMutex);
+			avfilter_free(mFilterContext);
+		}
 	}
 
 
@@ -74,6 +78,7 @@ namespace Strawberry::Codec
 
 	void BufferSource::SendFrame(Frame frame)
 	{
+		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = av_buffersrc_add_frame(mFilterContext, *frame);
 		Core::Assert(result == 0);
 	}
@@ -110,6 +115,7 @@ namespace Strawberry::Codec
 	Core::Option<Frame> BufferSink::ReadFrame()
 	{
 		Frame frame;
+		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = av_buffersink_get_frame(mFilterContext, *frame);
 		switch (result)
 		{

@@ -119,6 +119,7 @@ namespace Strawberry::Codec
 	void FilterGraph::RemoveInput(unsigned int index)
 	{
 		mInputs.erase(index);
+		mConfigurationDirty = true;
 	}
 
 
@@ -229,7 +230,6 @@ namespace Strawberry::Codec
 
 	void FilterGraph::RemoveFilter(const std::string& name)
 	{
-		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 		mFilters.erase(name);
 	}
 
@@ -238,6 +238,7 @@ namespace Strawberry::Codec
 	{
 		if (mConfigurationDirty)
 		{
+			std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 			Stop();
 			auto result = avfilter_graph_config(mFilterGraph, nullptr);
 			Start();
@@ -279,8 +280,7 @@ namespace Strawberry::Codec
 				auto frame = mInputFrameBuffers[i].Lock()->Pop();
 				if (frame)
 				{
-					std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-					if (Configure())
+					if (mConfigurationValid && !mConfigurationDirty)
 					{
 						Core::Assert(source->GetSampleRate()    == (*frame)->sample_rate);
 						Core::Assert(source->GetSampleFormat()  == (*frame)->format);
@@ -295,9 +295,7 @@ namespace Strawberry::Codec
 
 			for (auto [i, sink] : GetOutputPairs())
 			{
-
-				std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-				if (Configure())
+				if (mConfigurationValid && !mConfigurationDirty)
 				{
 					auto frame = sink->ReadFrame();
 
@@ -317,6 +315,11 @@ namespace Strawberry::Codec
 		Core::Assert(mRunning);
 
 		if (mWarmingUp) return true;
+
+		for (auto& buffer : mInputFrameBuffers)
+		{
+			if (buffer.Lock()->Size() > 0) return true;
+		}
 
 		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 		Frame frame;
@@ -349,7 +352,9 @@ namespace Strawberry::Codec
 	{
 		if (mRunning)
 		{
+			Core::Assert(mThread.HasValue());
 			mRunning = false;
+			Core::Assert(mThread->joinable());
 			mThread->join();
 			mThread.Reset();
 		}
