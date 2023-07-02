@@ -83,6 +83,7 @@ namespace Strawberry::Codec
 #endif // NDEBUG
 
 		mInputs.emplace_back(std::move(filter));
+		mInputFrameBuffers.emplace_back();
 		return &mInputs.back();
 	}
 
@@ -117,8 +118,9 @@ namespace Strawberry::Codec
 		Configure();
 #endif // NDEBUG
 
-		mInputs.emplace_back(std::move(filter));
-		return &mInputs.back();
+		mOutputs.emplace_back(std::move(filter));
+		mOutputFrameBuffers.emplace_back();
+		return &mOutputs.back();
 	}
 
 
@@ -183,7 +185,6 @@ namespace Strawberry::Codec
 
 	void FilterGraph::SendFrame(unsigned int inputIndex, Frame frame)
 	{
-		Core::Assert(*mRunning.Lock());
 		mInputFrameBuffers[inputIndex].Lock()->Push(std::move(frame));
 	}
 
