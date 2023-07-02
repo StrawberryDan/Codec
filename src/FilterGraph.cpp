@@ -231,10 +231,10 @@ namespace Strawberry::Codec
 
 	void FilterGraph::Stop()
 	{
-		auto running = mRunning.Lock();
-		if (*running)
+		auto running = *mRunning.Lock();
+		if (running)
 		{
-			*running = false;
+			*mRunning.Lock() = false;
 			mThread->join();
 			mThread.Reset();
 		}
