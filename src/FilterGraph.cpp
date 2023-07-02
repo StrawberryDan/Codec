@@ -286,9 +286,7 @@ namespace Strawberry::Codec
 						Core::Assert(mInputs.at(i).GetSampleFormat()  == (*frame)->format);
 						Core::Assert(mInputs.at(i).GetChannelCount()  == (*frame)->ch_layout.nb_channels);
 						Core::Assert(mInputs.at(i).GetChannelLayout() == (*frame)->channel_layout);
-
-						auto result = av_buffersrc_add_frame(*mInputs.at(i), **frame);
-						Core::Assert(result == 0);
+						mInputs.at(i).SendFrame(*frame);
 					}
 				}
 			}
@@ -297,16 +295,15 @@ namespace Strawberry::Codec
 
 			for (int i = 0; i < mOutputs.size(); i++)
 			{
-				Frame frame;
+
 				std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
 				if (Configure())
 				{
-					auto result = av_buffersink_get_frame(*mOutputs.at(i), *frame);
-					Core::Assert(result == 0 || AVERROR(EAGAIN));
+					auto frame = mOutputs.at(i).ReadFrame();
 
-					if (result == 0)
+					if (frame)
 					{
-						mOutputFrameBuffers[i].Lock()->Push(std::move(frame));
+						mOutputFrameBuffers[i].Lock()->Push(frame.Take());
 					}
 				}
 			}

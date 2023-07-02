@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include "Strawberry/Core/Option.hpp"
+#include "Frame.hpp"
 
 
 extern "C"
@@ -32,8 +33,9 @@ namespace Strawberry::Codec
 
 
 	private:
-		AVFilterContext* mFilterContext;
 		std::mutex*      mGraphMutex;
+	protected:
+		AVFilterContext* mFilterContext;
 	};
 
 
@@ -45,6 +47,9 @@ namespace Strawberry::Codec
 
 	public:
 		explicit BufferSource(std::mutex* graphMutex);
+
+
+		void SendFrame(Codec::Frame& frame);
 
 
 		uint64_t GetSampleRate() const;
@@ -69,9 +74,12 @@ namespace Strawberry::Codec
 		explicit BufferSink(std::mutex* graphMutex);
 
 
+		Core::Option<Codec::Frame> ReadFrame();
+
+
 		uint64_t GetSampleRate() const;
 		uint64_t GetSampleFormat() const;
-		uint64_t& GetChannelCount() const;
-		uint64_t& GetChannelLayout() const;
+		int GetChannelCount() const;
+		unsigned long long int GetChannelLayout() const;
 	};
 }
