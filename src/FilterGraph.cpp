@@ -78,10 +78,6 @@ namespace Strawberry::Codec
 												   args.c_str(), nullptr, mFilterGraph);
 		if (result < 0) return {};
 
-#if NDEBUG
-		Configure();
-#endif // NDEBUG
-
 		mInputs.emplace_back(std::move(filter));
 		mInputFrameBuffers.emplace_back();
 		return &mInputs.back();
@@ -113,10 +109,6 @@ namespace Strawberry::Codec
 												   fmt::format("output-{}", mInputs.size()).c_str(), args.c_str(),
 												   nullptr, mFilterGraph);
 		if (result < 0) return {};
-
-#if NDEBUG
-		Configure();
-#endif // NDEBUG
 
 		mOutputs.emplace_back(std::move(filter));
 		mOutputFrameBuffers.emplace_back();
