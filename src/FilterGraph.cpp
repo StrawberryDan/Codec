@@ -99,7 +99,7 @@ namespace Strawberry::Codec
 			case MediaType::Video: filterPtr = avfilter_get_by_name("buffersink");  break;
 			default: Core::Unreachable();
 		}
-		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("input-{}", mInputs.size()).c_str(), args.c_str(), nullptr, mFilterGraph);
+		auto result = avfilter_graph_create_filter(&*filter, filterPtr, fmt::format("output-{}", mInputs.size()).c_str(), args.c_str(), nullptr, mFilterGraph);
 		if (result < 0) return {};
 
 #if NDEBUG
