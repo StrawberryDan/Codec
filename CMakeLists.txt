@@ -13,6 +13,7 @@ pkg_check_modules(FFMPEG REQUIRED
 		libpostproc
 		libswresample
 		libswscale)
+message(STATUS "Using FFMPEG found at ${FFMPEG_LIBRARY_DIRS}")
 
 
 find_library(SODIUM_LIBRARY REQUIRED
