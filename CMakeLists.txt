@@ -20,7 +20,7 @@ find_library(SODIUM_LIBRARY REQUIRED
 		NAMES libsodium.a)
 
 
-if(NOT TARGET StrawberryCore AND EXISTS ../Core AND IS_DIRECTORY ../Core)
+if(NOT TARGET StrawberryCore AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../Core AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
 	add_subdirectory(../Core ${CMAKE_CURRENT_BINARY_DIR}/Core)
 endif()
 
