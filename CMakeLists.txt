@@ -62,7 +62,7 @@ target_compile_definitions(StrawberryCodec PUBLIC __STDC_CONSTANT_MACROS)
 
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	target_link_libraries(StrawberryCodec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices")
+	target_link_libraries(StrawberryCodec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices" "-framework CoreImage" "-framework CoreGraphics" "-framework VideoToolbox" "-framework OpenGL" "-framework Metal" "-framework Foundation" "-framework AppKit")
 endif()
 
 
