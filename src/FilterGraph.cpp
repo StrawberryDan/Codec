@@ -53,7 +53,6 @@ namespace Strawberry::Codec
 	{
 		if (mFilterGraph)
 		{
-			Stop();
 			mInputs.clear();
 			mOutputs.clear();
 			mFilters.clear();
@@ -69,7 +68,7 @@ namespace Strawberry::Codec
 	{
 		mConfigurationDirty = true;
 
-		BufferSource filter(&mGraphInteractionMutex);
+		BufferSource filter;
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
@@ -118,7 +117,6 @@ namespace Strawberry::Codec
 	void FilterGraph::RemoveInput(unsigned int index)
 	{
 		mInputs.erase(index);
-		mInputFrameBuffers.erase(index);
 		mConfigurationDirty = true;
 	}
 
@@ -127,7 +125,7 @@ namespace Strawberry::Codec
 	{
 		mConfigurationDirty = true;
 
-		BufferSink filter(&mGraphInteractionMutex);
+		BufferSink filter;
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
@@ -194,14 +192,12 @@ namespace Strawberry::Codec
 	Core::Option<Filter*>
 	FilterGraph::AddFilter(const std::string& filterId, const std::string& name, const std::string& args)
 	{
-		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-
 		mConfigurationDirty = true;
 
 		Core::Assert(!name.starts_with("input-"));
 		Core::Assert(!name.starts_with("output-"));
 
-		Filter filter(&mGraphInteractionMutex);
+		Filter filter;
 
 		auto filterPtr = avfilter_get_by_name(filterId.c_str());
 		if (!filterPtr) return {};
@@ -216,8 +212,6 @@ namespace Strawberry::Codec
 
 	Core::Option<Filter*> FilterGraph::GetFilter(const std::string& name)
 	{
-		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-
 		if (mFilters.contains(name))
 		{
 			return &mFilters.at(name);
@@ -237,10 +231,7 @@ namespace Strawberry::Codec
 	{
 		if (mConfigurationDirty)
 		{
-			std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-			Stop();
 			auto result = avfilter_graph_config(mFilterGraph, nullptr);
-			Start();
 			mConfigurationValid = result >= 0;
 			mConfigurationDirty = false;
 		}
@@ -251,111 +242,23 @@ namespace Strawberry::Codec
 
 	void FilterGraph::SendFrame(unsigned int inputIndex, Frame frame)
 	{
-		mInputFrameBuffers[inputIndex].Lock()->Push(std::move(frame));
+		auto configure = Configure();
+		Core::Assert(configure);
+		mInputs.at(inputIndex).SendFrame(std::move(frame));
 	}
 
 
 	Core::Option<Frame> FilterGraph::RecvFrame(unsigned int outputIndex)
 	{
 		if (!Configure()) return {};
-
-		auto result = mOutputFrameBuffers[outputIndex].Lock()->Pop();
-		while (!result)
-		{
-			std::this_thread::yield();
-			result = mOutputFrameBuffers[outputIndex].Lock()->Pop();
-		}
-
-		return result;
-	}
-
-
-	void FilterGraph::Run()
-	{
-		while (mRunning)
-		{
-			for (auto [i, source] : GetInputPairs())
-			{
-				auto frame = mInputFrameBuffers[i].Lock()->Pop();
-				if (frame)
-				{
-					if (mConfigurationValid && !mConfigurationDirty)
-					{
-						Core::Assert(source->GetSampleRate()    == (*frame)->sample_rate);
-						Core::Assert(source->GetSampleFormat()  == (*frame)->format);
-						Core::Assert(source->GetChannelCount()  == (*frame)->ch_layout.nb_channels);
-						Core::Assert(source->GetChannelLayout() == (*frame)->channel_layout);
-						source->SendFrame(*frame);
-					}
-				}
-			}
-
-			mWarmingUp = false;
-
-			for (auto [i, sink] : GetOutputPairs())
-			{
-				if (mConfigurationValid && !mConfigurationDirty)
-				{
-					auto frame = sink->ReadFrame();
-
-					if (frame)
-					{
-						mOutputFrameBuffers[i].Lock()->Push(frame.Take());
-					}
-				}
-			}
-		}
+		return mOutputs.at(outputIndex).ReadFrame();
 	}
 
 
 	bool FilterGraph::OutputAvailable(unsigned int index)
 	{
 		if (!Configure()) return false;
-		Core::Assert(mRunning);
-
-		if (mWarmingUp) return true;
-
-		for (auto& [i, buffer] : mInputFrameBuffers)
-		{
-			if (buffer.Lock()->Size() > 0) return true;
-		}
-
-		std::unique_lock<std::mutex> lock(mGraphInteractionMutex);
-		Frame frame;
-		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(*mOutputs.at(index)), *frame, AV_BUFFERSINK_FLAG_PEEK);
-		switch (result)
-		{
-			case 0: return true;
-			case AVERROR(EAGAIN): break;
-			default: Core::Unreachable();
-		}
-
-		if (mOutputFrameBuffers[index].Lock()->Size() > 0) return true;
-
+		if (mOutputs.at(index).OutputAvailable()) return true;
 		return false;
-	}
-
-
-	void FilterGraph::Start()
-	{
-		if (!mRunning)
-		{
-			mRunning = true;
-			mThread.Emplace(std::bind(&FilterGraph::Run, this));
-			mWarmingUp = true;
-		}
-	}
-
-
-	void FilterGraph::Stop()
-	{
-		if (mRunning)
-		{
-			Core::Assert(mThread.HasValue());
-			mRunning = false;
-			Core::Assert(mThread->joinable());
-			mThread->join();
-			mThread.Reset();
-		}
 	}
 }

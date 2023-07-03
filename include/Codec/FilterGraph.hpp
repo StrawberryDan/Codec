@@ -61,7 +61,6 @@ namespace Strawberry::Codec
 
 
 		bool Configure();
-		void Start();
 		bool OutputAvailable(unsigned int index);
 
 
@@ -69,34 +68,16 @@ namespace Strawberry::Codec
 		Core::Option<Frame> RecvFrame(unsigned int outputIndex);
 
 
-	protected:
-		void                      Stop();
-
 
 	private:
-		std::atomic<bool>         mRunning;
-		Core::Option<std::thread> mThread;
-		void                      Run();
-		std::atomic<bool>         mWarmingUp;
-
-
-
-	private:
-		std::mutex mGraphInteractionMutex;
-
 		MediaType mMediaType;
 		AVFilterGraph* mFilterGraph;
 		std::unordered_map<std::string, Filter> mFilters;
 		std::map<unsigned int, BufferSource> mInputs;
 		std::map<unsigned int, BufferSink> mOutputs;
-		std::vector<Core::Option<Frame>> mNextOutputs;
-
-		using FrameBuffer = std::map<unsigned int, Core::Mutex<Core::Collection::DynamicCircularBuffer<Frame>>>;
-		FrameBuffer mInputFrameBuffers;
-		FrameBuffer mOutputFrameBuffers;
 
 
-		std::atomic<bool> mConfigurationValid = false;
-		std::atomic<bool> mConfigurationDirty = true;
+		bool mConfigurationValid = false;
+		bool mConfigurationDirty = true;
 	};
 }

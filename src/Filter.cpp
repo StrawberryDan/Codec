@@ -18,16 +18,13 @@ extern "C"
 
 namespace Strawberry::Codec
 {
-	Filter::Filter(std::mutex* graphMutex)
+	Filter::Filter()
 			: mFilterContext(nullptr)
-			, mGraphMutex(graphMutex) {
-		Core::Assert(graphMutex != nullptr);
-	}
+	{}
 
 
 	Filter::Filter(Filter&& rhs)
-			: mFilterContext(std::exchange(rhs.mFilterContext, nullptr))
-			, mGraphMutex(rhs.mGraphMutex){}
+			: mFilterContext(std::exchange(rhs.mFilterContext, nullptr)) {}
 
 
 	Filter& Filter::operator=(Filter&& rhs)
@@ -46,7 +43,6 @@ namespace Strawberry::Codec
 	{
 		if (mFilterContext)
 		{
-			std::unique_lock<std::mutex> lock(*mGraphMutex);
 			avfilter_free(mFilterContext);
 		}
 	}
@@ -66,19 +62,16 @@ namespace Strawberry::Codec
 
 	void Filter::Link(Filter& consumer, unsigned int srcPad, unsigned int dstPad)
 	{
-		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = avfilter_link(**this, srcPad, *consumer, dstPad);
 		Core::Assert(result == 0);
 	}
 
 
-	BufferSource::BufferSource(std::mutex* graphMutex)
-			: Filter(graphMutex) {}
+	BufferSource::BufferSource() {}
 
 
 	void BufferSource::SendFrame(Frame frame)
 	{
-		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = av_buffersrc_add_frame(mFilterContext, *frame);
 		Core::Assert(result == 0);
 	}
@@ -108,19 +101,32 @@ namespace Strawberry::Codec
 	}
 
 
-	BufferSink::BufferSink(std::mutex* graphMutex)
-			: Filter(graphMutex) {}
+	BufferSink::BufferSink() {}
 
 
 	Core::Option<Frame> BufferSink::ReadFrame()
 	{
 		Frame frame;
-		std::unique_lock<std::mutex> lock(*mGraphMutex);
 		auto result = av_buffersink_get_frame(mFilterContext, *frame);
 		switch (result)
 		{
-			case 0: return frame;
-			case AVERROR(EAGAIN): return {};
+			case 0:
+				return frame;
+			case AVERROR(EAGAIN):
+				return {};
+			default:
+				Core::Unreachable();
+		}
+	}
+
+
+	bool BufferSink::OutputAvailable()
+	{
+		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(mFilterContext), nullptr, AV_BUFFERSINK_FLAG_PEEK);
+		switch (result)
+		{
+			case 0: return true;
+			case AVERROR(EAGAIN): return false;
 			default: Core::Unreachable();
 		}
 	}

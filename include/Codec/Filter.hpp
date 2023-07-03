@@ -17,7 +17,7 @@ namespace Strawberry::Codec
 	class Filter
 	{
 	public:
-		Filter(std::mutex* graphMutex);
+		Filter();
 		Filter(const Filter&) = delete;
 		Filter& operator=(const Filter&) = delete;
 		Filter(Filter&&);
@@ -34,7 +34,6 @@ namespace Strawberry::Codec
 
 	protected:
 		AVFilterContext* mFilterContext;
-		std::mutex*      mGraphMutex;
 	};
 
 
@@ -45,7 +44,7 @@ namespace Strawberry::Codec
 
 
 	public:
-		explicit BufferSource(std::mutex* graphMutex);
+		explicit BufferSource();
 
 
 		void SendFrame(Codec::Frame frame);
@@ -70,10 +69,11 @@ namespace Strawberry::Codec
 		: public Filter
 	{
 	public:
-		explicit BufferSink(std::mutex* graphMutex);
+		explicit BufferSink();
 
 
 		Core::Option<Codec::Frame> ReadFrame();
+		bool OutputAvailable();
 
 
 		uint64_t GetSampleRate() const;
