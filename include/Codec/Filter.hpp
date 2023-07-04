@@ -38,23 +38,17 @@ namespace Strawberry::Codec
 
 
 	class InputFilter
+		: public Filter
 	{
 	public:
+		virtual ~InputFilter() {}
+
 		virtual void SendFrame(Codec::Frame frame) = 0;
-	};
-
-
-	class OutputFilter
-	{
-	public:
-		virtual Core::Option<Frame> ReadFrame() = 0;
-		virtual bool OutputAvailable() = 0;
 	};
 
 
 	class BufferSource
 			: public InputFilter
-			  , public Filter
 	{
 		friend class FilterGraph;
 
@@ -75,15 +69,15 @@ namespace Strawberry::Codec
 
 
 	class BufferSink
-			: public OutputFilter
-			  , public Filter
+		: public Filter
 	{
 	public:
 		explicit BufferSink();
 
 
-		virtual Core::Option<Codec::Frame> ReadFrame() override;
-		virtual bool OutputAvailable() override;
+		Core::Option<Codec::Frame> ReadFrame();
+		Core::Option<Codec::Frame> PeekFrame();
+		bool OutputAvailable();
 
 
 		uint64_t GetSampleRate() const;

@@ -98,6 +98,19 @@ namespace Strawberry::Codec
 	}
 
 
+	Core::Option<Codec::Frame> BufferSink::PeekFrame()
+	{
+		Frame frame;
+		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(mFilterContext), *frame, AV_BUFFERSINK_FLAG_PEEK);
+		switch (result)
+		{
+			case 0: return frame;
+			case AVERROR(EAGAIN): return {};
+			default: Core::Unreachable();
+		}
+	}
+
+
 	bool BufferSink::OutputAvailable()
 	{
 		auto result = av_buffersink_get_frame_flags(const_cast<AVFilterContext*>(mFilterContext), nullptr, AV_BUFFERSINK_FLAG_PEEK);
