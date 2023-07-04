@@ -52,7 +52,9 @@ add_library(StrawberryCodec STATIC
 		include/Codec/Constants.hpp
 		src/AudioMixer.cpp
 		include/Codec/AudioMixer.hpp
-        include/Codec/AudioFrameFormat.hpp)
+        include/Codec/AudioFrameFormat.hpp
+		src/PTSSetter.cpp
+		include/Codec/PTSSetter.hpp)
 
 
 target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
