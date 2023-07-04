@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include <mutex>
-#include "Strawberry/Core/Option.hpp"
+#include "AudioFrameFormat.hpp"
 #include "Frame.hpp"
+#include "Strawberry/Core/Option.hpp"
 
 
 extern "C"
@@ -53,8 +53,8 @@ namespace Strawberry::Codec
 
 
 	class BufferSource
-		: public InputFilter
-		, public Filter
+			: public InputFilter
+			  , public Filter
 	{
 		friend class FilterGraph;
 
@@ -66,24 +66,17 @@ namespace Strawberry::Codec
 		virtual void SendFrame(Codec::Frame frame) override;
 
 
-		uint64_t GetSampleRate() const;
-		uint64_t GetSampleFormat() const;
-		uint64_t GetChannelCount() const;
-		uint64_t GetChannelLayout() const;
+		const AudioFrameFormat& FrameFormat() const { return mFormat; }
 
 
 	private:
-		uint64_t mSampleRate;
-		uint64_t mSampleFormat;
-		uint64_t mChannelCount;
-		uint64_t mChannelLayout;
+		AudioFrameFormat mFormat;
 	};
 
 
-
 	class BufferSink
-		: public OutputFilter
-		, public Filter
+			: public OutputFilter
+			  , public Filter
 	{
 	public:
 		explicit BufferSink();
