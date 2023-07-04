@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <libavutil/channel_layout.h>
 #include "Strawberry/Core/Assert.hpp"
+#include "Codec/Frame.hpp"
 
 
 namespace Strawberry::Codec
