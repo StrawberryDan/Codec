@@ -62,15 +62,11 @@ namespace Strawberry::Codec
 
 
 	Core::Option<InputFilter*>
-	FilterGraph::AddInputAudioBuffer(unsigned int index,
-							   uint64_t sampleRate,
-							   uint64_t sampleFormat,
-							   uint64_t channelCount,
-							   uint64_t channelLayout)
+	FilterGraph::AddInputAudioBuffer(unsigned int index, AudioFrameFormat format)
 	{
 		mConfigurationDirty = true;
 
-		auto filter = std::make_unique<BufferSource>();
+		auto filter = std::make_unique<BufferSource>(format);
 		const AVFilter* filterPtr = nullptr;
 		switch (mMediaType)
 		{
@@ -85,24 +81,20 @@ namespace Strawberry::Codec
 		}
 
 		std::string args;
-		if (channelLayout != 0)
+		if (format.channelLayout != 0)
 		{
-			args = fmt::format("sample_rate={}:sample_fmt={}:channel_layout={}:channels={}", sampleRate,
-									sampleFormat, channelLayout, channelCount);
+			args = fmt::format("sample_rate={}:sample_fmt={}:channel_layout={}:channels={}", format.sampleRate,
+							   format.sampleFormat, format.channelLayout, format.channels.nb_channels);
 		}
 		else
 		{
-			args = fmt::format("sample_rate={}:sample_fmt={}:channels={}", sampleRate,
-							   sampleFormat, channelCount);
+			args = fmt::format("sample_rate={}:sample_fmt={}:channels={}", format.sampleRate,
+							   format.sampleFormat, format.channels.nb_channels);
 		}
 
 		auto result = avfilter_graph_create_filter(&**filter, filterPtr, fmt::format("input-{}", mInputs.size()).c_str(),
 												   args.c_str(), nullptr, mFilterGraph);
 		if (result < 0) return {};
-		filter.mSampleRate = sampleRate;
-		filter.mSampleFormat = sampleFormat;
-		filter.mChannelCount = channelCount;
-		filter.mChannelLayout = channelLayout;
 
 		mInputs.emplace(index, std::move(filter));
 		return mInputs.at(index).get();

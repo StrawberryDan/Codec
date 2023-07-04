@@ -18,6 +18,7 @@
 #include "Filter.hpp"
 #include "Frame.hpp"
 #include "Constants.hpp"
+#include "AudioFrameFormat.hpp"
 
 
 extern "C"
@@ -40,11 +41,7 @@ namespace Strawberry::Codec
 
 
 		Core::Option<InputFilter*>
-		AddInputAudioBuffer(unsigned int index,
-							uint64_t sampleRate,
-							uint64_t sampleFormat,
-							uint64_t channelCount,
-							uint64_t channelLayout);
+		AddInputAudioBuffer(unsigned int index, AudioFrameFormat format);
 
 
 		InputFilter*                 GetInput(unsigned int index);
