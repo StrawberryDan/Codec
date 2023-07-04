@@ -1,3 +1,4 @@
+#include <fmt/format.h>
 #include "Codec/AudioFrameResizer.hpp"
 
 
@@ -14,67 +15,47 @@ namespace Strawberry::Codec
 
 
 
-	std::vector<Frame> AudioFrameResizer::Process(Frame frame)
+	void AudioFrameResizer::SendFrame(Frame frame)
 	{
-		mFrameBuffer.push_back(std::move(frame));
-
-		std::vector<Frame> resized;
-		while (BufferedSampleCount() > mTargetSampleCount)
+		if (mLastFrameFormat != AudioFrameFormat(frame))
 		{
-			Frame rFrame;
-			rFrame->format = mFrameBuffer[0]->format;
-			rFrame->ch_layout = mFrameBuffer[0]->ch_layout;
-
-			while (rFrame->nb_samples < mTargetSampleCount)
-			{
-				auto nextBufferedFrame = mFrameBuffer.begin();
-
-				size_t remainingSamplesNeeded = mTargetSampleCount - rFrame->nb_samples;
-				if (remainingSamplesNeeded >= (*nextBufferedFrame)->nb_samples)
-				{
-					// Merge this frame in
-					rFrame.Append(*nextBufferedFrame);
-					mFrameBuffer.erase(nextBufferedFrame);
-				}
-				else
-				{
-					// Split the next frame up
-					auto [needed, spare] = nextBufferedFrame->Split(remainingSamplesNeeded);
-					rFrame.Append(needed);
-					(*nextBufferedFrame) = std::move(spare);
-				}
-			}
-
-			resized.push_back(std::move(rFrame));
+			SetupFilterGraph(AudioFrameFormat(frame));
+			mLastFrameFormat.Emplace(frame);
 		}
 
-		return std::move(resized);
+		mFilterGraphInput->SendFrame(std::move(frame));
 	}
 
 
-
-	Core::Option<Frame> AudioFrameResizer::Flush()
+	Core::Option<Frame> AudioFrameResizer::ReadFrame()
 	{
-		if (mFrameBuffer.empty()) return {};
-
-		Frame frame;
-		for (const auto& stashFrame : mFrameBuffer)
+		auto nextFrame = mFilterGraphOutput->PeekFrame();
+		if (nextFrame && (*nextFrame)->nb_samples >= mTargetSampleCount)
 		{
-			frame.Append(stashFrame);
+			Core::Assert((*nextFrame)->nb_samples == mTargetSampleCount);
+			mFilterGraphOutput->ReadFrame().Unwrap();
+			Core::Assert(*mLastFrameFormat == AudioFrameFormat(*nextFrame));
+			return nextFrame;
 		}
-		mFrameBuffer.clear();
-		return frame;
+
+		return {};
 	}
 
 
-
-	size_t AudioFrameResizer::BufferedSampleCount() const
+	void AudioFrameResizer::SetupFilterGraph(const AudioFrameFormat& format)
 	{
-		size_t samples = 0;
-		for (const auto& frame : mFrameBuffer)
-		{
-			samples += frame->nb_samples;
-		}
-		return samples;
+		mFilterGraph.Emplace(MediaType::Audio);
+
+		mFilterGraphInput = mFilterGraph->AddInputAudioBuffer(0, format).Unwrap();
+		auto* resizer = mFilterGraph->AddFilter("asetnsamples", "resizer", fmt::format("n={}:p=0", mTargetSampleCount)).Unwrap();
+		auto* pts = mFilterGraph->AddFilter("asetpts", "pts", "expr=NB_CONSUMED_SAMPLES").Unwrap();
+		mFilterGraphOutput = mFilterGraph->AddOutput(0).Unwrap();
+
+		mFilterGraphInput->Link(*resizer, 0, 0);
+		resizer->Link(*pts, 0, 0);
+		pts->Link(*mFilterGraphOutput, 0, 0);
+
+		auto result = mFilterGraph->Configure();
+		Core::Assert(result);
 	}
 }

@@ -2,11 +2,14 @@
 
 
 
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
 #include "Frame.hpp"
 #include <stddef.h>
 #include <vector>
 #include "Strawberry/Core/Option.hpp"
-
+#include "FilterGraph.hpp"
 
 
 namespace Strawberry::Codec
@@ -22,21 +25,27 @@ namespace Strawberry::Codec
 		/// Processes an input frame and outputs some number
 		/// output audio frames with the size given in the constructor.
 		/// @param frame The input frame
-		std::vector<Frame> Process(Frame frame);
-		/// Flush the frame buffer and return the result
-		Core::Option<Frame> Flush();
+		void SendFrame(Frame frame);
+
+		Core::Option<Frame> ReadFrame();
+
 
 
 	private:
-		/// Returns the number of samples contained in all the frames
-		/// in the frame buffer.
-		size_t BufferedSampleCount() const;
+		void SetupFilterGraph(const AudioFrameFormat& format);
 
 
 	private:
 		/// The target sample count for output frames
 		const size_t		mTargetSampleCount;
-		/// Buffer for frames which have not been output yet.
-		std::vector<Frame>	mFrameBuffer;
+		/// Filter Graph to run frames through
+		Core::Option<FilterGraph> mFilterGraph;
+
+		InputFilter* mFilterGraphInput = nullptr;
+
+		BufferSink* mFilterGraphOutput = nullptr;
+
+
+		Core::Option<AudioFrameFormat> mLastFrameFormat;
 	};
 }
