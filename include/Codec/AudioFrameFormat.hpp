@@ -4,9 +4,14 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include <libavutil/channel_layout.h>
 #include "Strawberry/Core/Assert.hpp"
 #include "Codec/Frame.hpp"
+
+
+extern "C"
+{
+#include <libavutil/channel_layout.h>
+}
 
 
 namespace Strawberry::Codec
