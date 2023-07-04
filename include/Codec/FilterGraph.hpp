@@ -46,14 +46,14 @@ namespace Strawberry::Codec
 
 		InputFilter*                 GetInput(unsigned int index);
 		void                         RemoveInput(unsigned int index);
-		Core::Option<OutputFilter*>  AddOutput(unsigned int index, const std::string& args);
-		OutputFilter*                GetOutput(unsigned int index);
+		Core::Option<BufferSink*>  AddOutput(unsigned int index);
+		BufferSink*                GetOutput(unsigned int index);
 		size_t                       GetInputCount() const;
 		size_t                       GetOutputCount() const;
 
 
 		std::vector<std::pair<unsigned int, InputFilter*>> GetInputPairs();
-		std::vector<std::pair<unsigned int, OutputFilter*>>   GetOutputPairs();
+		std::vector<std::pair<unsigned int, BufferSink*>>   GetOutputPairs();
 
 
 		Core::Option<Filter*> AddFilter(const std::string& filter, const std::string& name, const std::string& args);
@@ -74,7 +74,7 @@ namespace Strawberry::Codec
 		AVFilterGraph*                                        mFilterGraph;
 		std::unordered_map<std::string, Filter>               mFilters;
 		std::map<unsigned int, std::unique_ptr<InputFilter>>  mInputs;
-		std::map<unsigned int, std::unique_ptr<OutputFilter>> mOutputs;
+		std::map<unsigned int, std::unique_ptr<BufferSink>>   mOutputs;
 
 
 		bool mConfigurationValid = false;

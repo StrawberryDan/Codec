@@ -115,7 +115,7 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Option<OutputFilter*> FilterGraph::AddOutput(unsigned int index, const std::string& args)
+	Core::Option<BufferSink*> FilterGraph::AddOutput(unsigned int index)
 	{
 		mConfigurationDirty = true;
 
@@ -133,7 +133,7 @@ namespace Strawberry::Codec
 				Core::Unreachable();
 		}
 		auto result = avfilter_graph_create_filter(&*filter, filterPtr,
-												   fmt::format("output-{}", mInputs.size()).c_str(), args.c_str(),
+												   fmt::format("output-{}", mInputs.size()).c_str(), "",
 												   nullptr, mFilterGraph);
 		if (result < 0) return {};
 
@@ -142,7 +142,7 @@ namespace Strawberry::Codec
 	}
 
 
-	OutputFilter* FilterGraph::GetOutput(unsigned int index)
+	BufferSink* FilterGraph::GetOutput(unsigned int index)
 	{
 		if (!mOutputs.contains(index)) return nullptr;
 		return mOutputs.at(index).get();
@@ -172,9 +172,9 @@ namespace Strawberry::Codec
 	}
 
 
-	std::vector<std::pair<unsigned int, OutputFilter*>> FilterGraph::GetOutputPairs()
+	std::vector<std::pair<unsigned int, BufferSink*>> FilterGraph::GetOutputPairs()
 	{
-		std::vector<std::pair<unsigned int, OutputFilter*>> result;
+		std::vector<std::pair<unsigned int, BufferSink*>> result;
 		for (auto& [i, buffer] : mOutputs)
 		{
 			result.emplace_back(i, buffer.get());
