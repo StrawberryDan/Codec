@@ -60,7 +60,7 @@ namespace Strawberry::Codec
 
 
 	public:
-		explicit BufferSource();
+		explicit BufferSource(const AudioFrameFormat& format);
 
 
 		virtual void SendFrame(Codec::Frame frame) override;

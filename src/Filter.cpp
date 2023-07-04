@@ -67,37 +67,15 @@ namespace Strawberry::Codec
 	}
 
 
-	BufferSource::BufferSource() {}
+	BufferSource::BufferSource(const AudioFrameFormat& format)
+		: mFormat(format)
+	{}
 
 
 	void BufferSource::SendFrame(Frame frame)
 	{
 		auto result = av_buffersrc_add_frame(mFilterContext, *frame);
 		Core::Assert(result == 0);
-	}
-
-
-	uint64_t BufferSource::GetSampleRate() const
-	{
-		return mSampleRate;
-	}
-
-
-	uint64_t BufferSource::GetSampleFormat() const
-	{
-		return mSampleFormat;
-	}
-
-
-	uint64_t BufferSource::GetChannelCount() const
-	{
-		return mChannelCount;
-	}
-
-
-	uint64_t BufferSource::GetChannelLayout() const
-	{
-		return mChannelLayout;
 	}
 
 
