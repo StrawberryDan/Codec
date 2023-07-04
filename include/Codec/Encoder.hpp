@@ -3,10 +3,12 @@
 
 
 #include "AudioFrameResizer.hpp"
+#include "Codec/PTSSetter.hpp"
 #include "Frame.hpp"
 #include "Packet.hpp"
 #include "Resampler.hpp"
 #include "Strawberry/Core/Option.hpp"
+#include "PTSSetter.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -37,5 +39,6 @@ namespace Strawberry::Codec
 		AVCodecParameters*				mParameters;
 		Core::Option<Resampler>			mFrameResampler;
 		Core::Option<AudioFrameResizer>	mFrameResizer;
+		PTSSetter						mPTSSetter;
 	};
 }

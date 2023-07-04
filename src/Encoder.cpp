@@ -61,10 +61,16 @@ namespace Strawberry::Codec
 		std::vector<Packet> packets;
 
 		auto resampledFrame = mFrameResampler->Resample(frame);
-		auto frames = mFrameResizer->Process(resampledFrame);
-		for (auto& resizedFrame : frames)
+		mFrameResizer->SendFrame(frame);
+
+
+		while (auto resizedFrame = mFrameResizer->ReadFrame())
 		{
-			auto send = avcodec_send_frame(mContext, *resizedFrame);
+			resizedFrame = mFrameResampler->Resample(*resizedFrame);
+			mPTSSetter.SendFrame(std::move(*resizedFrame));
+			resizedFrame = mPTSSetter.ReadFrame();
+
+			auto send = avcodec_send_frame(mContext, **resizedFrame);
 			Core::Assert(send == 0);
 
 			int receive;
@@ -83,18 +89,6 @@ namespace Strawberry::Codec
 		}
 
 		return packets;
-	}
-
-
-
-	Core::Option<Packet> Encoder::Flush()
-	{
-		auto lastFrame = mFrameResizer->Flush();
-		if (!lastFrame) return {};
-
-		auto output = Encode({lastFrame.Unwrap()});
-		Core::Assert(output.size() == 1);
-		return std::move(output[0]);
 	}
 
 
