@@ -50,22 +50,22 @@ namespace Strawberry::Codec
 
 			return *this;
 		}
+
+
+		bool operator==(const Strawberry::Codec::AudioFrameFormat& b) const
+		{
+			return sampleRate == b.sampleRate
+				   && sampleFormat == b.sampleFormat
+				   && channels.nb_channels == b.channels.nb_channels
+				   && channels.order == b.channels.order
+				   && (channels.u.mask == b.channels.u.mask || channels.u.map == b.channels.u.map)
+				   && channelLayout == b.channelLayout;
+		}
+
+
+		bool operator!=(const Strawberry::Codec::AudioFrameFormat& b) const
+		{
+			return !(*this == b);
+		}
 	};
-}
-
-
-bool operator==(const Strawberry::Codec::AudioFrameFormat& a, const Strawberry::Codec::AudioFrameFormat& b)
-{
-	return a.sampleRate == b.sampleRate
-		   && a.sampleFormat == b.sampleFormat
-		   && a.channels.nb_channels == b.channels.nb_channels
-		   && a.channels.order == b.channels.order
-		   && (a.channels.u.mask == b.channels.u.mask || a.channels.u.map == b.channels.u.map)
-		   && a.channelLayout == b.channelLayout;
-}
-
-
-bool operator!=(const Strawberry::Codec::AudioFrameFormat& a, const Strawberry::Codec::AudioFrameFormat& b)
-{
-	return !(a == b);
 }
