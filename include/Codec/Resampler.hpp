@@ -4,7 +4,9 @@
 
 #include <vector>
 #include "Frame.hpp"
-
+#include "Filter.hpp"
+#include "FilterGraph.hpp"
+#include "AudioFrameFormat.hpp"
 
 
 extern "C"
@@ -20,20 +22,26 @@ namespace Strawberry::Codec
 	class Resampler
 	{
 	public:
-		Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat);
-		Resampler(const Resampler& other) = delete;
-		Resampler& operator=(const Resampler& other) = delete;
-		Resampler(Resampler&& other) noexcept ;
-		Resampler& operator=(Resampler&& other) noexcept ;
-		~Resampler();
+		explicit Resampler(AudioFrameFormat targetFormat);
 
-		Frame Resample(const Frame& input);
-		std::vector<Frame> Resample(const std::vector<Frame>& input);
+
+		void SendFrame(Frame frame);
+		Core::Option<Frame> ReadFrame();
+
+
+		void SetOutputFrameSize(unsigned int frameSize);
+
 
 	private:
-		const unsigned int			mTargetSampleRate;
-		const AVChannelLayout		mTargetChannelLayout;
-		const AVSampleFormat		mTargetSampleFormat;
-		SwrContext* 				mSwrContext;
+		void SetupGraph(AudioFrameFormat format);
+
+
+	private:
+		AudioFrameFormat mTargetFormat;
+		Core::Option<unsigned int> mOutputFrameSize;
+		Core::Option<AudioFrameFormat> mLastFrameFormat;
+		Core::Option<FilterGraph> mFilterGraph;
+		InputFilter* mInput;
+		BufferSink* mOutput;
 	};
 }

@@ -1,3 +1,4 @@
+#include <fmt/format.h>
 #include "Codec/Resampler.hpp"
 #include "Strawberry/Core/Utilities.hpp"
 
@@ -5,94 +6,82 @@
 #include "Strawberry/Core/Assert.hpp"
 
 
+extern "C"
+{
+#include "libavfilter/buffersink.h"
+}
+
+
 
 using Strawberry::Core::Assert;
 using Strawberry::Core::Take;
 
 
-
 namespace Strawberry::Codec
 {
-	Resampler::Resampler(unsigned int targetSampleRate, AVChannelLayout targetLayout, AVSampleFormat targetFormat)
-		: mTargetSampleRate(targetSampleRate)
-		, mTargetChannelLayout(targetLayout)
-		, mTargetSampleFormat(targetFormat)
-		, mSwrContext(nullptr)
-	{}
+	Resampler::Resampler(AudioFrameFormat targetFormat)
+			: mTargetFormat(targetFormat) {}
 
 
-
-	Resampler::Resampler(Resampler&& other) noexcept
-		: mTargetSampleRate(other.mTargetSampleRate)
-		, mTargetChannelLayout(other.mTargetChannelLayout)
-		, mTargetSampleFormat(other.mTargetSampleFormat)
-		, mSwrContext(Take(other.mSwrContext))
-	{}
-
-
-
-	Resampler& Resampler::operator=(Resampler&& other) noexcept
+	void Resampler::SendFrame(Frame frame)
 	{
-		if (this != &other)
+		if (mLastFrameFormat != AudioFrameFormat(frame))
 		{
-			std::destroy_at(this);
-			std::construct_at(this, std::move(other));
+			SetupGraph(AudioFrameFormat(frame));
+			mLastFrameFormat = AudioFrameFormat(frame);
 		}
 
-		return (*this);
+		mInput->SendFrame(std::move(frame));
 	}
 
 
-
-	Resampler::~Resampler()
+	Core::Option<Frame> Resampler::ReadFrame()
 	{
-		if (mSwrContext) swr_free(&mSwrContext);
-	}
-
-
-
-	Frame Resampler::Resample(const Frame& input)
-	{
-		auto result = swr_alloc_set_opts2(
-				&mSwrContext,
-				&mTargetChannelLayout,
-				mTargetSampleFormat,
-				static_cast<int>(mTargetSampleRate),
-				&input->ch_layout,
-				static_cast<AVSampleFormat>(input->format),
-				input->sample_rate,
-				0,
-				nullptr);
-		Assert(result == 0);
-
-		Assert(mSwrContext != nullptr);
-
-		Frame output;
-		output->ch_layout	= mTargetChannelLayout;
-		output->format		= mTargetSampleFormat;
-		output->sample_rate	= static_cast<int>(mTargetSampleRate);
-		result = swr_convert_frame(mSwrContext, *output, *input);
-		Assert(result == 0);
-		Assert(output->ch_layout.nb_channels == mTargetChannelLayout.nb_channels);
-		Assert(output->ch_layout.order == mTargetChannelLayout.order);
-		Assert(output->format == mTargetSampleFormat);
-		Assert(output->sample_rate == mTargetSampleRate);
-
+		auto output = mOutput->ReadFrame();
+		if (mOutputFrameSize && output)
+		{
+			Core::Assert(*mOutputFrameSize == (*output)->nb_samples);
+		}
 
 		return output;
 	}
 
 
-
-	std::vector<Frame> Resampler::Resample(const std::vector<Frame>& input)
+	void Resampler::SetOutputFrameSize(unsigned int frameSize)
 	{
-		Assert(mSwrContext != nullptr);
-		std::vector<Frame> output;
-		output.reserve(input.size());
-		for (const auto& frame : input)
+		mOutputFrameSize = frameSize;
+	}
+
+
+	void Resampler::SetupGraph(AudioFrameFormat format)
+	{
+		mFilterGraph.Emplace(MediaType::Audio);
+
+		char inChannelString[1024]{0};
+		auto res = av_channel_layout_describe(&format.channels, inChannelString, sizeof(inChannelString));
+		Core::Assert(res >= 0);
+
+		char outChannelString[1024]{0};
+		res = av_channel_layout_describe(&mTargetFormat.channels, outChannelString, sizeof(outChannelString));
+		Core::Assert(res >= 0);
+
+		auto args = fmt::format("isr={}:osr={}:isf={}:osf={}:ichl={}:ochl={}",
+								format.sampleRate, mTargetFormat.sampleRate,
+								format.sampleFormat, mTargetFormat.sampleFormat,
+								inChannelString, outChannelString);
+		mInput = mFilterGraph->AddInputAudioBuffer(0, format).Unwrap();
+		auto resampler = mFilterGraph->AddFilter("aresample", "resampler",
+												 args).Unwrap();
+		mOutput = mFilterGraph->AddOutput(0).Unwrap();
+
+		mInput->Link(*resampler, 0, 0);
+		resampler->Link(*mOutput, 0, 0);
+
+		Core::Assert(mFilterGraph->Configure());
+
+		if (mOutputFrameSize)
 		{
-			output.emplace_back(std::move(Resample(frame)));
+			av_buffersink_set_frame_size(**mOutput, *mOutputFrameSize);
 		}
-		return output;
 	}
 }
