@@ -21,7 +21,7 @@ int main()
 {
 	av_log_set_level(AV_LOG_DEBUG);
 
-	AudioFile file("data/selen.mp3");
+	AudioFile file("data/girigiri.mp3");
 	std::vector<Packet> packets;
 	while (!file.IsEof())
 	{
@@ -60,8 +60,11 @@ int main()
 	Muxer muxer("output.opus");
 	muxer.OpenStream(encoder.Parameters());
 	muxer.WriteHeader();
+	int pts = 0;
 	for (auto& packet: packets)
 	{
+		packet->pts = pts;
+		pts += packet->duration;
 		muxer.WritePacket(packet);
 	}
 	muxer.WriteTrailer();
