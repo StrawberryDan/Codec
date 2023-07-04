@@ -24,6 +24,17 @@ namespace Strawberry::Codec
 		int channelLayout = 0;
 
 
+		explicit AudioFrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels, int channelLayout = 0)
+			: sampleRate(sampleRate)
+			, sampleFormat(sampleFormat)
+			, channels{}
+			, channelLayout(channelLayout)
+		{
+			auto result = av_channel_layout_copy(&channels, &inchannels);
+			Core::Assert(result == 0);
+		}
+
+
 		explicit AudioFrameFormat(const Frame& frame)
 			: sampleRate(frame->sample_rate)
 			, sampleFormat(frame->format)
