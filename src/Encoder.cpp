@@ -41,8 +41,9 @@ namespace Strawberry::Codec
 		result = avcodec_parameters_from_context(mParameters, mContext);
 		Core::Assert(result >= 0);
 
-		mFrameResampler.Emplace(mContext->sample_rate, mContext->ch_layout, mContext->sample_fmt);
-		mFrameResizer.Emplace(mContext->frame_size);
+		AudioFrameFormat format(mContext->sample_rate, mContext->sample_fmt, mContext->ch_layout);
+		mFrameResampler.Emplace(format);
+		mFrameResampler->SetOutputFrameSize(mContext->frame_size);
 	}
 
 
@@ -60,13 +61,10 @@ namespace Strawberry::Codec
 	{
 		std::vector<Packet> packets;
 
-		auto resampledFrame = mFrameResampler->Resample(frame);
-		mFrameResizer->SendFrame(frame);
+		mFrameResampler->SendFrame(frame);
 
-
-		while (auto resizedFrame = mFrameResizer->ReadFrame())
+		while (auto resizedFrame = mFrameResampler->ReadFrame())
 		{
-			resizedFrame = mFrameResampler->Resample(*resizedFrame);
 			mPTSSetter.SendFrame(std::move(*resizedFrame));
 			resizedFrame = mPTSSetter.ReadFrame();
 
