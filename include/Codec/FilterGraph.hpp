@@ -39,20 +39,24 @@ namespace Strawberry::Codec
 		~FilterGraph();
 
 
-		Core::Option<BufferSource*>
-		AddAudioInput(unsigned int index, uint64_t sampleRate, uint64_t sampleFormat,
-					  uint64_t channelCount,
-					  uint64_t channelLayout);
-		BufferSource*               GetInput(unsigned int index);
-		void                        RemoveInput(unsigned int index);
-		Core::Option<BufferSink*>   AddOutput(unsigned int index, const std::string& args);
-		BufferSink*                 GetOutput(unsigned int index);
-		size_t                      GetInputCount() const;
-		size_t                      GetOutputCount() const;
+		Core::Option<InputFilter*>
+		AddInputAudioBuffer(unsigned int index,
+							uint64_t sampleRate,
+							uint64_t sampleFormat,
+							uint64_t channelCount,
+							uint64_t channelLayout);
 
 
-		std::vector<std::pair<unsigned int, BufferSource*>> GetInputPairs();
-		std::vector<std::pair<unsigned int, BufferSink*>>   GetOutputPairs();
+		InputFilter*                 GetInput(unsigned int index);
+		void                         RemoveInput(unsigned int index);
+		Core::Option<OutputFilter*>  AddOutput(unsigned int index, const std::string& args);
+		OutputFilter*                GetOutput(unsigned int index);
+		size_t                       GetInputCount() const;
+		size_t                       GetOutputCount() const;
+
+
+		std::vector<std::pair<unsigned int, InputFilter*>> GetInputPairs();
+		std::vector<std::pair<unsigned int, OutputFilter*>>   GetOutputPairs();
 
 
 		Core::Option<Filter*> AddFilter(const std::string& filter, const std::string& name, const std::string& args);
@@ -68,13 +72,12 @@ namespace Strawberry::Codec
 		Core::Option<Frame> RecvFrame(unsigned int outputIndex);
 
 
-
 	private:
-		MediaType mMediaType;
-		AVFilterGraph* mFilterGraph;
-		std::unordered_map<std::string, Filter> mFilters;
-		std::map<unsigned int, BufferSource> mInputs;
-		std::map<unsigned int, BufferSink> mOutputs;
+		MediaType                                             mMediaType;
+		AVFilterGraph*                                        mFilterGraph;
+		std::unordered_map<std::string, Filter>               mFilters;
+		std::map<unsigned int, std::unique_ptr<InputFilter>>  mInputs;
+		std::map<unsigned int, std::unique_ptr<OutputFilter>> mOutputs;
 
 
 		bool mConfigurationValid = false;
