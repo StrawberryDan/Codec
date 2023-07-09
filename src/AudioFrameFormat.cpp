@@ -58,7 +58,7 @@ namespace Strawberry::Codec
 			   && channels.nb_channels == b.channels.nb_channels
 			   && channels.order == b.channels.order
 			   && (channels.u.mask == b.channels.u.mask || channels.u.map == b.channels.u.map)
-			   && channelLayout == b.channelLayout;
+			   && (channelLayout == 0 || b.channelLayout == 0 || channelLayout == b.channelLayout);
 	}
 
 
