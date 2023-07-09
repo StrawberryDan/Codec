@@ -54,7 +54,7 @@ namespace Strawberry::Codec
 		Frame frame = Frame::Silence(format, FRAME_SIZE);
 		for (int inputIndex = 0; inputIndex < inputs.size(); inputIndex++)
 		{
-			for (int sampleIndex = 0; sampleIndex < FRAME_SIZE * 2; sampleIndex++)
+			for (int sampleIndex = 0; sampleIndex < FRAME_SIZE * format.channels.nb_channels; sampleIndex++)
 			{
 				for (int i = 0; i < AV_NUM_DATA_POINTERS; i++)
 				{
