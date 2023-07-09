@@ -2,6 +2,12 @@
 
 
 
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Codec
+#include "Codec/AudioFrameFormat.hpp"
+// C++ Standard
 #include <vector>
 #include <utility>
 
@@ -18,6 +24,10 @@ namespace Strawberry::Codec
 {
 	class Frame
 	{
+	public:
+		static Frame Silence(const AudioFrameFormat& format, size_t samples);
+
+
 	public:
 		Frame();
 		Frame(const Frame& other);

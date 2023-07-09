@@ -9,12 +9,37 @@
 extern "C"
 {
 #include <libavutil/avutil.h>
+#include <libavutil/samplefmt.h>
 }
 
 
 
 namespace Strawberry::Codec
 {
+	Frame Frame::Silence(const AudioFrameFormat& format, size_t samples)
+	{
+		int result = 0;
+
+		Frame frame;
+		frame->format = format.sampleFormat;
+		result = av_channel_layout_copy(&frame->ch_layout, &format.channels);
+		Core::Assert(result == 0);
+		frame->sample_rate = format.sampleRate;
+		frame->nb_samples = samples;
+		frame->channel_layout = format.channelLayout;
+
+		result = av_frame_get_buffer(*frame, 0);
+		Core::Assert(result == 0);
+
+		result = av_samples_set_silence(frame->data, 0, frame->nb_samples, frame->ch_layout.nb_channels,
+							   static_cast<AVSampleFormat>(frame->format));
+		Core::Assert(result == 0);
+
+		return frame;
+	}
+
+
+
 	Frame::Frame()
 		: mFrame(av_frame_alloc())
 	{
@@ -135,7 +160,6 @@ namespace Strawberry::Codec
 		Core::Assert(frames[0]->nb_samples + frames[1]->nb_samples == mFrame->nb_samples);
 		return { Frame(frames[0]), Frame(frames[1]) };
 	}
-
 
 
 	Frame::Frame(AVFrame* frame)
