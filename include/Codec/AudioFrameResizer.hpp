@@ -42,7 +42,7 @@ namespace Strawberry::Codec
 
 	private:
 		/// The target sample count for output frames
-		const size_t		mTargetSampleCount;
+		size_t		mTargetSampleCount;
 		/// Filter Graph to run frames through
 		Core::Option<FilterGraph> mFilterGraph;
 
