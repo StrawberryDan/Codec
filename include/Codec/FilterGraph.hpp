@@ -46,8 +46,8 @@ namespace Strawberry::Codec
 
 		InputFilter*                 GetInput(unsigned int index);
 		void                         RemoveInput(unsigned int index);
-		Core::Option<BufferSink*>  AddOutput(unsigned int index);
-		BufferSink*                GetOutput(unsigned int index);
+		Core::Option<BufferSink*>    AddOutput(unsigned int index);
+		BufferSink*                  GetOutput(unsigned int index);
 		size_t                       GetInputCount() const;
 		size_t                       GetOutputCount() const;
 
