@@ -1,5 +1,7 @@
 #include <iostream>
+#include <Strawberry/Core/ScopedTimer.hpp>
 #include "Codec/AudioFile.hpp"
+#include "Codec/AudioMixer.hpp"
 #include "Codec/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"
@@ -17,11 +19,9 @@ using namespace Strawberry::Codec;
 using namespace Strawberry;
 
 
-int main()
+std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 {
-	av_log_set_level(AV_LOG_DEBUG);
-
-	AudioFile file("data/girigiri.mp3");
+	AudioFile file(filePath);
 	std::vector<Packet> packets;
 	while (!file.IsEof())
 	{
@@ -44,12 +44,44 @@ int main()
 		}
 	}
 
+	return frames;
+};
+
+
+int main()
+{
+	Core::ScopedTimer timer("Test");
+
+
+	av_log_set_level(AV_LOG_FATAL);
+
+
+	std::vector<Frame> frames[] =
+	{
+		DecodeAudioFile("data/pd.wav"),
+		DecodeAudioFile("data/girigiri.mp3"),
+		DecodeAudioFile("data/dcl.wav"),
+		DecodeAudioFile("data/cotn.flac"),
+	};
+
+
+	std::vector<Packet> packets;
+	AudioMixer mixer(std::extent_v<decltype(frames)>);
+	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
+	{
+		for (auto& frame : frames[i])
+		{
+			mixer.Send(i, frame);
+		}
+	}
+
+
 
 	packets.clear();
 	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
-	for (auto& frame: frames)
+	while (auto frame= mixer.ReceiveFrame())
 	{
-		auto somePackets = encoder.Encode(frame);
+		auto somePackets = encoder.Encode(*frame);
 		for (const auto p: somePackets)
 		{
 			packets.push_back(p);
