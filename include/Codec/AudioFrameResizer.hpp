@@ -22,6 +22,11 @@ namespace Strawberry::Codec
 		/// Constructor
 		/// @param sampleCount The number of samples output audio frames should have
 		AudioFrameResizer(size_t sampleCount);
+
+		AudioFrameResizer(const AudioFrameResizer& rhs) = delete;
+		AudioFrameResizer& operator=(const AudioFrameResizer& rhs) = delete;
+		AudioFrameResizer(AudioFrameResizer&& rhs) = default;
+		AudioFrameResizer& operator=(AudioFrameResizer&& rhs) = default;
 		/// Processes an input frame and outputs some number
 		/// output audio frames with the size given in the constructor.
 		/// @param frame The input frame
