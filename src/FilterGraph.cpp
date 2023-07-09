@@ -21,32 +21,27 @@ namespace Strawberry::Codec
 			: mMediaType(type), mFilterGraph(avfilter_graph_alloc()) {}
 
 
-//	FilterGraph::FilterGraph(FilterGraph&& rhs)
-//	{
-//		auto wasRunning = *rhs.mRunning.Lock();
-//		if (wasRunning) rhs.Stop();
-//
-//		mMediaType = rhs.mMediaType;
-//		mFilterGraph = std::exchange(rhs.mFilterGraph, nullptr);
-//		mInputs = std::move(rhs.mInputs);
-//		mOutputs = std::move(rhs.mOutputs);
-//		mInputFrameBuffers = std::move(rhs.mInputFrameBuffers);
-//		mOutputFrameBuffers = std::move(rhs.mOutputFrameBuffers);
-//
-//		if (wasRunning) Start();
-//	}
+	FilterGraph::FilterGraph(FilterGraph&& rhs)
+		: mMediaType(rhs.mMediaType)
+		, mFilterGraph(std::exchange(rhs.mFilterGraph, nullptr))
+		, mFilters(std::move(rhs.mFilters))
+		, mInputs(std::move(rhs.mInputs))
+		, mOutputs(std::move(rhs.mOutputs))
+		, mConfigurationValid(std::exchange(rhs.mConfigurationValid, false))
+		, mConfigurationDirty(std::exchange(rhs.mConfigurationDirty, false))
+	{}
 
 
-//	FilterGraph& FilterGraph::operator=(FilterGraph&& rhs)
-//	{
-//		if (this != &rhs)
-//		{
-//			std::destroy_at(this);
-//			std::construct_at(this, std::move(rhs));
-//		}
-//
-//		return *this;
-//	}
+	FilterGraph& FilterGraph::operator=(FilterGraph&& rhs)
+	{
+		if (this != &rhs)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
+		}
+
+		return *this;
+	}
 
 
 	FilterGraph::~FilterGraph()

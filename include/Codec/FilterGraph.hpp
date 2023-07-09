@@ -35,8 +35,8 @@ namespace Strawberry::Codec
 		FilterGraph(MediaType type);
 		FilterGraph(const FilterGraph&) = delete;
 		FilterGraph& operator=(const FilterGraph&) = delete;
-		FilterGraph(FilterGraph&&) = delete;
-		FilterGraph& operator=(FilterGraph&&) = delete;
+		FilterGraph(FilterGraph&&);
+		FilterGraph& operator=(FilterGraph&&);
 		~FilterGraph();
 
 
