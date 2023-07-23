@@ -69,7 +69,7 @@ namespace Strawberry::Codec
 
 
 
-	Core::Option<Packet> AudioFile::ReadPacket()
+	Core::Option<Packet> AudioFile::Receive()
 	{
 		if (IsEof()) return {};
 

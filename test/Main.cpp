@@ -25,7 +25,7 @@ std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 	std::vector<Packet> packets;
 	while (!file.IsEof())
 	{
-		auto packet = file.ReadPacket();
+		auto packet = file.Receive();
 		if (packet)
 		{
 			packets.push_back(packet.Unwrap());

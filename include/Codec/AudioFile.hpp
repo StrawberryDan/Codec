@@ -4,6 +4,7 @@
 
 #include <string>
 #include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/IO/Producer.hpp"
 #include "Packet.hpp"
 #include "Decoder.hpp"
 #include "Resampler.hpp"
@@ -21,6 +22,7 @@ extern "C"
 namespace Strawberry::Codec
 {
 	class AudioFile
+			: Core::IO::Producer<Packet>
 	{
 	public:
 		explicit AudioFile(const std::string& path);
@@ -35,7 +37,7 @@ namespace Strawberry::Codec
 		inline       AVFormatContext* operator->()       { return mFile; }
 		inline const AVFormatContext* operator->() const { return mFile; }
 
-		Core::Option<Packet> ReadPacket();
+		virtual Core::Option<Packet> Receive() override;
 
 		[[nodiscard]] inline bool IsEof() const { return mIsEof; }
 
