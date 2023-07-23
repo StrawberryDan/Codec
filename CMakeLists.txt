@@ -10,12 +10,12 @@ pkg_check_modules(FFMPEG REQUIRED
 		libavfilter
 		libavformat
 		libavutil
-		libpostproc
 		libswresample
 		libswscale)
 message(STATUS "Using FFMPEG found at ${FFMPEG_LIBRARY_DIRS}")
 
 
+find_path(SODIUM_INCLUDE_DIR PATHS sodium.h)
 find_library(SODIUM_LIBRARY REQUIRED
 		NAMES libsodium.a)
 
@@ -58,7 +58,7 @@ add_library(StrawberryCodec STATIC
         src/AudioFrameFormat.cpp)
 
 
-target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS})
+target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LIBRARIES} ${SODIUM_LIBRARY})
 target_link_directories(StrawberryCodec PUBLIC ${FFMPEG_LIBRARY_DIRS})
 # We need this for libavfilter
