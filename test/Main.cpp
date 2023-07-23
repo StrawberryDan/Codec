@@ -59,7 +59,7 @@ int main()
 	std::vector<Frame> frames[] =
 	{
 		DecodeAudioFile("data/pd.wav"),
-		DecodeAudioFile("data/girigiri.mp3"),
+		DecodeAudioFile("data/girigiri.wav"),
 		DecodeAudioFile("data/dcl.wav"),
 		DecodeAudioFile("data/cotn.flac"),
 	};
