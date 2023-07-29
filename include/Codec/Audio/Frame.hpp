@@ -37,6 +37,9 @@ namespace Strawberry::Codec::Audio
 		~Frame();
 
 
+		FrameFormat GetFormat() const;
+
+
 		void Append(const Frame& other);
 		[[nodiscard]] std::pair<Frame, Frame> Split(size_t pos) const;
 
