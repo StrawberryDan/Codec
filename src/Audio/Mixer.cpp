@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <libavutil/channel_layout.h>
 /// Strawberry Codec
-#include "Codec/Audio/AudioMixer.hpp"
+#include "Codec/Audio/Mixer.hpp"
 // Lib Format
 #include "fmt/format.h"
 

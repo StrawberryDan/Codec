@@ -5,7 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 /// Codec
-#include "AudioFrameResizer.hpp"
+#include "FrameResizer.hpp"
 #include "Resampler.hpp"
 #include "Frame.hpp"
 /// Strawberry Libraries

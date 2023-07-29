@@ -6,7 +6,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Codec
-#include "AudioFrameFormat.hpp"
+#include "FrameFormat.hpp"
 // C++ Standard
 #include <vector>
 #include <utility>

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Strawberry/Core/ScopedTimer.hpp>
 #include "Codec/MediaFile.hpp"
-#include "Codec/Audio/AudioMixer.hpp"
+#include "Codec/Audio/Mixer.hpp"
 #include "Codec/Audio/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"

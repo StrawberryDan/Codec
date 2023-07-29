@@ -27,7 +27,7 @@ endif()
 
 add_library(StrawberryCodec STATIC
 		include/Codec/MediaFile.hpp
-		include/Codec/Audio/AudioFrameResizer.hpp
+		include/Codec/Audio/FrameResizer.hpp
 		include/Codec/CodecParameters.hpp
 		include/Codec/Audio/Decoder.hpp
 		include/Codec/Audio/Frame.hpp
@@ -37,7 +37,7 @@ add_library(StrawberryCodec STATIC
 		include/Codec/Audio/Resampler.hpp
 		include/Codec/SodiumEncrypter.hpp
 		src/MediaFile.cpp
-		src/Audio/AudioFrameResizer.cpp
+		src/Audio/FrameResizer.cpp
 		src/Audio/Decoder.cpp
 		src/Audio/Frame.cpp
 		src/Muxer.cpp
@@ -46,10 +46,10 @@ add_library(StrawberryCodec STATIC
 		src/Audio/Resampler.cpp
 		src/SodiumEncrypter.cpp
 		include/Codec/Constants.hpp
-		src/Audio/AudioMixer.cpp
-		include/Codec/Audio/AudioMixer.hpp
-		include/Codec/Audio/AudioFrameFormat.hpp
-		src/Audio/AudioFrameFormat.cpp
+		src/Audio/Mixer.cpp
+		include/Codec/Audio/Mixer.hpp
+		include/Codec/Audio/FrameFormat.hpp
+		src/Audio/FrameFormat.cpp
 		include/Codec/MediaStream.hpp
 		src/MediaStream.cpp)
 

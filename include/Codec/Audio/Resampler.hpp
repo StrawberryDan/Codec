@@ -4,7 +4,7 @@
 
 #include <vector>
 #include "Frame.hpp"
-#include "AudioFrameFormat.hpp"
+#include "FrameFormat.hpp"
 #include "Strawberry/Core/Option.hpp"
 
 

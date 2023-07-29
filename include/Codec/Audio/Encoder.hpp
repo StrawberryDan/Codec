@@ -2,7 +2,7 @@
 
 
 
-#include "Codec/Audio/AudioFrameResizer.hpp"
+#include "Codec/Audio/FrameResizer.hpp"
 #include "Codec/Audio/Frame.hpp"
 #include "Codec/Packet.hpp"
 #include "Codec/Audio/Resampler.hpp"
