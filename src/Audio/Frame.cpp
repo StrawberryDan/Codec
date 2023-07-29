@@ -34,6 +34,8 @@ namespace Strawberry::Codec::Audio
 		result = av_samples_set_silence(frame->data, 0, frame->nb_samples, frame->ch_layout.nb_channels,
 							   static_cast<AVSampleFormat>(frame->format));
 		Core::Assert(result == 0);
+		Core::Assert(frame.GetFormat() == format);
+		Core::Assert(frame.GetNumSamples() == samples);
 
 		return frame;
 	}
@@ -114,11 +116,14 @@ namespace Strawberry::Codec::Audio
 
 	void Frame::Append(const Frame& other)
 	{
-		AVFrame* newFrame		= av_frame_alloc();
-		newFrame->format		= mFrame->format;
-		newFrame->nb_samples	= mFrame->nb_samples + other->nb_samples;
-		newFrame->ch_layout		= mFrame->ch_layout;
-		auto error 				= av_frame_get_buffer(newFrame, 1);
+		AVFrame* newFrame        = av_frame_alloc();
+		newFrame->format         = mFrame->format;
+		newFrame->nb_samples     = mFrame->nb_samples + other->nb_samples;
+		newFrame->ch_layout      = mFrame->ch_layout;
+		newFrame->channels       = mFrame->channels;
+		newFrame->channel_layout = mFrame->channel_layout;
+		newFrame->sample_rate    = mFrame->sample_rate;
+		auto error               = av_frame_get_buffer(newFrame, 1);
 		Core::Assert(error == 0);
 
 		av_samples_copy(newFrame->data, mFrame->data,
