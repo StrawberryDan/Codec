@@ -25,6 +25,7 @@ namespace Strawberry::Codec::Audio
 	class Frame
 	{
 	public:
+		static Frame Allocate();
 		static Frame Silence(const FrameFormat& format, size_t samples);
 
 

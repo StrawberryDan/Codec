@@ -16,11 +16,19 @@ extern "C"
 
 namespace Strawberry::Codec::Audio
 {
+	Frame Frame::Allocate()
+	{
+		Frame frame;
+		frame.mFrame = av_frame_alloc();
+		return frame;
+	}
+
+
 	Frame Frame::Silence(const FrameFormat& format, size_t samples)
 	{
 		int result = 0;
 
-		Frame frame;
+		Frame frame = Frame::Allocate();
 		frame->format = format.sampleFormat;
 		result = av_channel_layout_copy(&frame->ch_layout, &format.channels);
 		Core::Assert(result == 0);
@@ -43,10 +51,8 @@ namespace Strawberry::Codec::Audio
 
 
 	Frame::Frame()
-		: mFrame(av_frame_alloc())
-	{
-		Core::Assert(mFrame != nullptr);
-	}
+		: mFrame(nullptr)
+	{}
 
 
 
@@ -77,8 +83,7 @@ namespace Strawberry::Codec::Audio
 	Frame::Frame(Frame&& other) noexcept
 		: Frame()
 	{
-		av_frame_move_ref(mFrame, other.mFrame);
-		Core::Assert(mFrame != nullptr);
+		mFrame = std::exchange(other.mFrame, nullptr);
 	}
 
 
@@ -87,8 +92,8 @@ namespace Strawberry::Codec::Audio
 	{
 		if (this != &other)
 		{
-			av_frame_unref(mFrame);
-			av_frame_move_ref(mFrame, other.mFrame);
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
 		}
 
 		return (*this);

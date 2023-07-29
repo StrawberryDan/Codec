@@ -81,7 +81,7 @@ namespace Strawberry::Codec::Audio
 		int receiveResult;
 		do
 		{
-			Frame frame;
+			Frame frame = Frame::Allocate();
 			receiveResult = avcodec_receive_frame(mCodecContext, *frame);
 			Assert(receiveResult == 0 || receiveResult == AVERROR(EAGAIN) || receiveResult == AVERROR_EOF);
 			if (receiveResult == 0)
