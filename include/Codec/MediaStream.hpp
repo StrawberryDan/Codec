@@ -5,6 +5,7 @@
 #include "Strawberry/Core/Collection/CircularBuffer.hpp"
 #include "Codec/Packet.hpp"
 #include "Codec/Constants.hpp"
+#include "Codec/Decoder.hpp"
 
 
 namespace Strawberry::Codec
@@ -37,6 +38,9 @@ namespace Strawberry::Codec
 
 		const AVCodec*           GetCodec() const;
 		const AVCodecParameters* GetCodecParameters() const;
+
+
+		Decoder GetDecoder() { return Decoder(GetCodec(), GetCodecParameters()); }
 
 
 	private:
