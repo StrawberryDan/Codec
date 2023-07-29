@@ -22,7 +22,7 @@ using namespace Strawberry;
 std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 {
 	MediaFile file = MediaFile::Open(filePath).Unwrap();
-	auto stream = file.GetStream(0).Unwrap();
+	auto stream = file.GetBestStream(MediaType::Audio).Unwrap();
 	std::vector<Packet> packets;
 	while (auto packet = stream->Read())
 	{

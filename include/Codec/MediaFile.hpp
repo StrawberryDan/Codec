@@ -43,6 +43,9 @@ namespace Strawberry::Codec
 		Core::Option<MediaStream*> GetStream(size_t index);
 
 
+		Core::Option<MediaStream*> GetBestStream(MediaType type);
+
+
 	protected:
 		void Seek(size_t stream, size_t pts);
 		Core::Result<Packet, Core::IO::Error> Read();

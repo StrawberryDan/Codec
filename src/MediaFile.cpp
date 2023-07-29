@@ -94,6 +94,28 @@ namespace Strawberry::Codec
 	}
 
 
+	Core::Option<MediaStream*> MediaFile::GetBestStream(MediaType type)
+	{
+		Core::Option<AVMediaType> streamTypeImpl;
+		switch (type)
+		{
+			case MediaType::Audio:
+				streamTypeImpl = AVMEDIA_TYPE_AUDIO; break;
+			case MediaType::Video:
+				streamTypeImpl = AVMEDIA_TYPE_VIDEO; break;
+			case MediaType::Subtitle:
+				streamTypeImpl = AVMEDIA_TYPE_SUBTITLE; break;
+			case MediaType::Unknown:
+			default:
+				Core::DebugBreak(); return Core::NullOpt;
+		}
+
+		Core::Assert(streamTypeImpl.HasValue());
+		auto index = av_find_best_stream(mFile, *streamTypeImpl, -1, -1, nullptr, 0);
+		return (index >= 0) ? GetStream(index) : Core::NullOpt;
+	}
+
+
 	void MediaFile::Seek(size_t stream, size_t pts)
 	{
 		auto result = avformat_seek_file(mFile, static_cast<int>(stream), 0, static_cast<int>(pts), mFile->streams[stream]->duration, 0);
