@@ -38,6 +38,7 @@ namespace Strawberry::Codec::Audio
 
 
 		FrameFormat GetFormat() const;
+		size_t      GetNumSamples() const;
 
 
 		void Append(const Frame& other);

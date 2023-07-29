@@ -106,6 +106,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	size_t Frame::GetNumSamples() const
+	{
+		return static_cast<size_t>(mFrame->nb_samples);
+	}
+
+
 	void Frame::Append(const Frame& other)
 	{
 		AVFrame* newFrame		= av_frame_alloc();
