@@ -49,8 +49,7 @@ namespace Strawberry::Codec
 		InputFilter* mFilterGraphInput = nullptr;
 
 		BufferSink* mFilterGraphOutput = nullptr;
-
-
+		/// Stores the frame format of the previous frame. Used to tell when to regenerate the filter graph.
 		Core::Option<AudioFrameFormat> mLastFrameFormat;
 	};
 }
