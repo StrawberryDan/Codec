@@ -26,7 +26,7 @@ endif()
 
 
 add_library(StrawberryCodec STATIC
-		include/Codec/AudioFile.hpp
+		include/Codec/MediaFile.hpp
 		include/Codec/AudioFrameResizer.hpp
 		include/Codec/CodecParameters.hpp
 		include/Codec/Decoder.hpp
@@ -36,7 +36,7 @@ add_library(StrawberryCodec STATIC
 		include/Codec/Packet.hpp
 		include/Codec/Resampler.hpp
 		include/Codec/SodiumEncrypter.hpp
-		src/AudioFile.cpp
+		src/MediaFile.cpp
 		src/AudioFrameResizer.cpp
 		src/Decoder.cpp
 		src/Frame.cpp
@@ -55,7 +55,9 @@ add_library(StrawberryCodec STATIC
         include/Codec/AudioFrameFormat.hpp
 		src/PTSSetter.cpp
 		include/Codec/PTSSetter.hpp
-        src/AudioFrameFormat.cpp)
+        src/AudioFrameFormat.cpp
+		include/Codec/MediaStream.hpp
+		src/MediaStream.cpp)
 
 
 target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})

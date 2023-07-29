@@ -1,6 +1,6 @@
 #include <iostream>
 #include <Strawberry/Core/ScopedTimer.hpp>
-#include "Codec/AudioFile.hpp"
+#include "Codec/MediaFile.hpp"
 #include "Codec/AudioMixer.hpp"
 #include "Codec/Encoder.hpp"
 #include "Codec/Muxer.hpp"
@@ -21,20 +21,17 @@ using namespace Strawberry;
 
 std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 {
-	AudioFile file(filePath);
+	MediaFile file = MediaFile::Open(filePath).Unwrap();
+	auto stream = file.GetStream(0).Unwrap();
 	std::vector<Packet> packets;
-	while (!file.IsEof())
+	while (auto packet = stream->Read())
 	{
-		auto packet = file.Receive();
-		if (packet)
-		{
-			packets.push_back(packet.Unwrap());
-		}
+		packets.push_back(packet.Unwrap());
 	}
 
 
 	std::vector<Frame> frames;
-	Decoder decoder(file.GetCodec(), file.GetCodecParameters());
+	Decoder decoder(stream->GetCodec(), stream->GetCodecParameters());
 	for (const auto& packet: packets)
 	{
 		auto someFrames = decoder.DecodePacket(packet);
