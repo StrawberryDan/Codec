@@ -45,7 +45,7 @@ std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 };
 
 
-int main()
+void AudioMixing()
 {
 	Core::ScopedTimer timer("Test");
 
@@ -54,12 +54,12 @@ int main()
 
 
 	std::vector<Frame> frames[] =
-	{
-		DecodeAudioFile("data/pd.wav"),
-		DecodeAudioFile("data/girigiri.wav"),
-		DecodeAudioFile("data/dcl.wav"),
-		DecodeAudioFile("data/cotn.flac"),
-	};
+			{
+					DecodeAudioFile("data/pd.wav"),
+					DecodeAudioFile("data/girigiri.wav"),
+					DecodeAudioFile("data/dcl.wav"),
+					DecodeAudioFile("data/cotn.flac"),
+			};
 
 
 	std::vector<Packet> packets;
@@ -98,6 +98,10 @@ int main()
 	}
 	muxer.WriteTrailer();
 	muxer.Flush();
+}
 
-	return 0;
+
+int main()
+{
+	AudioMixing();
 }
