@@ -6,7 +6,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Codec
-#include "Codec/AudioFrameFormat.hpp"
+#include "AudioFrameFormat.hpp"
 // C++ Standard
 #include <vector>
 #include <utility>
@@ -20,12 +20,12 @@ extern "C"
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	class Frame
 	{
 	public:
-		static Frame Silence(const AudioFrameFormat& format, size_t samples);
+		static Frame Silence(const FrameFormat& format, size_t samples);
 
 
 	public:

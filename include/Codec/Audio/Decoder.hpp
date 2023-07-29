@@ -2,8 +2,8 @@
 
 
 
-#include "Packet.hpp"
-#include "Frame.hpp"
+#include "Codec/Packet.hpp"
+#include "Codec/Audio/Frame.hpp"
 #include <vector>
 
 
@@ -15,7 +15,7 @@ extern "C"
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	class Decoder
 	{

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <Strawberry/Core/ScopedTimer.hpp>
 #include "Codec/MediaFile.hpp"
-#include "Codec/AudioMixer.hpp"
-#include "Codec/Encoder.hpp"
+#include "Codec/Audio/AudioMixer.hpp"
+#include "Codec/Audio/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"
 #include "Strawberry/Core/Logging.hpp"
@@ -19,7 +19,7 @@ using namespace Strawberry::Codec;
 using namespace Strawberry;
 
 
-std::vector<Frame> DecodeAudioFile(const std::string& filePath)
+std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 {
 	MediaFile file = MediaFile::Open(filePath).Unwrap();
 	auto stream = file.GetBestStream(MediaType::Audio).Unwrap();
@@ -30,8 +30,8 @@ std::vector<Frame> DecodeAudioFile(const std::string& filePath)
 	}
 
 
-	std::vector<Frame> frames;
-	Decoder decoder = stream->GetDecoder();
+	std::vector<Audio::Frame> frames;
+	Audio::Decoder decoder = stream->GetDecoder();
 	for (const auto& packet: packets)
 	{
 		auto someFrames = decoder.DecodePacket(packet);
@@ -53,7 +53,7 @@ void AudioMixing()
 	av_log_set_level(AV_LOG_FATAL);
 
 
-	std::vector<Frame> frames[] =
+	std::vector<Audio::Frame> frames[] =
 			{
 					DecodeAudioFile("data/pd.wav"),
 					DecodeAudioFile("data/girigiri.wav"),
@@ -63,7 +63,7 @@ void AudioMixing()
 
 
 	std::vector<Packet> packets;
-	AudioMixer mixer(std::extent_v<decltype(frames)>);
+	Audio::Mixer mixer(std::extent_v<decltype(frames)>);
 	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
 	{
 		for (auto& frame : frames[i])
@@ -75,7 +75,7 @@ void AudioMixing()
 
 
 	packets.clear();
-	Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
+	Audio::Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	while (auto frame= mixer.ReceiveFrame())
 	{
 		auto somePackets = encoder.Encode(*frame);

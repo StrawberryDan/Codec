@@ -5,8 +5,8 @@
 #include <string>
 #include "Strawberry/Core/Option.hpp"
 #include "Packet.hpp"
-#include "Decoder.hpp"
-#include "Resampler.hpp"
+#include "Codec/Audio/Decoder.hpp"
+#include "Codec/Audio/Resampler.hpp"
 #include "MediaStream.hpp"
 #include <map>
 #include <memory>

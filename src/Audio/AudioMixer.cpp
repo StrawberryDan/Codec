@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <libavutil/channel_layout.h>
 /// Strawberry Codec
-#include "Codec/AudioMixer.hpp"
+#include "Codec/Audio/AudioMixer.hpp"
 // Lib Format
 #include "fmt/format.h"
 
@@ -12,32 +12,31 @@ constexpr size_t FRAME_SIZE = 48000 / 32;
 constexpr int    FORMAT = AV_SAMPLE_FMT_DBL;
 
 ;
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
-	AudioMixer::AudioMixer(size_t trackCount)
+	Mixer::Mixer(size_t trackCount)
 		: mTrackCount(trackCount)
 		, mResamplers()
 	{
-		AudioFrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
+		FrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
 
 		for (int i = 0; i < trackCount; i++)
 		{
 			mResamplers.emplace_back(format);
-			mResamplers.back().SetOutputFrameSize(FRAME_SIZE);
 		}
 	}
 
 
-	void AudioMixer::Send(size_t trackIndex, const Frame& frame)
+	void Mixer::Send(size_t trackIndex, const Frame& frame)
 	{
 		Core::Assert(trackIndex >= 0 && trackIndex < mTrackCount);
 		mResamplers[trackIndex].SendFrame(frame);
 	}
 
 
-	Core::Option<Frame> AudioMixer::ReceiveFrame()
+	Core::Option<Frame> Mixer::ReceiveFrame()
 	{
-		AudioFrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
+		FrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
 
 		std::vector<Frame> inputs;
 		inputs.reserve(mTrackCount);

@@ -6,19 +6,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 /// Codec
 #include "AudioFrameResizer.hpp"
-#include "Codec/Resampler.hpp"
-#include "FilterGraph.hpp"
+#include "Resampler.hpp"
 #include "Frame.hpp"
 /// Strawberry Libraries
 #include "Strawberry/Core/Option.hpp"
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
-	class AudioMixer
+	class Mixer
 	{
 	public:
-		AudioMixer(size_t trackCount);
+		Mixer(size_t trackCount);
 
 
 		void Send(size_t trackIndex, const Frame& frame);

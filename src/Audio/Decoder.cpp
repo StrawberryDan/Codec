@@ -1,4 +1,4 @@
-#include "Codec/Decoder.hpp"
+#include "Codec/Audio/Decoder.hpp"
 #include "Strawberry/Core/Utilities.hpp"
 
 
@@ -11,7 +11,7 @@ using Strawberry::Core::Take;
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)

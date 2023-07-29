@@ -1,4 +1,4 @@
-#include "Codec/Encoder.hpp"
+#include "Codec/Audio/Encoder.hpp"
 
 
 
@@ -15,7 +15,7 @@ extern "C"
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	Encoder::Encoder(AVCodecID codecID, AVChannelLayout channelLayout)
 		: mContext(nullptr)
@@ -41,9 +41,9 @@ namespace Strawberry::Codec
 		result = avcodec_parameters_from_context(mParameters, mContext);
 		Core::Assert(result >= 0);
 
-		AudioFrameFormat format(mContext->sample_rate, mContext->sample_fmt, mContext->ch_layout);
+		FrameFormat format(mContext->sample_rate, mContext->sample_fmt, mContext->ch_layout);
 		mFrameResampler.Emplace(format);
-		mFrameResampler->SetOutputFrameSize(mContext->frame_size);
+		mFrameResizer.Emplace(mContext->frame_size);
 	}
 
 
@@ -61,29 +61,29 @@ namespace Strawberry::Codec
 	{
 		std::vector<Packet> packets;
 
-		mFrameResampler->SendFrame(frame);
-
-		while (auto resizedFrame = mFrameResampler->ReadFrame())
+		mFrameResizer->SendFrame(std::move(frame));
+		while (auto frame = mFrameResizer->ReadFrame())
 		{
-			mPTSSetter.SendFrame(std::move(*resizedFrame));
-			resizedFrame = mPTSSetter.ReadFrame();
-
-			auto send = avcodec_send_frame(mContext, **resizedFrame);
-			Core::Assert(send == 0);
-
-			int receive;
-			do
+			mFrameResampler->SendFrame(frame.Unwrap());
+			while (auto frame = mFrameResampler->ReadFrame())
 			{
-				Packet packet;
-				receive = avcodec_receive_packet(mContext, *packet);
-				Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
+				auto send = avcodec_send_frame(mContext, **frame);
+				Core::Assert(send == 0);
 
-				if (receive == 0)
+				int receive;
+				do
 				{
-					packets.push_back(packet);
+					Packet packet;
+					receive = avcodec_receive_packet(mContext, *packet);
+					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
+
+					if (receive == 0)
+					{
+						packets.push_back(packet);
+					}
 				}
+				while (receive == 0);
 			}
-			while (receive == 0);
 		}
 
 		return packets;

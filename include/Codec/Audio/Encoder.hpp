@@ -2,19 +2,17 @@
 
 
 
-#include "AudioFrameResizer.hpp"
-#include "Codec/PTSSetter.hpp"
-#include "Frame.hpp"
-#include "Packet.hpp"
-#include "Resampler.hpp"
+#include "Codec/Audio/AudioFrameResizer.hpp"
+#include "Codec/Audio/Frame.hpp"
+#include "Codec/Packet.hpp"
+#include "Codec/Audio/Resampler.hpp"
 #include "Strawberry/Core/Option.hpp"
-#include "PTSSetter.hpp"
 #include <cstdint>
 #include <vector>
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	class Encoder
 	{
@@ -38,7 +36,6 @@ namespace Strawberry::Codec
 		AVCodecContext*					mContext;
 		AVCodecParameters*				mParameters;
 		Core::Option<Resampler>			mFrameResampler;
-		Core::Option<AudioFrameResizer>	mFrameResizer;
-		PTSSetter						mPTSSetter;
+		Core::Option<FrameResizer>		mFrameResizer;
 	};
 }

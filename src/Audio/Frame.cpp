@@ -1,4 +1,4 @@
-#include "Codec/Frame.hpp"
+#include "Codec/Audio/Frame.hpp"
 
 
 
@@ -14,9 +14,9 @@ extern "C"
 
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
-	Frame Frame::Silence(const AudioFrameFormat& format, size_t samples)
+	Frame Frame::Silence(const FrameFormat& format, size_t samples)
 	{
 		int result = 0;
 

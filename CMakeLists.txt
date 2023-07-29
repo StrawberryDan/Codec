@@ -27,35 +27,29 @@ endif()
 
 add_library(StrawberryCodec STATIC
 		include/Codec/MediaFile.hpp
-		include/Codec/AudioFrameResizer.hpp
+		include/Codec/Audio/AudioFrameResizer.hpp
 		include/Codec/CodecParameters.hpp
-		include/Codec/Decoder.hpp
-		include/Codec/Frame.hpp
+		include/Codec/Audio/Decoder.hpp
+		include/Codec/Audio/Frame.hpp
 		include/Codec/Muxer.hpp
-		include/Codec/Encoder.hpp
+		include/Codec/Audio/Encoder.hpp
 		include/Codec/Packet.hpp
-		include/Codec/Resampler.hpp
+		include/Codec/Audio/Resampler.hpp
 		include/Codec/SodiumEncrypter.hpp
 		src/MediaFile.cpp
-		src/AudioFrameResizer.cpp
-		src/Decoder.cpp
-		src/Frame.cpp
+		src/Audio/AudioFrameResizer.cpp
+		src/Audio/Decoder.cpp
+		src/Audio/Frame.cpp
 		src/Muxer.cpp
-		src/Encoder.cpp
+		src/Audio/Encoder.cpp
 		src/Packet.cpp
-		src/Resampler.cpp
+		src/Audio/Resampler.cpp
 		src/SodiumEncrypter.cpp
-		src/FilterGraph.cpp
-		include/Codec/FilterGraph.hpp
-		src/Filter.cpp
-		include/Codec/Filter.hpp
 		include/Codec/Constants.hpp
-		src/AudioMixer.cpp
-		include/Codec/AudioMixer.hpp
-        include/Codec/AudioFrameFormat.hpp
-		src/PTSSetter.cpp
-		include/Codec/PTSSetter.hpp
-        src/AudioFrameFormat.cpp
+		src/Audio/AudioMixer.cpp
+		include/Codec/Audio/AudioMixer.hpp
+		include/Codec/Audio/AudioFrameFormat.hpp
+		src/Audio/AudioFrameFormat.cpp
 		include/Codec/MediaStream.hpp
 		src/MediaStream.cpp)
 

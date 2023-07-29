@@ -13,12 +13,12 @@ extern "C"
 }
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
 	class Frame;
 
 
-	struct AudioFrameFormat
+	struct FrameFormat
 	{
 		int sampleRate;
 		int sampleFormat;
@@ -26,20 +26,20 @@ namespace Strawberry::Codec
 		int channelLayout = 0;
 
 
-		explicit AudioFrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels, int channelLayout = 0);
+		explicit FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels, int channelLayout = 0);
 
-		explicit AudioFrameFormat(const Frame& frame);
-
-
-		AudioFrameFormat(const AudioFrameFormat& rhs);
+		explicit FrameFormat(const Frame& frame);
 
 
-		AudioFrameFormat& operator=(const AudioFrameFormat& rhs);
+		FrameFormat(const FrameFormat& rhs);
 
 
-		bool operator==(const AudioFrameFormat& b) const;
+		FrameFormat& operator=(const FrameFormat& rhs);
 
 
-		bool operator!=(const AudioFrameFormat& b) const;
+		bool operator==(const FrameFormat& b) const;
+
+
+		bool operator!=(const FrameFormat& b) const;
 	};
 }

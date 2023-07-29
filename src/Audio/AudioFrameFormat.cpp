@@ -1,12 +1,12 @@
-#include "Codec/AudioFrameFormat.hpp"
+#include "Codec/Audio/AudioFrameFormat.hpp"
 
 
-#include "Codec/Frame.hpp"
+#include "Codec/Audio/Frame.hpp"
 
 
-namespace Strawberry::Codec
+namespace Strawberry::Codec::Audio
 {
-	AudioFrameFormat::AudioFrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels,
+	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels,
 									   int channelLayout)
 			: sampleRate(sampleRate)
 			  , sampleFormat(sampleFormat)
@@ -18,7 +18,7 @@ namespace Strawberry::Codec
 	}
 
 
-	AudioFrameFormat::AudioFrameFormat(const Frame& frame)
+	FrameFormat::FrameFormat(const Frame& frame)
 			: sampleRate(frame->sample_rate)
 			  , sampleFormat(frame->format)
 			  , channels{}
@@ -29,7 +29,7 @@ namespace Strawberry::Codec
 	}
 
 
-	AudioFrameFormat::AudioFrameFormat(const AudioFrameFormat& rhs)
+	FrameFormat::FrameFormat(const FrameFormat& rhs)
 			: sampleRate(rhs.sampleRate)
 			  , sampleFormat(rhs.sampleFormat)
 			  , channels{}
@@ -40,7 +40,7 @@ namespace Strawberry::Codec
 	}
 
 
-	AudioFrameFormat& AudioFrameFormat::operator=(const AudioFrameFormat& rhs)
+	FrameFormat& FrameFormat::operator=(const FrameFormat& rhs)
 	{
 		if (this != &rhs)
 		{
@@ -51,7 +51,7 @@ namespace Strawberry::Codec
 	}
 
 
-	bool AudioFrameFormat::operator==(const AudioFrameFormat& b) const
+	bool FrameFormat::operator==(const FrameFormat& b) const
 	{
 		return sampleRate == b.sampleRate
 			   && sampleFormat == b.sampleFormat
@@ -62,7 +62,7 @@ namespace Strawberry::Codec
 	}
 
 
-	bool AudioFrameFormat::operator!=(const AudioFrameFormat& b) const
+	bool FrameFormat::operator!=(const FrameFormat& b) const
 	{
 		return !(*this == b);
 	}
