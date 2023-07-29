@@ -173,6 +173,92 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	template <typename T> requires (std::integral<T> || std::floating_point<T>)
+	static void MixArrays(T* a, T* b, size_t count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			*(a + i) += *(b + i);
+		}
+	}
+
+
+	template <typename T> requires (std::integral<T> || std::floating_point<T>)
+	static void MixArrays(void* a, void* b, size_t count)
+	{
+		MixArrays(reinterpret_cast<T*>(a), reinterpret_cast<T*>(b), count);
+	}
+
+
+	void Frame::Mix(const Frame& other)
+	{
+		Core::Assert(GetFormat() == other.GetFormat());
+		Core::Assert(GetNumSamples() == other.GetNumSamples());
+
+
+		switch (mFrame->format)
+		{
+			case AV_SAMPLE_FMT_U8 :
+				MixArrays<uint8_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+			case AV_SAMPLE_FMT_S16:
+				MixArrays<int16_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+			case AV_SAMPLE_FMT_S32:
+				MixArrays<int32_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+			case AV_SAMPLE_FMT_FLT:
+				MixArrays<float>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+			case AV_SAMPLE_FMT_DBL:
+				MixArrays<double>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+			case AV_SAMPLE_FMT_S64:
+				MixArrays<int64_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples());
+				break;
+
+			case AV_SAMPLE_FMT_U8P:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<uint8_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			case AV_SAMPLE_FMT_S16P:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<int16_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			case AV_SAMPLE_FMT_S32P:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<int32_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			case AV_SAMPLE_FMT_S64P:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<int64_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			case AV_SAMPLE_FMT_FLTP:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<float>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			case AV_SAMPLE_FMT_DBLP:
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
+				{
+					MixArrays<double>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+				}
+				break;
+			default:
+				Core::Unreachable();
+		}
+	}
+
+
 	Frame::Frame(AVFrame* frame)
 		: mFrame(frame)
 	{}
