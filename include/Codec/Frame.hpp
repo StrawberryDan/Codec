@@ -49,7 +49,7 @@ namespace Strawberry::Codec
 
 
 	private:
-		Frame(AVFrame* frame);
+		explicit Frame(AVFrame* frame);
 
 
 
