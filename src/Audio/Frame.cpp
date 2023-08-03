@@ -125,6 +125,18 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	size_t Frame::GetSampleSize() const
+	{
+		return av_get_bytes_per_sample(static_cast<AVSampleFormat>(mFrame->format));
+	}
+
+
+	bool Frame::IsFormatPlanar() const
+	{
+		return av_sample_fmt_is_planar(static_cast<AVSampleFormat>(mFrame->format));
+	}
+
+
 	void Frame::Append(const Frame& other)
 	{
 		AVFrame* newFrame        = av_frame_alloc();

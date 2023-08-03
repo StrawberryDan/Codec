@@ -41,6 +41,8 @@ namespace Strawberry::Codec::Audio
 		FrameFormat GetFormat() const;
 		size_t      GetChannelCount() const;
 		size_t      GetNumSamples() const;
+		size_t      GetSampleSize() const;
+		bool        IsFormatPlanar() const;
 
 
 		void Append(const Frame& other);
