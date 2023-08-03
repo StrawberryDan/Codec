@@ -12,14 +12,13 @@ namespace Strawberry::Codec::Audio
 	FrameResizer::FrameResizer(const FrameFormat& format, size_t outputFrameSize)
 		: mOutputFrameSize(outputFrameSize)
 		, mFrameFormat(format)
-		, mWorkingFrame(Frame::Silence(format, 1))
+		, mWorkingFrame()
 	{}
 
 
 
 	void FrameResizer::SendFrame(Frame frame)
 	{
-		Core::Assert(frame.GetFormat() == mFrameFormat);
 		mInputFrames.emplace(std::move(frame));
 	}
 
@@ -28,23 +27,32 @@ namespace Strawberry::Codec::Audio
 	{
 		while (true)
 		{
-			if (mWorkingFrame.GetNumSamples() == mOutputFrameSize)
+			if (!mWorkingFrame)
 			{
-				auto result = std::move(mWorkingFrame);
-				mWorkingFrame = Frame::Silence(mFrameFormat, 0);
-				return result;
+				if (mInputFrames.empty()) return Core::NullOpt;
+
+				mWorkingFrame = std::move(mInputFrames.front());
+				mInputFrames.pop();
 			}
 
-			if (mWorkingFrame.GetNumSamples() > mOutputFrameSize)
+			Core::Assert(mWorkingFrame.HasValue());
+			if (mWorkingFrame->GetNumSamples() == mOutputFrameSize)
 			{
-				auto [result, remainder] = mWorkingFrame.Split(mOutputFrameSize);
+				return std::move(mWorkingFrame);
+			}
+
+			if (mWorkingFrame->GetNumSamples() > mOutputFrameSize)
+			{
+				auto [result, remainder] = mWorkingFrame->Split(mOutputFrameSize);
 				mWorkingFrame = std::move(remainder);
+
+				Core::Assert(result->sample_rate > 0);
 				return result;
 			}
 
-			if (!mInputFrames.empty())
+			if (mWorkingFrame->GetNumSamples() < mOutputFrameSize && !mInputFrames.empty())
 			{
-				mWorkingFrame.Append(std::move(mInputFrames.front()));
+				mWorkingFrame->Append(mInputFrames.front());
 				mInputFrames.pop();
 				continue;
 			}
@@ -56,6 +64,6 @@ namespace Strawberry::Codec::Audio
 
 	bool FrameResizer::IsOutputAvailable() const
 	{
-		return mWorkingFrame.GetNumSamples() > 0 && !mInputFrames.empty();
+		return !mInputFrames.empty() || (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize);
 	}
 }

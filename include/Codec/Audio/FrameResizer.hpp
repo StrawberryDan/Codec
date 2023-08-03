@@ -39,9 +39,9 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		const size_t      mOutputFrameSize;
-		const FrameFormat mFrameFormat;
-		Frame             mWorkingFrame;
-		std::queue<Frame> mInputFrames;
+		const size_t        mOutputFrameSize;
+		const FrameFormat   mFrameFormat;
+		Core::Option<Frame> mWorkingFrame;
+		std::queue<Frame>   mInputFrames;
 	};
 }
