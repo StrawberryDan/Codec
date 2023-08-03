@@ -39,6 +39,7 @@ namespace Strawberry::Codec::Audio
 
 
 		FrameFormat GetFormat() const;
+		size_t      GetChannelCount() const;
 		size_t      GetNumSamples() const;
 
 
