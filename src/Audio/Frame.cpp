@@ -208,7 +208,7 @@ namespace Strawberry::Codec::Audio
 	{
 		for (int i = 0; i < count; i++)
 		{
-			*(a + i) += *(b + i);
+			*(a + i) = *(a + i) + *(b + i);
 		}
 	}
 
@@ -228,7 +228,7 @@ namespace Strawberry::Codec::Audio
 
 		switch (mFrame->format)
 		{
-			case AV_SAMPLE_FMT_U8 :
+			case AV_SAMPLE_FMT_U8:
 				MixArrays<uint8_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_S16:
@@ -237,14 +237,14 @@ namespace Strawberry::Codec::Audio
 			case AV_SAMPLE_FMT_S32:
 				MixArrays<int32_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
 				break;
+			case AV_SAMPLE_FMT_S64:
+				MixArrays<int64_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				break;
 			case AV_SAMPLE_FMT_FLT:
 				MixArrays<float>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_DBL:
 				MixArrays<double>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
-				break;
-			case AV_SAMPLE_FMT_S64:
-				MixArrays<int64_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
 				break;
 
 			case AV_SAMPLE_FMT_U8P:
