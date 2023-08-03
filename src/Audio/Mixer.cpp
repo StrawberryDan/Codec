@@ -8,65 +8,98 @@
 #include "fmt/format.h"
 
 
-constexpr size_t FRAME_SIZE = 48000 / 32;
-constexpr int    FORMAT = AV_SAMPLE_FMT_DBL;
 
-;
 namespace Strawberry::Codec::Audio
 {
-	Mixer::Mixer(size_t trackCount)
-		: mTrackCount(trackCount)
-		, mResamplers()
+	Mixer::Mixer(const FrameFormat& outputFormat, size_t outputFrameSize)
+			: mOutputFormat(outputFormat)
+			, mOutputFrameSize(outputFrameSize)
 	{
-		FrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
 
-		for (int i = 0; i < trackCount; i++)
-		{
-			mResamplers.emplace_back(format);
-		}
 	}
 
 
-	void Mixer::Send(size_t trackIndex, const Frame& frame)
+	Frame Mixer::ReadFrame()
 	{
-		Core::Assert(trackIndex >= 0 && trackIndex < mTrackCount);
-		mResamplers[trackIndex].SendFrame(frame);
+		// Erase dead channels
+		std::erase_if(mInputChannels, [](std::weak_ptr<InputChannel>& x) { return x.expired(); });
+
+		// Mix Input Channels
+		Frame result = Frame::Silence(mOutputFormat, mOutputFrameSize);
+		for (auto& channel : mInputChannels)
+		{
+			auto frame = channel.lock()->ReadFrame();
+			result.Mix(frame);
+		}
+
+		return result;
 	}
 
 
-	Core::Option<Frame> Mixer::ReceiveFrame()
+	bool Mixer::IsEmpty() const
 	{
-		FrameFormat format(48000, FORMAT, AV_CHANNEL_LAYOUT_STEREO);
+		return std::all_of(
+			mInputChannels.begin(), mInputChannels.end(),
+			[](auto& x) { return !x.lock()->IsOutputAvailable(); });
+	}
 
-		std::vector<Frame> inputs;
-		inputs.reserve(mTrackCount);
-		int tracksReadFrom = 0;
-		for (int i = 0; i < mTrackCount; i++)
+
+	std::shared_ptr<Mixer::InputChannel> Mixer::CreateInputChannel()
+	{
+		auto channel = std::make_shared<InputChannel>(mOutputFormat, mOutputFrameSize);
+		mInputChannels.emplace_back(channel);
+		return channel;
+	}
+
+
+	Mixer::InputChannel::InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize)
+		: mOutputFormat(outputFormat)
+		, mOutputFrameSize(outputFrameSize)
+		, mResampler(outputFormat)
+		, mFrameResizer(outputFormat, outputFrameSize)
+	{}
+
+
+	bool Mixer::InputChannel::IsOutputAvailable() const
+	{
+		bool a = !mFrameBuffer.empty();
+		bool b = mFrameResizer.IsOutputAvailable();
+		bool c = mResampler.IsOutputAvailable();
+		return a || b || c;
+	}
+
+
+	void Mixer::InputChannel::EnqueueFrame(Frame frame)
+	{
+		Core::Assert(frame->sample_rate > 0);
+		mFrameBuffer.emplace_back(std::move(frame));
+	}
+
+
+	Frame Mixer::InputChannel::ReadFrame()
+	{
+		while (true)
 		{
-			auto frame = mResamplers[i].ReadFrame();
-			if (frame) tracksReadFrom += 1;
-			inputs.emplace_back(std::move(frame.UnwrapOr(Frame::Silence(format, FRAME_SIZE))));
-		}
+			Core::Option<Frame> result = mFrameResizer.ReadFrame();
+			if (result) return result.Unwrap();
 
-		if (tracksReadFrom == 0) return {};
-
-		Frame frame = Frame::Silence(format, FRAME_SIZE);
-		for (int inputIndex = 0; inputIndex < inputs.size(); inputIndex++)
-		{
-			for (int sampleIndex = 0; sampleIndex < FRAME_SIZE * format.channels.nb_channels; sampleIndex++)
+			result = mResampler.ReadFrame();
+			if (result)
 			{
-				for (int i = 0; i < AV_NUM_DATA_POINTERS; i++)
-				{
-					if (frame->data[i])
-					{
-						auto& input = reinterpret_cast<double*>(inputs[inputIndex]->data[i])[sampleIndex];
-						auto& output = reinterpret_cast<double*>(frame->data[i])[sampleIndex];
-						output += input / tracksReadFrom;
-					}
-				}
+				mFrameResizer.SendFrame(result.Unwrap());
+				continue;
 			}
-		}
 
-		return frame;
+			result = mFrameBuffer.empty() ? Core::NullOpt : Core::Option(std::move(mFrameBuffer.front()));
+			if (result)
+			{
+				Core::Assert(result.Value()->sample_rate > 0);
+				mResampler.SendFrame(result.Unwrap());
+				mFrameBuffer.pop_front();
+				continue;
+			}
+
+			return Frame::Silence(mOutputFormat, mOutputFrameSize);
+		}
 	}
 }
