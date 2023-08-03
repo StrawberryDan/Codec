@@ -10,6 +10,7 @@
 #include "Frame.hpp"
 /// Strawberry Libraries
 #include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Mutex.hpp"
 /// Standard Library
 #include <unordered_set>
 #include <memory>
@@ -40,7 +41,7 @@ namespace Strawberry::Codec::Audio
 	private:
 		const FrameFormat                      mOutputFormat;
 		const size_t                           mOutputFrameSize;
-		std::list<std::weak_ptr<InputChannel>> mInputChannels;
+		std::list<std::shared_ptr<InputChannel>> mInputChannels;
 	};
 
 
@@ -66,7 +67,7 @@ namespace Strawberry::Codec::Audio
 	private:
 		const FrameFormat mOutputFormat;
 		const size_t      mOutputFrameSize;
-		std::deque<Frame>  mFrameBuffer;
+		Core::Mutex<std::deque<Frame>> mFrameBuffer;
 		Resampler         mResampler;
 		FrameResizer      mFrameResizer;
 	};

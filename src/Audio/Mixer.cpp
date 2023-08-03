@@ -22,13 +22,13 @@ namespace Strawberry::Codec::Audio
 	Frame Mixer::ReadFrame()
 	{
 		// Erase dead channels
-		std::erase_if(mInputChannels, [](std::weak_ptr<InputChannel>& x) { return x.expired(); });
+		std::erase_if(mInputChannels, [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
 
 		// Mix Input Channels
 		Frame result = Frame::Silence(mOutputFormat, mOutputFrameSize);
 		for (auto& channel : mInputChannels)
 		{
-			auto frame = channel.lock()->ReadFrame();
+			auto frame = channel->ReadFrame();
 			result.Mix(frame);
 		}
 
@@ -40,7 +40,7 @@ namespace Strawberry::Codec::Audio
 	{
 		return std::all_of(
 			mInputChannels.begin(), mInputChannels.end(),
-			[](auto& x) { return !x.lock()->IsOutputAvailable(); });
+			[](auto& x) { return !x->IsOutputAvailable(); });
 	}
 
 
@@ -62,7 +62,7 @@ namespace Strawberry::Codec::Audio
 
 	bool Mixer::InputChannel::IsOutputAvailable() const
 	{
-		bool a = !mFrameBuffer.empty();
+		bool a = !mFrameBuffer.Lock()->empty();
 		bool b = mFrameResizer.IsOutputAvailable();
 		bool c = mResampler.IsOutputAvailable();
 		return a || b || c;
@@ -72,7 +72,7 @@ namespace Strawberry::Codec::Audio
 	void Mixer::InputChannel::EnqueueFrame(Frame frame)
 	{
 		Core::Assert(frame->sample_rate > 0);
-		mFrameBuffer.emplace_back(std::move(frame));
+		mFrameBuffer.Lock()->emplace_back(std::move(frame));
 	}
 
 
@@ -90,12 +90,13 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			result = mFrameBuffer.empty() ? Core::NullOpt : Core::Option(std::move(mFrameBuffer.front()));
+			auto frameBuffer = mFrameBuffer.Lock();
+			result = frameBuffer->empty() ? Core::NullOpt : Core::Option(std::move(frameBuffer->front()));
 			if (result)
 			{
 				Core::Assert(result.Value()->sample_rate > 0);
 				mResampler.SendFrame(result.Unwrap());
-				mFrameBuffer.pop_front();
+				frameBuffer->pop_front();
 				continue;
 			}
 
