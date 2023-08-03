@@ -47,28 +47,29 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 
 void AudioMixing()
 {
-	Core::ScopedTimer timer("Test");
-
-
-	av_log_set_level(AV_LOG_FATAL);
+	Core::ScopedTimer timer("Audio Mixing");
 
 
 	std::vector<Audio::Frame> frames[] =
-			{
-					DecodeAudioFile("data/pd.wav"),
-					DecodeAudioFile("data/girigiri.wav"),
-					DecodeAudioFile("data/dcl.wav"),
-					DecodeAudioFile("data/cotn.flac"),
-			};
+	{
+		// DecodeAudioFile("data/pd.wav"),
+		// DecodeAudioFile("data/girigiri.wav"),
+		// DecodeAudioFile("data/dcl.wav"),
+		DecodeAudioFile("data/cotn.flac"),
+	};
+
+
+	Audio::Mixer mixer(Audio::FrameFormat(48000, AV_SAMPLE_FMT_DBL, AV_CHANNEL_LAYOUT_STEREO), 1024);
+	std::vector<std::shared_ptr<Audio::Mixer::InputChannel>> mixerChannels;
+	for (auto& x : frames) mixerChannels.push_back(mixer.CreateInputChannel());
 
 
 	std::vector<Packet> packets;
-	Audio::Mixer mixer(std::extent_v<decltype(frames)>);
 	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
 	{
 		for (auto& frame : frames[i])
 		{
-			mixer.Send(i, frame);
+			mixerChannels[i]->EnqueueFrame(frame);
 		}
 	}
 
@@ -76,9 +77,9 @@ void AudioMixing()
 
 	packets.clear();
 	Audio::Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
-	while (auto frame= mixer.ReceiveFrame())
+	while (!mixer.IsEmpty())
 	{
-		auto somePackets = encoder.Encode(*frame);
+		auto somePackets = encoder.Encode(mixer.ReadFrame());
 		for (const auto p: somePackets)
 		{
 			packets.push_back(p);
@@ -103,5 +104,7 @@ void AudioMixing()
 
 int main()
 {
+	av_log_set_level(AV_LOG_WARNING);
+
 	AudioMixing();
 }
