@@ -26,20 +26,16 @@ namespace Strawberry::Codec::Audio
 		int channelLayout = 0;
 
 
-		explicit FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels, int channelLayout = 0);
+		FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels, int channelLayout = 0);
 
-		explicit FrameFormat(const Frame& frame);
-
+		FrameFormat(const Frame& frame);
 
 		FrameFormat(const FrameFormat& rhs);
-
 
 		FrameFormat& operator=(const FrameFormat& rhs);
 
 
 		bool operator==(const FrameFormat& b) const;
-
-
 		bool operator!=(const FrameFormat& b) const;
 	};
 }
