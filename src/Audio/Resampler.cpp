@@ -46,10 +46,16 @@ namespace Strawberry::Codec::Audio
 	{
 		if (!IsOutputAvailable()) return Core::NullOpt;
 
-
+		// Read our next buffered frame. Early return if it's already in the right format.
 		Frame input(std::move(mInputFrames.front()));
 		mInputFrames.pop();
 		Core::Assert(input->sample_rate > 0);
+		if (input.GetFormat() == mOutputFormat)
+		{
+			return input;
+		}
+
+
 		Frame output = Frame::Allocate();
 		output->sample_rate = mOutputFormat.sampleRate;
 		output->ch_layout   = mOutputFormat.channels;
