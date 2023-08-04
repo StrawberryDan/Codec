@@ -68,10 +68,10 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		const FrameFormat mOutputFormat;
-		const size_t      mOutputFrameSize;
+		const FrameFormat              mOutputFormat;
+		const size_t                   mOutputFrameSize;
 		Core::Mutex<std::deque<Frame>> mFrameBuffer;
-		Resampler         mResampler;
-		FrameResizer      mFrameResizer;
+		Resampler                      mResampler;
+		FrameResizer                   mFrameResizer;
 	};
 }
