@@ -80,7 +80,7 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Math::Rational<> MediaStream::GetTimeBase() const
+	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const
 	{
 		return
 		{
@@ -94,8 +94,7 @@ namespace Strawberry::Codec
 	{
 		auto timeBase = GetTimeBase();
 		auto timeBaseCount = mStreamInfo.Stream->duration;
-		timeBase.Numerator() *= timeBaseCount;
-		timeBase.Denominator() *= timeBaseCount;
+		timeBase = timeBase * timeBaseCount;
 		return std::chrono::duration<double>(timeBase.Evaluate());
 	}
 
