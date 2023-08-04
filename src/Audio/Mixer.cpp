@@ -29,7 +29,7 @@ namespace Strawberry::Codec::Audio
 		for (auto& channel : mInputChannels)
 		{
 			auto frame = channel->ReadFrame();
-			result.Mix(frame);
+			result = result.Mix(frame);
 		}
 
 		return result;

@@ -47,7 +47,7 @@ namespace Strawberry::Codec::Audio
 
 		void Append(const Frame& other);
 		[[nodiscard]] std::pair<Frame, Frame> Split(size_t pos) const;
-		void Mix(const Frame& other);
+		[[nodiscard]] Frame Mix(const Frame& other) const;
 
 
 		inline       AVFrame* operator*()        { return mFrame; }

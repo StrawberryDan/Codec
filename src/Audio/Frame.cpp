@@ -220,60 +220,76 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Frame::Mix(const Frame& other)
+	Frame Frame::Mix(const Frame& other) const
 	{
 		Core::Assert(GetFormat() == other.GetFormat());
-		Core::Assert(GetNumSamples() == other.GetNumSamples());
+		const size_t samplesToCopy = std::min(GetNumSamples(), other.GetNumSamples());
+
+		Frame result;
+		Frame* bigger  = &result;
+		const Frame* smaller = nullptr;
+		if (GetNumSamples() > other.GetNumSamples())
+		{
+			result = (*this);
+			smaller = &other;
+		}
+		else
+		{
+			result = other;
+			smaller = this;
+		}
 
 
 		switch (mFrame->format)
 		{
 			case AV_SAMPLE_FMT_U8:
-				MixArrays<uint8_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<uint8_t>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_S16:
-				MixArrays<int16_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<int16_t>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_S32:
-				MixArrays<int32_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<int32_t>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_S64:
-				MixArrays<int64_t>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<int64_t>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_FLT:
-				MixArrays<float>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<float>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 			case AV_SAMPLE_FMT_DBL:
-				MixArrays<double>(mFrame->data[0], other.mFrame->data[0], GetNumSamples() * GetChannelCount());
+				MixArrays<double>((*bigger)->data[0], (*smaller)->data[0], samplesToCopy * GetChannelCount());
 				break;
 
 			case AV_SAMPLE_FMT_U8P:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<uint8_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<uint8_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S16P:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int16_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<int16_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S32P:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int32_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<int32_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S64P:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int64_t>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<int64_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_FLTP:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<float>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<float>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_DBLP:
 				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<double>(mFrame->data[i], other.mFrame->data[i], GetNumSamples());
+					MixArrays<double>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			default:
 				Core::Unreachable();
 		}
+
+		return result;
 	}
 
 
