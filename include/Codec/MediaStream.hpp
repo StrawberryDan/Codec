@@ -45,8 +45,11 @@ namespace Strawberry::Codec
 		Core::Option<Packet> Read();
 
 
-		Core::Math::Rational<>        GetTimeBase() const;
-		std::chrono::duration<double> GetDuration() const;
+		Core::Option<std::string>     GetTitle()      const;
+		Core::Option<std::string>     GetAlbumTitle() const;
+		Core::Option<std::string>     GetArtist()     const;
+		Core::Math::Rational<>        GetTimeBase()   const;
+		std::chrono::duration<double> GetDuration()   const;
 
 
 		const AVCodec*           GetCodec() const;

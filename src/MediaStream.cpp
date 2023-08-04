@@ -1,7 +1,14 @@
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
 #include "Codec/MediaStream.hpp"
-
-
+// Codec
 #include "Codec/MediaFile.hpp"
+// LibAV
+extern "C"
+{
+#include "libavutil/dict.h"
+}
 
 
 namespace Strawberry::Codec
@@ -28,6 +35,48 @@ namespace Strawberry::Codec
 		}
 
 		return mPacketBuffer.Pop();
+	}
+
+
+	Core::Option<std::string> MediaStream::GetTitle() const
+	{
+		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "title", nullptr, 0);
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
+	}
+
+
+	Core::Option<std::string> MediaStream::GetAlbumTitle() const
+	{
+		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "album", nullptr, 0);
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
+	}
+
+
+	Core::Option<std::string> MediaStream::GetArtist() const
+	{
+		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "artist", nullptr, 0);
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
 	}
 
 
