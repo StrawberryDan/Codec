@@ -26,32 +26,35 @@ endif()
 
 
 add_library(StrawberryCodec STATIC
-		include/Codec/MediaFile.hpp
-		include/Codec/Audio/FrameResizer.hpp
-		include/Codec/CodecParameters.hpp
 		include/Codec/Audio/Decoder.hpp
-		include/Codec/Audio/Frame.hpp
-		include/Codec/Muxer.hpp
 		include/Codec/Audio/Encoder.hpp
-		include/Codec/Packet.hpp
-		include/Codec/Audio/Resampler.hpp
-		include/Codec/SodiumEncrypter.hpp
-		src/MediaFile.cpp
-		src/Audio/FrameResizer.cpp
-		src/Audio/Decoder.cpp
-		src/Audio/Frame.cpp
-		src/Muxer.cpp
-		src/Audio/Encoder.cpp
-		src/Packet.cpp
-		src/Audio/Resampler.cpp
-		src/SodiumEncrypter.cpp
-		include/Codec/Constants.hpp
-		src/Audio/Mixer.cpp
-		include/Codec/Audio/Mixer.hpp
+		include/Codec/Audio/Frame.hpp
 		include/Codec/Audio/FrameFormat.hpp
-		src/Audio/FrameFormat.cpp
+		include/Codec/Audio/FrameResizer.hpp
+		include/Codec/Audio/Mixer.hpp
+		include/Codec/Audio/Playlist.hpp
+		include/Codec/Audio/Resampler.hpp
+		include/Codec/CodecParameters.hpp
+		include/Codec/Constants.hpp
+		include/Codec/MediaFile.hpp
 		include/Codec/MediaStream.hpp
-		src/MediaStream.cpp)
+		include/Codec/Muxer.hpp
+		include/Codec/Packet.hpp
+		include/Codec/SodiumEncrypter.hpp
+		src/Audio/Decoder.cpp
+		src/Audio/Encoder.cpp
+		src/Audio/Frame.cpp
+		src/Audio/FrameFormat.cpp
+		src/Audio/FrameResizer.cpp
+		src/Audio/Mixer.cpp
+		src/Audio/Playlist.cpp
+		src/Audio/Resampler.cpp
+		src/MediaFile.cpp
+		src/MediaStream.cpp
+		src/Muxer.cpp
+		src/Packet.cpp
+		src/SodiumEncrypter.cpp
+)
 
 
 target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
