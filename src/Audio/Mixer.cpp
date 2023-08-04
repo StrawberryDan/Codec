@@ -92,7 +92,7 @@ namespace Strawberry::Codec::Audio
 	{
 		while (true)
 		{
-			Core::Option<Frame> result = mFrameResizer.ReadFrame();
+			Core::Option<Frame> result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result.Unwrap();
 
 			result = mResampler.ReadFrame();
