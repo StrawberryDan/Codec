@@ -1,11 +1,19 @@
 #pragma once
 
-
-#include "Strawberry/Core/Option.hpp"
-#include "Strawberry/Core/Collection/CircularBuffer.hpp"
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Codec
 #include "Codec/Packet.hpp"
 #include "Codec/Constants.hpp"
 #include "Codec/Audio/Decoder.hpp"
+// Core
+#include "Strawberry/Core/Collection/CircularBuffer.hpp"
+#include "Strawberry/Core/Math/Rational.hpp"
+#include "Strawberry/Core/Option.hpp"
+// Standard Library
+#include <chrono>
+
 
 
 namespace Strawberry::Codec
@@ -17,6 +25,7 @@ namespace Strawberry::Codec
 	{
 		size_t             Index;
 		MediaType          MediaType;
+		AVStream*          Stream;
 		AVCodecParameters* CodecParameters;
 	};
 
@@ -34,6 +43,10 @@ namespace Strawberry::Codec
 
 
 		Core::Option<Packet> Read();
+
+
+		Core::Math::Rational<>        GetTimeBase() const;
+		std::chrono::duration<double> GetDuration() const;
 
 
 		const AVCodec*           GetCodec() const;

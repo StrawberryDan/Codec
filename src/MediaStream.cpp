@@ -31,6 +31,26 @@ namespace Strawberry::Codec
 	}
 
 
+	Core::Math::Rational<> MediaStream::GetTimeBase() const
+	{
+		return
+		{
+			mStreamInfo.Stream->time_base.num,
+			mStreamInfo.Stream->time_base.den
+		};
+	}
+
+
+	std::chrono::duration<double> MediaStream::GetDuration() const
+	{
+		auto timeBase = GetTimeBase();
+		auto timeBaseCount = mStreamInfo.Stream->duration;
+		timeBase.Numerator() *= timeBaseCount;
+		timeBase.Denominator() *= timeBaseCount;
+		return std::chrono::duration<double>(timeBase.Evaluate());
+	}
+
+
 	const AVCodec* MediaStream::GetCodec() const
 	{
 		auto codec = avcodec_find_decoder(mStreamInfo.CodecParameters->codec_id);

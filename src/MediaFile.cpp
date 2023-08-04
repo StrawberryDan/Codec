@@ -74,7 +74,8 @@ namespace Strawberry::Codec
 		}
 
 		info.Index = index;
-		info.CodecParameters = mFile->streams[index]->codecpar;
+		info.Stream = mFile->streams[index];
+		info.CodecParameters = info.Stream->codecpar;
 
 		return info;
 	}
