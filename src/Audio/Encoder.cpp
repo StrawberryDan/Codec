@@ -63,7 +63,7 @@ namespace Strawberry::Codec::Audio
 		std::vector<Packet> packets;
 
 		mFrameResizer->SendFrame(std::move(frame));
-		while (auto frame = mFrameResizer->ReadFrame())
+		while (auto frame = mFrameResizer->ReadFrame(FrameResizer::Mode::WaitForFullFrames))
 		{
 			mFrameResampler->SendFrame(frame.Unwrap());
 			while (auto frame = mFrameResampler->ReadFrame())
@@ -90,6 +90,37 @@ namespace Strawberry::Codec::Audio
 		return packets;
 	}
 
+
+	std::vector<Packet> Encoder::Flush()
+	{
+		std::vector<Packet> packets;
+
+		while (auto frame = mFrameResizer->ReadFrame(FrameResizer::Mode::YieldAvailable))
+		{
+			mFrameResampler->SendFrame(frame.Unwrap());
+			while (auto frame = mFrameResampler->ReadFrame())
+			{
+				auto send = avcodec_send_frame(mContext, **frame);
+				Core::Assert(send == 0);
+
+				int receive;
+				do
+				{
+					Packet packet;
+					receive = avcodec_receive_packet(mContext, *packet);
+					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
+
+					if (receive == 0)
+					{
+						packets.push_back(packet);
+					}
+				}
+				while (receive == 0);
+			}
+		}
+
+		return packets;
+	}
 
 
 	AVCodecParameters* Encoder::Parameters() const

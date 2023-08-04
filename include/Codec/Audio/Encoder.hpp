@@ -21,7 +21,7 @@ namespace Strawberry::Codec::Audio
 		~Encoder();
 
 		std::vector<Packet>  Encode(const Frame& frame);
-		Core::Option<Packet> Flush();
+		std::vector<Packet> Flush();
 
 		inline       AVCodecContext* operator*()        { return mContext; }
 		inline const AVCodecContext* operator*()  const { return mContext; }

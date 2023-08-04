@@ -63,7 +63,7 @@ namespace Strawberry::Codec::Audio
 	bool Mixer::InputChannel::IsOutputAvailable() const
 	{
 		bool a = !mFrameBuffer.Lock()->empty();
-		bool b = mFrameResizer.IsOutputAvailable();
+		bool b = mFrameResizer.IsOutputAvailable(FrameResizer::Mode::YieldAvailable);
 		bool c = mResampler.IsOutputAvailable();
 		return a || b || c;
 	}

@@ -18,6 +18,14 @@ namespace Strawberry::Codec::Audio
 	class FrameResizer
 	{
 	public:
+		enum class Mode
+		{
+			YieldAvailable,
+			WaitForFullFrames,
+		};
+
+
+	public:
 		/// Constructor
 		/// @param outputFrameSize The number of samples output audio frames should have
 		FrameResizer(const FrameFormat& format, size_t outputFrameSize);
