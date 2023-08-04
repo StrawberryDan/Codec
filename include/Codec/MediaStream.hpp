@@ -42,21 +42,21 @@ namespace Strawberry::Codec
 		MediaStream& operator=(MediaStream&&)      = delete;
 
 
-		Core::Option<Packet> Read();
+		[[nodiscard]] Core::Option<Packet> Read();
 
 
-		Core::Option<std::string>     GetTitle()      const;
-		Core::Option<std::string>     GetAlbumTitle() const;
-		Core::Option<std::string>     GetArtist()     const;
-		Core::Math::Rational<int64_t> GetTimeBase()   const;
-		std::chrono::duration<double> GetDuration()   const;
+		[[nodiscard]] Core::Option<std::string>     GetTitle()      const;
+		[[nodiscard]] Core::Option<std::string>     GetAlbumTitle() const;
+		[[nodiscard]] Core::Option<std::string>     GetArtist()     const;
+		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase()   const;
+		[[nodiscard]] std::chrono::duration<double> GetDuration()   const;
 
 
-		const AVCodec*           GetCodec() const;
-		const AVCodecParameters* GetCodecParameters() const;
+		[[nodiscard]] const AVCodec*           GetCodec() const;
+		[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
 
 
-		Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters()); }
+		[[nodiscard]] Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters()); }
 
 
 	private:
