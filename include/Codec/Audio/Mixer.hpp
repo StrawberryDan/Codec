@@ -57,6 +57,8 @@ namespace Strawberry::Codec::Audio
 		bool IsOutputAvailable() const;
 
 
+		/// Returns the number of samples currently buffered.
+		size_t QueueLength() const;
 		void EnqueueFrame(Frame frame);
 
 

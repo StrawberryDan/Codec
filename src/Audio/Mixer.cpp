@@ -69,6 +69,18 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	size_t Mixer::InputChannel::QueueLength() const
+	{
+		size_t sum = 0;
+		auto frameBuffer = mFrameBuffer.Lock();
+		for (const auto& frame : *frameBuffer)
+		{
+			sum += frame->nb_samples;
+		}
+		return sum;
+	}
+
+
 	void Mixer::InputChannel::EnqueueFrame(Frame frame)
 	{
 		Core::Assert(frame->sample_rate > 0);
