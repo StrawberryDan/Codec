@@ -4,17 +4,18 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-/// Codec
+// Codec
 #include "FrameResizer.hpp"
 #include "Codec/Audio/Resampler.hpp"
 #include "Frame.hpp"
-/// Strawberry Libraries
+// Strawberry Libraries
 #include "Strawberry/Core/Option.hpp"
 #include "Strawberry/Core/Mutex.hpp"
-/// Standard Library
+// Standard Library
 #include <unordered_set>
 #include <memory>
 #include <list>
+#include <deque>
 
 
 namespace Strawberry::Codec::Audio
@@ -54,11 +55,11 @@ namespace Strawberry::Codec::Audio
 		InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize);
 
 
+		/// Returns whether there are any queued samples in this channel.
 		bool IsOutputAvailable() const;
-
-
 		/// Returns the number of samples currently buffered.
 		size_t QueueLength() const;
+		/// Enqueues a frame in this channel's buffer.
 		void EnqueueFrame(Frame frame);
 
 
