@@ -56,7 +56,7 @@ namespace Strawberry::Codec::Audio
 		: mOutputFormat(outputFormat)
 		, mOutputFrameSize(outputFrameSize)
 		, mResampler(outputFormat)
-		, mFrameResizer(outputFormat, outputFrameSize)
+		, mFrameResizer(outputFrameSize)
 	{}
 
 

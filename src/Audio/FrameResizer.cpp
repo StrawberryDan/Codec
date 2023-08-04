@@ -9,9 +9,8 @@
 
 namespace Strawberry::Codec::Audio
 {
-	FrameResizer::FrameResizer(const FrameFormat& format, size_t outputFrameSize)
+	FrameResizer::FrameResizer(size_t outputFrameSize)
 		: mOutputFrameSize(outputFrameSize)
-		, mFrameFormat(format)
 		, mWorkingFrame()
 	{}
 
