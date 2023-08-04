@@ -39,9 +39,9 @@ namespace Strawberry::Codec::Audio
 		/// @param frame The input frame
 		void SendFrame(Frame frame);
 
-		Core::Option<Frame> ReadFrame();
+		Core::Option<Frame> ReadFrame(Mode mode);
 
-		bool IsOutputAvailable() const;
+		bool IsOutputAvailable(Mode mode) const;
 
 		const FrameFormat& GetFormat() const { return mFrameFormat; }
 
