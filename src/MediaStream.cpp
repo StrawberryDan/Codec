@@ -52,7 +52,7 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Option<std::string> MediaStream::GetAlbumTitle() const
+	Core::Option<std::string> MediaStream::GetAlbum() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "album", nullptr, 0);
 		if (entry)

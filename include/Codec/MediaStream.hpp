@@ -46,7 +46,7 @@ namespace Strawberry::Codec
 
 
 		[[nodiscard]] Core::Option<std::string>     GetTitle()      const;
-		[[nodiscard]] Core::Option<std::string>     GetAlbumTitle() const;
+		[[nodiscard]] Core::Option<std::string>     GetAlbum() const;
 		[[nodiscard]] Core::Option<std::string>     GetArtist()     const;
 		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase()   const;
 		[[nodiscard]] std::chrono::duration<double> GetDuration()   const;
