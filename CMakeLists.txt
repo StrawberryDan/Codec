@@ -15,7 +15,9 @@ pkg_check_modules(FFMPEG REQUIRED
 message(STATUS "Using FFMPEG found at ${FFMPEG_LIBRARY_DIRS}")
 
 
-find_path(SODIUM_INCLUDE_DIR PATHS sodium.h)
+
+find_path(SODIUM_INCLUDE_DIR PATHS sodium.h
+	HINTS /usr/local/include)
 find_library(SODIUM_LIBRARY REQUIRED
 		NAMES libsodium.a)
 
