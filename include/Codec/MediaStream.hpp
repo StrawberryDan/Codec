@@ -56,7 +56,7 @@ namespace Strawberry::Codec
 		[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
 
 
-		[[nodiscard]] Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters(), {mStreamInfo.Stream->time_base.num, mStreamInfo.Stream->time_base.den}); }
+		[[nodiscard]] Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters()); }
 
 
 	private:
