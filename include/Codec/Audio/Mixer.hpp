@@ -54,6 +54,11 @@ namespace Strawberry::Codec::Audio
 	public:
 		InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize);
 
+		InputChannel(const InputChannel& rhs)            = delete;
+		InputChannel& operator=(const InputChannel& rhs) = delete;
+		InputChannel(InputChannel&& rhs)                 = default;
+		InputChannel& operator=(InputChannel&& rhs)      = default;
+
 
 		/// Returns whether there are any queued samples in this channel.
 		bool IsOutputAvailable() const;
@@ -68,10 +73,13 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		const FrameFormat              mOutputFormat;
-		const size_t                   mOutputFrameSize;
+		FrameFormat                    mOutputFormat;
+		size_t                         mOutputFrameSize;
 		Core::Mutex<std::deque<Frame>> mFrameBuffer;
 		Resampler                      mResampler;
 		FrameResizer                   mFrameResizer;
 	};
+
+	static_assert(std::is_move_constructible_v<Mixer::InputChannel>);
+	static_assert(std::is_move_assignable_v<Mixer::InputChannel>);
 }
