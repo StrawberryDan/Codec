@@ -24,8 +24,8 @@ namespace Strawberry::Codec::Audio
 		explicit Resampler(FrameFormat outputFormat);
 		Resampler(const Resampler&)            = delete;
 		Resampler& operator=(const Resampler&) = delete;
-		Resampler(Resampler&&)                 = delete;
-		Resampler& operator=(Resampler&&)      = delete;
+		Resampler(Resampler&&)                 = default;
+		Resampler& operator=(Resampler&&)      = default;
 		~Resampler();
 
 
@@ -39,7 +39,7 @@ namespace Strawberry::Codec::Audio
 
 	private:
 		Core::Option<FrameFormat> mInputFormat;
-		const FrameFormat         mOutputFormat;
+		FrameFormat               mOutputFormat;
 		SwrContext*               mContext;
 		std::queue<Frame>         mInputFrames;
 	};
