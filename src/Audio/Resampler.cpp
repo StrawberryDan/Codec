@@ -1,10 +1,10 @@
 #include <fmt/format.h>
-#include <Strawberry/Core/Logging.hpp>
+#include <Strawberry/Core/Util/Logging.hpp>
 #include "Codec/Audio/Resampler.hpp"
-#include "Strawberry/Core/Utilities.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 extern "C"

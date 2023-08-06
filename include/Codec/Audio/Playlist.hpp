@@ -7,7 +7,7 @@
 #include "Codec/Audio/Resampler.hpp"
 #include "Codec/Audio/FrameResizer.hpp"
 // Core
-#include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 // Standard Library
 #include <deque>
 #include <functional>

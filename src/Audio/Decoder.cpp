@@ -1,8 +1,8 @@
 #include "Codec/Audio/Decoder.hpp"
-#include "Strawberry/Core/Utilities.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 

@@ -9,8 +9,8 @@
 #include "Codec/Audio/Resampler.hpp"
 #include "Frame.hpp"
 // Strawberry Libraries
-#include "Strawberry/Core/Option.hpp"
-#include "Strawberry/Core/Mutex.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
 // Standard Library
 #include <unordered_set>
 #include <memory>

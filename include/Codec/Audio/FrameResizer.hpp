@@ -8,7 +8,7 @@
 #include "Frame.hpp"
 #include <cstddef>
 #include <queue>
-#include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 
 
 namespace Strawberry::Codec::Audio

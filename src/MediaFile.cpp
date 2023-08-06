@@ -1,10 +1,10 @@
 #include "Codec/MediaFile.hpp"
-#include "Strawberry/Core/Utilities.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
 
 #include <iostream>
-#include <Strawberry/Core/Markers.hpp>
+#include <Strawberry/Core/Util/Markers.hpp>
 #include <Strawberry/Core/IO/Error.hpp>
 
 

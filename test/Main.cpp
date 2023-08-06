@@ -1,11 +1,11 @@
 #include <iostream>
-#include <Strawberry/Core/ScopedTimer.hpp>
+#include <Strawberry/Core/Util/ScopedTimer.hpp>
 #include "Codec/MediaFile.hpp"
 #include "Codec/Audio/Mixer.hpp"
 #include "Codec/Audio/Encoder.hpp"
 #include "Codec/Muxer.hpp"
 #include "Codec/SodiumEncrypter.hpp"
-#include "Strawberry/Core/Logging.hpp"
+#include "Strawberry/Core/Util/Logging.hpp"
 
 
 extern "C"

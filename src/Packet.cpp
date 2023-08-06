@@ -1,7 +1,7 @@
 #include "Codec/Packet.hpp"
 
 
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 

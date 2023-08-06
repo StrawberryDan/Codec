@@ -5,7 +5,7 @@
 #include <queue>
 #include "Frame.hpp"
 #include "FrameFormat.hpp"
-#include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 
 
 extern "C"
