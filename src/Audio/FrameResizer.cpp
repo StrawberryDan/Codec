@@ -18,6 +18,7 @@ namespace Strawberry::Codec::Audio
 
 	void FrameResizer::SendFrame(Frame frame)
 	{
+		Core::Assert(*frame);
 		mInputFrames.emplace(std::move(frame));
 	}
 
@@ -59,7 +60,7 @@ namespace Strawberry::Codec::Audio
 			// Otherwise, we append frames to the working frame until it's big enough or we run out of frames.
 			else if (mWorkingFrame->GetNumSamples() < mOutputFrameSize && !mInputFrames.empty())
 			{
-				while (mWorkingFrame->GetNumSamples() < mOutputFrameSize)
+				while (mWorkingFrame->GetNumSamples() < mOutputFrameSize && !mInputFrames.empty())
 				{
 					mWorkingFrame->Append(mInputFrames.front());
 					mInputFrames.pop();
