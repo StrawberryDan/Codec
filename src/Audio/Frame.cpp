@@ -3,6 +3,7 @@
 
 
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Math/Rational.hpp"
 
 
 
