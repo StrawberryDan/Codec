@@ -23,7 +23,24 @@ namespace Strawberry::Codec
 				auto packet = mMediaFile->Read();
 				if (packet)
 				{
-					mNextPts = (*packet)->pts + (*packet)->duration;
+					mNextPts = mNextPts + (*packet)->duration;
+					if (mNextPts > mStreamInfo.Stream->duration)
+					{
+						mIsEOF = true;
+						return Core::NullOpt;
+					}
+
+
+					if (mLastDTS >= (*packet)->dts)
+					{
+						mIsEOF = true;
+						return Core::NullOpt;
+					}
+
+
+					mLastDTS = (*packet)->dts;
+
+
 					mPacketBuffer.Push(packet.Unwrap());
 				}
 				else switch (packet.Err())

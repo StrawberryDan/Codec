@@ -56,7 +56,7 @@ namespace Strawberry::Codec
 		[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
 
 
-		[[nodiscard]] Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters()); }
+		[[nodiscard]] Audio::Decoder GetDecoder() { return Audio::Decoder(GetCodec(), GetCodecParameters(), {mStreamInfo.Stream->time_base.num, mStreamInfo.Stream->time_base.den}); }
 
 
 	private:
@@ -69,5 +69,6 @@ namespace Strawberry::Codec
 		bool                                     mIsEOF     = false;
 		size_t                                   mNextPts   = 0;
 		Core::Collection::CircularBuffer<Packet> mPacketBuffer;
+		Core::Option<int>                        mLastDTS;
 	};
 }
