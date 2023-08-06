@@ -34,6 +34,10 @@ namespace Strawberry::Codec::Audio
 
 		FrameFormat& operator=(const FrameFormat& rhs);
 
+		FrameFormat(FrameFormat&& rhs);
+
+		FrameFormat& operator=(FrameFormat&& rhs);
+
 
 		bool operator==(const FrameFormat& b) const;
 		bool operator!=(const FrameFormat& b) const;
