@@ -119,7 +119,7 @@ namespace Strawberry::Codec
 
 	void MediaFile::Seek(size_t stream, size_t pts)
 	{
-		auto result = avformat_seek_file(mFile, static_cast<int>(stream), 0, static_cast<int>(pts), mFile->streams[stream]->duration, 0);
+		auto result = av_seek_frame(mFile, static_cast<int>(stream), static_cast<int>(pts), 0);
 		Assert(result >= 0);
 	}
 
