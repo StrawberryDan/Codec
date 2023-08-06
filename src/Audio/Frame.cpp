@@ -137,6 +137,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	double Frame::GetDuration() const
+	{
+		return (mFrame->nb_samples * Core::Math::Rational(1, mFrame->sample_rate)).Evaluate();
+	}
+
+
 	void Frame::Append(const Frame& other)
 	{
 		AVFrame* newFrame        = av_frame_alloc();

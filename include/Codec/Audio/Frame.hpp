@@ -43,6 +43,7 @@ namespace Strawberry::Codec::Audio
 		size_t      GetNumSamples() const;
 		size_t      GetSampleSize() const;
 		bool        IsFormatPlanar() const;
+		double      GetDuration() const;
 
 
 		void Append(const Frame& other);
