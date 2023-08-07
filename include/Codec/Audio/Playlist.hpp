@@ -34,6 +34,10 @@ namespace Strawberry::Codec::Audio
 		void                           EnqueueFile(const std::string path);
 
 
+		void                           GotoPrevTrack();
+		void                           GotoNextTrack();
+
+
 	private:
 		using TrackLoader = std::function<std::vector<Frame>()>;
 
@@ -44,9 +48,9 @@ namespace Strawberry::Codec::Audio
 		Resampler                                       mResampler;
 		FrameResizer                                    mFrameResizer;
 
-		std::uint64_t                                   mCurrentPosition = 0;
+		Core::Mutex<std::uint64_t>                      mCurrentPosition = Core::Mutex<uint64_t>(0);
 		Core::Mutex<std::deque<TrackLoader>>            mPreviousTracks;
-		Core::Option<TrackLoader>                       mCurrentTrack;
+		Core::Mutex<Core::Option<TrackLoader>>          mCurrentTrack;
 		Core::Mutex<std::vector<Frame>>                 mCurrentTrackFrames;
 		Core::Mutex<std::deque<TrackLoader>>            mNextTracks;
 	};

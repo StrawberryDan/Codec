@@ -26,6 +26,11 @@ namespace Strawberry::Codec::Audio
 
 		while (true)
 		{
+			auto currentPosition = mCurrentPosition.Lock();
+			auto currentFrames = mCurrentTrackFrames.Lock();
+			auto nextTracks = mNextTracks.Lock();
+			
+			
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result;
 
@@ -36,20 +41,16 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (auto frames = mCurrentTrackFrames.Lock(); !frames->empty())
+			if (!currentFrames->empty())
 			{
-				result = (*frames)[mCurrentPosition++];
+				result = (*currentFrames)[(*currentPosition)++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
 
-			if (auto nextTracks = mNextTracks.Lock(); !nextTracks->empty())
+			if (!nextTracks->empty())
 			{
-				mPreviousTracks.Lock()->push_front(mCurrentTrack.Unwrap());
-				mCurrentTrack = nextTracks->front();
-				*mCurrentTrackFrames.Lock() = (*mCurrentTrack)();
-				nextTracks->pop_front();
-				mCurrentPosition = 0;
+				GotoNextTrack();
 				continue;
 			}
 
@@ -86,5 +87,52 @@ namespace Strawberry::Codec::Audio
 
 			return frames;
 		});
+	}
+
+
+	void Playlist::GotoPrevTrack()
+	{
+		auto nextTracks = mNextTracks.Lock();
+		auto currentTrack = mCurrentTrack.Lock();
+		auto prevTracks = mPreviousTracks.Lock();
+		auto currentTrackFrames = mCurrentTrackFrames.Lock();
+		auto currentPosition = mCurrentPosition.Lock();
+
+		if (!prevTracks->empty())
+		{
+			if (currentTrack->HasValue())
+			{
+				nextTracks->push_front(currentTrack->Unwrap());
+			}
+
+			*currentTrack = (*prevTracks)[0];
+			*currentTrackFrames = (**currentTrack)();
+			prevTracks->pop_front();
+		}
+		
+		(*currentPosition) = 0;
+	}
+
+
+	void Playlist::GotoNextTrack()
+	{
+		auto nextTracks = mNextTracks.Lock();
+		auto currentTrack = mCurrentTrack.Lock();
+		auto prevTracks = mPreviousTracks.Lock();
+		auto currentTrackFrames = mCurrentTrackFrames.Lock();
+		auto currentPosition = mCurrentPosition.Lock();
+
+
+		if (!nextTracks->empty())
+		{
+			if (currentTrack->HasValue())
+				prevTracks->push_front(currentTrack->Unwrap());
+
+
+			*currentTrack = nextTracks->front();
+			*currentTrackFrames = (**currentTrack)();
+			nextTracks->pop_front();
+			(*currentPosition) = 0;
+		}
 	}
 }
