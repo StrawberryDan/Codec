@@ -36,19 +36,18 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (auto frames = mFrames.Lock(); !frames->empty())
+			if (auto frames = mCurrentTrack.Lock(); !frames->empty())
 			{
-				result = frames->front();
-				frames->pop_front();
+				result = (*frames)[mCurrentPosition++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
 
 			if (auto nextTracks = mNextTracks.Lock(); !nextTracks->empty())
 			{
-				auto newFrames = nextTracks->front()();
+				*mCurrentTrack.Lock() = nextTracks->front()();
 				nextTracks->pop_front();
-				for (auto& frame : newFrames) mFrames.Lock()->emplace_back(std::move(frame));
+				mCurrentPosition = 0;
 				continue;
 			}
 

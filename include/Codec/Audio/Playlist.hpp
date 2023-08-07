@@ -10,6 +10,7 @@
 #include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/Sync/Mutex.hpp"
 // Standard Library
+#include <vector>
 #include <deque>
 #include <functional>
 
@@ -38,7 +39,8 @@ namespace Strawberry::Codec::Audio
 		Resampler                                       mResampler;
 		FrameResizer                                    mFrameResizer;
 
-		Core::Mutex<std::deque<Frame>>                               mFrames;
+		std::uint64_t                                                mCurrentPosition = 0;
+		Core::Mutex<std::vector<Frame>>                              mCurrentTrack;
 		Core::Mutex<std::deque<std::function<std::vector<Frame>()>>> mNextTracks;
 	};
 }
