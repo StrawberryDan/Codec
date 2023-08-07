@@ -57,7 +57,7 @@ namespace Strawberry::Codec::Audio
 
 
 	Frame::Frame(const Frame& other)
-		: mFrame(av_frame_clone(other.mFrame))
+		: mFrame(other.mFrame ? av_frame_clone(other.mFrame) : nullptr)
 	{
 		int error = av_frame_make_writable(mFrame);
 		Core::Assert(error == 0);
