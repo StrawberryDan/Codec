@@ -33,14 +33,17 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
+		using TrackLoader = std::function<std::vector<Frame>()>;
+
+
 		const Audio::FrameFormat                        mFormat;
 		const size_t                                    mFrameSize;
 
 		Resampler                                       mResampler;
 		FrameResizer                                    mFrameResizer;
 
-		std::uint64_t                                                mCurrentPosition = 0;
-		Core::Mutex<std::vector<Frame>>                              mCurrentTrack;
-		Core::Mutex<std::deque<std::function<std::vector<Frame>()>>> mNextTracks;
+		std::uint64_t                                   mCurrentPosition = 0;
+		Core::Mutex<std::vector<Frame>>                 mCurrentTrack;
+		Core::Mutex<std::deque<TrackLoader>>            mNextTracks;
 	};
 }
