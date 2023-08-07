@@ -25,7 +25,6 @@ namespace Strawberry::Codec::Audio
 		: sampleRate(frame->sample_rate)
 		  , sampleFormat(frame->format)
 		  , channels{}
-		  , channelLayout(frame->channel_layout)
 	{
 		auto result = av_channel_layout_copy(&channels, &frame->ch_layout);
 		Core::Assert(result == 0);

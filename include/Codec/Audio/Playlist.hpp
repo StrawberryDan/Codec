@@ -8,6 +8,7 @@
 #include "Codec/Audio/FrameResizer.hpp"
 // Core
 #include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
 // Standard Library
 #include <deque>
 #include <functional>
@@ -37,7 +38,7 @@ namespace Strawberry::Codec::Audio
 		Resampler                                       mResampler;
 		FrameResizer                                    mFrameResizer;
 
-		std::deque<Frame>                               mFrames;
-		std::deque<std::function<std::vector<Frame>()>> mNextTracks;
+		Core::Mutex<std::deque<Frame>>                               mFrames;
+		Core::Mutex<std::deque<std::function<std::vector<Frame>()>>> mNextTracks;
 	};
 }

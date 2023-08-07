@@ -35,7 +35,6 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(result == 0);
 		frame->sample_rate = format.sampleRate;
 		frame->nb_samples = samples;
-		frame->channel_layout = format.channelLayout;
 
 		result = av_frame_get_buffer(*frame, 0);
 		Core::Assert(result == 0);
@@ -150,8 +149,6 @@ namespace Strawberry::Codec::Audio
 		newFrame->format         = mFrame->format;
 		newFrame->nb_samples     = mFrame->nb_samples + other->nb_samples;
 		newFrame->ch_layout      = mFrame->ch_layout;
-		newFrame->channels       = mFrame->channels;
-		newFrame->channel_layout = mFrame->channel_layout;
 		newFrame->sample_rate    = mFrame->sample_rate;
 		auto error               = av_frame_get_buffer(newFrame, 1);
 		Core::Assert(error == 0);

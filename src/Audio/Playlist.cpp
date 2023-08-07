@@ -36,19 +36,19 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (!mFrames.empty())
+			if (auto frames = mFrames.Lock(); !frames->empty())
 			{
-				result = mFrames.front();
-				mFrames.pop_front();
+				result = frames->front();
+				frames->pop_front();
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
 
-			if (!mNextTracks.empty())
+			if (auto nextTracks = mNextTracks.Lock(); !nextTracks->empty())
 			{
-				auto newFrames = mNextTracks.front()();
-				mNextTracks.pop_front();
-				for (auto& frame : newFrames) mFrames.emplace_back(std::move(frame));
+				auto newFrames = nextTracks->front()();
+				nextTracks->pop_front();
+				for (auto& frame : newFrames) mFrames.Lock()->emplace_back(std::move(frame));
 				continue;
 			}
 
@@ -59,7 +59,7 @@ namespace Strawberry::Codec::Audio
 
 	void Playlist::EnqueueFile(const std::string path)
 	{
-		mNextTracks.push_back([=]() -> std::vector<Frame>
+		mNextTracks.Lock()->push_back([=]() -> std::vector<Frame>
 		{
 			auto file = MediaFile::Open(path);
 			if (!file) return {};
