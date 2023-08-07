@@ -36,7 +36,7 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (auto frames = mCurrentTrack.Lock(); !frames->empty())
+			if (auto frames = mCurrentTrackFrames.Lock(); !frames->empty())
 			{
 				result = (*frames)[mCurrentPosition++];
 				mResampler.SendFrame(result.Unwrap());
@@ -45,7 +45,9 @@ namespace Strawberry::Codec::Audio
 
 			if (auto nextTracks = mNextTracks.Lock(); !nextTracks->empty())
 			{
-				*mCurrentTrack.Lock() = nextTracks->front()();
+				mPreviousTracks.Lock()->push_front(mCurrentTrack.Unwrap());
+				mCurrentTrack = nextTracks->front();
+				*mCurrentTrackFrames.Lock() = (*mCurrentTrack)();
 				nextTracks->pop_front();
 				mCurrentPosition = 0;
 				continue;

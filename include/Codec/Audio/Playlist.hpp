@@ -23,6 +23,8 @@ namespace Strawberry::Codec::Audio
 	class Playlist
 	{
 	public:
+
+	public:
 		Playlist(Audio::FrameFormat format, size_t sampleCount);
 
 
@@ -43,7 +45,9 @@ namespace Strawberry::Codec::Audio
 		FrameResizer                                    mFrameResizer;
 
 		std::uint64_t                                   mCurrentPosition = 0;
-		Core::Mutex<std::vector<Frame>>                 mCurrentTrack;
+		Core::Mutex<std::deque<TrackLoader>>            mPreviousTracks;
+		Core::Option<TrackLoader>                       mCurrentTrack;
+		Core::Mutex<std::vector<Frame>>                 mCurrentTrackFrames;
 		Core::Mutex<std::deque<TrackLoader>>            mNextTracks;
 	};
 }
