@@ -59,9 +59,23 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Playlist::EnqueueFile(const std::string path)
+	void Playlist::EnqueueFile(const std::string& path)
 	{
-		mNextTracks.Lock()->push_back([=]() -> std::vector<Frame>
+		Track track;
+
+
+		auto file = MediaFile::Open(path);
+		if (!file) return;
+
+		auto channel = file->GetBestStream(MediaType::Audio);
+		if (!channel) return;
+
+
+		track.title = channel->GetTitle();
+		track.fileName = path;
+
+
+		track.loader = [=]() mutable -> std::vector<Frame>
 		{
 			auto file = MediaFile::Open(path);
 			if (!file) return {};
@@ -86,7 +100,16 @@ namespace Strawberry::Codec::Audio
 			}
 
 			return frames;
-		});
+		};
+
+
+		mNextTracks.Lock()->push_back(track);
+	}
+
+
+	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
+	{
+		return mEventBroadcaster.CreateReceiver();
 	}
 
 
@@ -106,8 +129,14 @@ namespace Strawberry::Codec::Audio
 			}
 
 			*currentTrack = (*prevTracks)[0];
-			*currentTrackFrames = (**currentTrack)();
+			*currentTrackFrames = (*currentTrack)->loader();
 			prevTracks->pop_front();
+
+			mEventBroadcaster.Broadcast(SongChangedEvent
+			{
+				.newSongTitle = (*currentTrack)->title,
+				.newSongPath = (*currentTrack)->fileName,
+			});
 		}
 		
 		(*currentPosition) = 0;
@@ -130,9 +159,15 @@ namespace Strawberry::Codec::Audio
 
 
 			*currentTrack = nextTracks->front();
-			*currentTrackFrames = (**currentTrack)();
+			*currentTrackFrames = (*currentTrack)->loader();
 			nextTracks->pop_front();
 			(*currentPosition) = 0;
+
+			mEventBroadcaster.Broadcast(SongChangedEvent
+			{
+				.newSongTitle = (*currentTrack)->title,
+				.newSongPath = (*currentTrack)->fileName,
+			});
 		}
 	}
 }

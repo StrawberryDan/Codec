@@ -34,8 +34,8 @@ namespace Strawberry::Codec
 
 		MediaFile(const MediaFile& other)            = delete;
 		MediaFile& operator=(const MediaFile& other) = delete;
-		MediaFile(MediaFile&& other) noexcept ;
-		MediaFile& operator=(MediaFile&& rhs) noexcept ;
+		MediaFile(MediaFile&& other) noexcept;
+		MediaFile& operator=(MediaFile&& rhs) noexcept;
 		~MediaFile();
 
 
