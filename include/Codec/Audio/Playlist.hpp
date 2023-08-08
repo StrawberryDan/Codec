@@ -27,8 +27,10 @@ namespace Strawberry::Codec::Audio
 	public:
 		struct SongChangedEvent
 		{
+			/// The difference in playlist index.
+			int                       offset;
 			Core::Option<std::string> newSongTitle;
-			std::string newSongPath;
+			std::string               newSongPath;
 		};
 
 
