@@ -47,9 +47,17 @@ namespace Strawberry::Codec::Audio
 		};
 
 
+		struct SongRemovedEvent
+		{
+			/// The index where the song was inserted.
+			size_t                    index;
+		};
+
+
 		using Event = Core::Variant<
 			SongChangedEvent,
-			SongAddedEvent>;
+			SongAddedEvent,
+			SongRemovedEvent>;
 
 		using EventReceiver = std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>>;
 
@@ -62,6 +70,9 @@ namespace Strawberry::Codec::Audio
 
 
 		void                             EnqueueFile(const std::string& path);
+
+
+		void                             RemoveTrack(size_t index);
 
 
 		EventReceiver                    CreateEventReceiver();

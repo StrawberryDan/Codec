@@ -114,6 +114,42 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	void Playlist::RemoveTrack(size_t index)
+	{
+		Core::Assert(index < Length());
+		auto nextTracks = mNextTracks.Lock();
+		auto currentTrack = mCurrentTrack.Lock();
+		auto currentFrames = mCurrentTrackFrames.Lock();
+		auto prevTracks = mPreviousTracks.Lock();
+
+		if (index < prevTracks->size())
+		{
+			prevTracks->erase(prevTracks->begin() + static_cast<long>(index));
+		}
+		else if (*currentTrack && index == prevTracks->size())
+		{
+			currentTrack->Reset();
+			currentFrames->clear();
+
+		}
+		else if (!*currentTrack && index == prevTracks->size())
+		{
+			nextTracks->pop_front();
+		}
+		else
+		{
+			Core::Assert(index >= prevTracks->size() + (currentTrack->HasValue() ? 1 : 0));
+			nextTracks->erase(nextTracks->begin() + static_cast<long>(index) - static_cast<long>(prevTracks->size()) - (currentTrack->HasValue() ? 1 : 0));
+		}
+
+		SongRemovedEvent event
+			{
+				.index = index,
+			};
+		mEventBroadcaster.Broadcast(event);
+	}
+
+
 	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
 	{
 		return mEventBroadcaster.CreateReceiver();
