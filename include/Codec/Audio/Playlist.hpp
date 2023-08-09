@@ -29,8 +29,10 @@ namespace Strawberry::Codec::Audio
 		{
 			/// The difference in playlist index.
 			int                       offset;
-			Core::Option<std::string> newSongTitle;
-			std::string               newSongPath;
+			/// The title of the song.
+			Core::Option<std::string> title;
+			/// The file path of the song.
+			std::string path;
 		};
 
 

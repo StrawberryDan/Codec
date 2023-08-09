@@ -142,8 +142,8 @@ namespace Strawberry::Codec::Audio
 			mEventBroadcaster.Broadcast(SongChangedEvent
 											{
 												.offset       = -1,
-												.newSongTitle = (*currentTrack)->title,
-												.newSongPath  = (*currentTrack)->fileName,
+												.title = (*currentTrack)->title,
+												.path  = (*currentTrack)->fileName,
 											});
 		}
 
@@ -174,8 +174,8 @@ namespace Strawberry::Codec::Audio
 			mEventBroadcaster.Broadcast(SongChangedEvent
 											{
 												.offset       = 1,
-												.newSongTitle = (*currentTrack)->title,
-												.newSongPath  = (*currentTrack)->fileName,
+												.title = (*currentTrack)->title,
+												.path  = (*currentTrack)->fileName,
 											});
 		}
 	}
