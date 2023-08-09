@@ -20,16 +20,19 @@ namespace Strawberry::Codec::Audio
 		Encoder(AVCodecID codecID, AVChannelLayout channelLayout);
 		~Encoder();
 
-		std::vector<Packet>  Encode(const Frame& frame);
+
+		void                Send(Frame frame);
+		std::vector<Packet> Receive();
 		std::vector<Packet> Flush();
+
 
 		inline       AVCodecContext* operator*()        { return mContext; }
 		inline const AVCodecContext* operator*()  const { return mContext; }
 		inline       AVCodecContext* operator->()       { return mContext; }
 		inline const AVCodecContext* operator->() const { return mContext; }
 
-		[[nodiscard]] AVCodecParameters* Parameters() const;
 
+		[[nodiscard]] AVCodecParameters* Parameters() const;
 
 
 	private:
@@ -37,5 +40,6 @@ namespace Strawberry::Codec::Audio
 		AVCodecParameters*				mParameters;
 		Core::Option<Resampler>			mFrameResampler;
 		Core::Option<FrameResizer>		mFrameResizer;
+		std::deque<Frame>				mFrameBuffer;
 	};
 }

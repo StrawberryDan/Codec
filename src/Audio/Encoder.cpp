@@ -1,10 +1,8 @@
 #include "Codec/Audio/Encoder.hpp"
 
 
-
 #include "Codec/Packet.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
-
 
 
 extern "C"
@@ -14,12 +12,11 @@ extern "C"
 }
 
 
-
 namespace Strawberry::Codec::Audio
 {
 	Encoder::Encoder(AVCodecID codecID, AVChannelLayout channelLayout)
 		: mContext(nullptr)
-		, mParameters(nullptr)
+		  , mParameters(nullptr)
 	{
 		const AVCodec* codec = avcodec_find_encoder(codecID);
 		Core::Assert(codec != nullptr);
@@ -28,9 +25,9 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(mContext != nullptr);
 		mContext->strict_std_compliance = -2;
 		mContext->sample_rate = codec->supported_samplerates[0];
-		mContext->time_base   = AVRational{1, mContext->sample_rate};
-		mContext->sample_fmt  = codec->sample_fmts[0];
-		mContext->ch_layout   = channelLayout;
+		mContext->time_base = AVRational{1, mContext->sample_rate};
+		mContext->sample_fmt = codec->sample_fmts[0];
+		mContext->ch_layout = channelLayout;
 
 		auto result = avcodec_open2(mContext, codec, nullptr);
 		Core::Assert(result == 0);
@@ -48,7 +45,6 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-
 	Encoder::~Encoder()
 	{
 		avcodec_parameters_free(&mParameters);
@@ -57,11 +53,21 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-
-	std::vector<Packet> Encoder::Encode(const Frame& frame)
+	void Encoder::Send(Frame frame)
 	{
-		std::vector<Packet> packets;
+		mFrameBuffer.push_back(std::move(frame));
+	}
 
+
+	std::vector<Packet> Encoder::Receive()
+	{
+		if (mFrameBuffer.empty())
+			return {};
+
+		Frame frame = std::move(mFrameBuffer.front());
+		mFrameBuffer.pop_back();
+
+		std::vector<Packet> packets;
 		mFrameResizer->SendFrame(std::move(frame));
 		while (auto frame = mFrameResizer->ReadFrame(FrameResizer::Mode::WaitForFullFrames))
 		{
