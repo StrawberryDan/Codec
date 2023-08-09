@@ -47,6 +47,7 @@ namespace Strawberry::Codec::Audio
 		if (!IsOutputAvailable()) return Core::NullOpt;
 
 		// Read our next buffered frame. Early return if it's already in the right format.
+		Core::Assert(!mInputFrames.empty());
 		Frame input(std::move(mInputFrames.front()));
 		mInputFrames.pop();
 		Core::Assert(input->sample_rate > 0);
