@@ -106,7 +106,7 @@ namespace Strawberry::Codec::Audio
 		nextTracks->push_back(track);
 		SongAddedEvent songAddedEvent
 			{
-				.index = nextTracks->size() - 1,
+				.index = Length() - 1,
 				.title=track.title,
 				.path=track.fileName
 			};
@@ -117,6 +117,15 @@ namespace Strawberry::Codec::Audio
 	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
 	{
 		return mEventBroadcaster.CreateReceiver();
+	}
+
+
+	size_t Playlist::Length() const
+	{
+		auto nextTracks = mNextTracks.Lock();
+		auto currentTrack = mCurrentTrack.Lock();
+		auto prevTracks = mPreviousTracks.Lock();
+		return prevTracks->size() + nextTracks->size() + (currentTrack->HasValue() ? 1 : 0);
 	}
 
 
@@ -171,12 +180,13 @@ namespace Strawberry::Codec::Audio
 			nextTracks->pop_front();
 			(*currentPosition) = 0;
 
-			mEventBroadcaster.Broadcast(SongChangedEvent
-											{
-												.offset       = 1,
-												.title = (*currentTrack)->title,
-												.path  = (*currentTrack)->fileName,
-											});
+			mEventBroadcaster.Broadcast(
+				SongChangedEvent
+					{
+						.offset       = 1,
+						.title = (*currentTrack)->title,
+						.path  = (*currentTrack)->fileName,
+					});
 		}
 	}
 }

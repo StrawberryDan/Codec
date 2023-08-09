@@ -51,6 +51,8 @@ namespace Strawberry::Codec::Audio
 			SongChangedEvent,
 			SongAddedEvent>;
 
+		using EventReceiver = std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>>;
+
 
 	public:
 		Playlist(Audio::FrameFormat format, size_t sampleCount);
@@ -62,7 +64,10 @@ namespace Strawberry::Codec::Audio
 		void                             EnqueueFile(const std::string& path);
 
 
-		std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> CreateEventReceiver();
+		EventReceiver                    CreateEventReceiver();
+
+
+		size_t                           Length() const;
 
 
 		void                             GotoPrevTrack();
