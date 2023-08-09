@@ -27,6 +27,8 @@ namespace Strawberry::Codec::Audio
 	public:
 		struct SongChangedEvent
 		{
+			/// The index of the new currently playing song
+			size_t                    index;
 			/// The difference in playlist index.
 			int                       offset;
 			/// The title of the song.

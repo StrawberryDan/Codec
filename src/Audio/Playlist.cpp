@@ -139,7 +139,8 @@ namespace Strawberry::Codec::Audio
 		else
 		{
 			Core::Assert(index >= prevTracks->size() + (currentTrack->HasValue() ? 1 : 0));
-			nextTracks->erase(nextTracks->begin() + static_cast<long>(index) - static_cast<long>(prevTracks->size()) - (currentTrack->HasValue() ? 1 : 0));
+			nextTracks->erase(nextTracks->begin() + static_cast<long>(index) - static_cast<long>(prevTracks->size()) -
+							  (currentTrack->HasValue() ? 1 : 0));
 		}
 
 		SongRemovedEvent event
@@ -184,12 +185,14 @@ namespace Strawberry::Codec::Audio
 			*currentTrackFrames = (*currentTrack)->loader();
 			prevTracks->pop_front();
 
-			mEventBroadcaster.Broadcast(SongChangedEvent
-											{
-												.offset       = -1,
-												.title = (*currentTrack)->title,
-												.path  = (*currentTrack)->fileName,
-											});
+			mEventBroadcaster.Broadcast(
+				SongChangedEvent
+					{
+						.index        = prevTracks->size(),
+						.offset       = -1,
+						.title = (*currentTrack)->title,
+						.path  = (*currentTrack)->fileName,
+					});
 		}
 
 		(*currentPosition) = 0;
@@ -219,6 +222,7 @@ namespace Strawberry::Codec::Audio
 			mEventBroadcaster.Broadcast(
 				SongChangedEvent
 					{
+						.index        = prevTracks->size(),
 						.offset       = 1,
 						.title = (*currentTrack)->title,
 						.path  = (*currentTrack)->fileName,
