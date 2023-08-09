@@ -93,7 +93,8 @@ namespace Strawberry::Codec::Audio
 			auto decoder = channel->GetDecoder();
 			for (auto& packet : packets)
 			{
-				for (auto frame : decoder.DecodePacket(std::move(packet)))
+				decoder.Send(std::move(packet));
+				for (auto frame : decoder.Receive())
 				{
 					frames.emplace_back(std::move(frame));
 				}

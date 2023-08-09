@@ -8,6 +8,7 @@
 #include "Codec/Packet.hpp"
 #include "Codec/Audio/Frame.hpp"
 // Standard Library
+#include <deque>
 #include <vector>
 
 
@@ -24,21 +25,22 @@ namespace Strawberry::Codec::Audio
 	class Decoder
 	{
 	public:
-	    Decoder(const AVCodec* codec, const AVCodecParameters* parameters);
-	    Decoder(const Decoder& other) = delete;
-	    Decoder& operator=(const Decoder& other) = delete;
-	    Decoder(Decoder&& other) noexcept ;
-	    Decoder& operator=(Decoder&& other) noexcept ;
-	    ~Decoder();
+		Decoder(const AVCodec* codec, const AVCodecParameters* parameters);
+		Decoder(const Decoder& other)            = delete;
+		Decoder& operator=(const Decoder& other) = delete;
+		Decoder(Decoder&& other) noexcept;
+		Decoder& operator=(Decoder&& other) noexcept;
+		~Decoder();
 
 
-	    std::vector<Frame> DecodePacket(const Packet& packet);
-
+		void Send(Packet packet);
+		std::vector<Frame> Receive();
 
 	    [[nodiscard]] inline const AVCodecParameters* Parameters() const { return mParameters; }
 
 	private:
-	    AVCodecContext* mCodecContext;
+	    AVCodecContext*          mCodecContext;
 	    const AVCodecParameters* mParameters;
+		std::deque<Packet>       mPacketBuffer;
 	};
 }

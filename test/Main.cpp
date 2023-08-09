@@ -32,9 +32,10 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 
 	std::vector<Audio::Frame> frames;
 	Audio::Decoder decoder = stream->GetDecoder();
-	for (const auto& packet: packets)
+	for (auto& packet: packets)
 	{
-		auto someFrames = decoder.DecodePacket(packet);
+		decoder.Send(std::move(packet));
+		auto someFrames = decoder.Receive();
 		for (auto& f: someFrames)
 		{
 			frames.push_back(std::move(f));

@@ -3,6 +3,7 @@
 
 
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 
 
 
@@ -69,11 +70,23 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-
-	std::vector<Frame> Decoder::DecodePacket(const Packet& packet)
+	void Decoder::Send(Packet packet)
 	{
-		Assert(mCodecContext != nullptr);
+		mPacketBuffer.push_back(std::move(packet));
+	}
 
+
+	std::vector<Frame> Decoder::Receive()
+	{
+		if (mPacketBuffer.empty())
+			return {};
+
+
+		Packet packet(std::move(mPacketBuffer.front()));
+		mPacketBuffer.pop_front();
+
+
+		Core::Assert(mCodecContext != nullptr);
 		auto sendResult = avcodec_send_packet(mCodecContext, *packet);
 		Assert(sendResult == 0 || sendResult == AVERROR(EAGAIN));
 
