@@ -34,7 +34,20 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		using Event = Core::Variant<SongChangedEvent>;
+		struct SongAddedEvent
+		{
+			/// The index where the song was inserted.
+			size_t                    index;
+			/// The title of the song.
+			Core::Option<std::string> title;
+			/// The file path of the song.
+			std::string path;
+		};
+
+
+		using Event = Core::Variant<
+			SongChangedEvent,
+			SongAddedEvent>;
 
 
 	public:

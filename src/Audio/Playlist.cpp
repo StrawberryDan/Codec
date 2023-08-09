@@ -9,15 +9,13 @@
 #include <vector>
 
 
-
 namespace Strawberry::Codec::Audio
 {
 	Playlist::Playlist(Audio::FrameFormat format, size_t sampleCount)
 		: mFormat(format)
-		, mFrameSize()
-		, mResampler(format)
-		, mFrameResizer(sampleCount)
-	{}
+		  , mFrameSize()
+		  , mResampler(format)
+		  , mFrameResizer(sampleCount) {}
 
 
 	Core::Option<Frame> Playlist::ReadFrame()
@@ -29,8 +27,8 @@ namespace Strawberry::Codec::Audio
 			auto currentPosition = mCurrentPosition.Lock();
 			auto currentFrames = mCurrentTrackFrames.Lock();
 			auto nextTracks = mNextTracks.Lock();
-			
-			
+
+
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result;
 
@@ -91,10 +89,10 @@ namespace Strawberry::Codec::Audio
 
 			std::vector<Frame> frames;
 			auto decoder = channel->GetDecoder();
-			for (auto& packet : packets)
+			for (auto& packet: packets)
 			{
 				decoder.Send(std::move(packet));
-				for (auto frame : decoder.Receive())
+				for (auto frame: decoder.Receive())
 				{
 					frames.emplace_back(std::move(frame));
 				}
@@ -104,7 +102,15 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		mNextTracks.Lock()->push_back(track);
+		auto nextTracks = mNextTracks.Lock();
+		nextTracks->push_back(track);
+		SongAddedEvent songAddedEvent
+			{
+				.index = nextTracks->size() - 1,
+				.title=track.title,
+				.path=track.fileName
+			};
+		mEventBroadcaster.Broadcast(songAddedEvent);
 	}
 
 
@@ -134,13 +140,13 @@ namespace Strawberry::Codec::Audio
 			prevTracks->pop_front();
 
 			mEventBroadcaster.Broadcast(SongChangedEvent
-			{
-				.offset       = -1,
-				.newSongTitle = (*currentTrack)->title,
-				.newSongPath  = (*currentTrack)->fileName,
-			});
+											{
+												.offset       = -1,
+												.newSongTitle = (*currentTrack)->title,
+												.newSongPath  = (*currentTrack)->fileName,
+											});
 		}
-		
+
 		(*currentPosition) = 0;
 	}
 
@@ -166,11 +172,11 @@ namespace Strawberry::Codec::Audio
 			(*currentPosition) = 0;
 
 			mEventBroadcaster.Broadcast(SongChangedEvent
-			{
-				.offset       = 1,
-				.newSongTitle = (*currentTrack)->title,
-				.newSongPath  = (*currentTrack)->fileName,
-			});
+											{
+												.offset       = 1,
+												.newSongTitle = (*currentTrack)->title,
+												.newSongPath  = (*currentTrack)->fileName,
+											});
 		}
 	}
 }
