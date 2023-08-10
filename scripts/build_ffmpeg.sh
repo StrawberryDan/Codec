@@ -7,7 +7,7 @@ BINARY_DIR=$2
 if [[ ! -d ${BINARY_DIR} ]]; then
   mkdir -p ${SOURCE_DIR}
 
-  cd ${SOURCE_DIR}
+  cd ${SOURCE_DIR} || exit
   git clone "https://git.ffmpeg.org/ffmpeg.git" .
   git checkout "release/6.0"
 
