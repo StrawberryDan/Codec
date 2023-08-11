@@ -20,15 +20,16 @@ namespace Strawberry::Codec::Audio
 	{
 		Assert(av_codec_is_decoder(codec));
 
-
 		mParameters = avcodec_parameters_alloc();
 		Assert(mParameters);
 		auto result = avcodec_parameters_copy(mParameters, parameters);
 		Assert(result >= 0);
 
-
 		mCodecContext = avcodec_alloc_context3(codec);
 		Assert(mCodecContext != nullptr);
+
+		result = avcodec_parameters_to_context(mCodecContext, mParameters);
+		Assert(result >= 0);
 
 		// Set channel layout to stereo if none is already specified.
 		if (mCodecContext->codec_type == AVMEDIA_TYPE_AUDIO && (mCodecContext->ch_layout.nb_channels == 0))
@@ -39,8 +40,6 @@ namespace Strawberry::Codec::Audio
 		result = avcodec_open2(mCodecContext, codec, nullptr);
 		Assert(result == 0);
 		Assert(avcodec_is_open(mCodecContext));
-		result = avcodec_parameters_to_context(mCodecContext, mParameters);
-		Assert(result >= 0);
 	}
 
 
