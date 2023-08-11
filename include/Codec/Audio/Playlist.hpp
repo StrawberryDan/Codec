@@ -87,6 +87,8 @@ namespace Strawberry::Codec::Audio
 
 
 		size_t                           Length() const;
+		Codec::Audio::FrameFormat        GetFrameFormat() const;
+		size_t                           GetFrameSize() const;
 
 
 		void                             GotoPrevTrack();

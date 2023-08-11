@@ -163,6 +163,18 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const
+	{
+		return mFormat;
+	}
+
+
+	size_t Playlist::GetFrameSize() const
+	{
+		return mFrameSize;
+	}
+
+
 	void Playlist::GotoPrevTrack()
 	{
 		if (!mPreviousTracks.empty())
