@@ -78,6 +78,7 @@ namespace Strawberry::Codec::Audio
 		Core::Option<Frame>              ReadFrame();
 
 
+		[[nodiscard]]
 		Core::Option<size_t>             EnqueueFile(const std::string& path);
 
 
@@ -87,13 +88,18 @@ namespace Strawberry::Codec::Audio
 		EventReceiver                    CreateEventReceiver();
 
 
+		[[nodiscard]]
 		size_t                           GetCurrentTrackIndex() const;
+		[[nodiscard]]
 		size_t                           Length() const;
+		[[nodiscard]]
 		Codec::Audio::FrameFormat        GetFrameFormat() const;
+		[[nodiscard]]
 		size_t                           GetFrameSize() const;
 
 
 		template <typename T>
+		[[nodiscard]]
 		T                                GetTrackAssociatedData(size_t index) const;
 		template <typename T>
 		void                             SetTrackAssociatedData(size_t index, T value);
