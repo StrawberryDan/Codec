@@ -86,6 +86,7 @@ namespace Strawberry::Codec::Audio
 		EventReceiver                    CreateEventReceiver();
 
 
+		size_t                           GetCurrentTrackIndex() const;
 		size_t                           Length() const;
 		Codec::Audio::FrameFormat        GetFrameFormat() const;
 		size_t                           GetFrameSize() const;

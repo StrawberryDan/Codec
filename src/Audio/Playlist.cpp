@@ -157,6 +157,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	size_t Playlist::GetCurrentTrackIndex() const
+	{
+		return mPreviousTracks.size();
+	}
+
+
 	size_t Playlist::Length() const
 	{
 		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
