@@ -58,16 +58,16 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Playlist::EnqueueFile(const std::string& path)
+	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path)
 	{
 		Track track;
 
 
 		auto file = MediaFile::Open(path);
-		if (!file) return;
+		if (!file) return Core::NullOpt;
 
 		auto channel = file->GetBestStream(MediaType::Audio);
-		if (!channel) return;
+		if (!channel) return Core::NullOpt;
 
 
 		track.title = channel->GetTitle();
@@ -111,6 +111,8 @@ namespace Strawberry::Codec::Audio
 				.path=track.fileName
 			};
 		mEventBroadcaster.Broadcast(songAddedEvent);
+
+		return Length() - 1;
 	}
 
 
