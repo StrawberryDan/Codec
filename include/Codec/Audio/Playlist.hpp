@@ -56,10 +56,17 @@ namespace Strawberry::Codec::Audio
 		};
 
 
+		struct PlaybackEndedEvent
+		{
+
+		};
+
+
 		using Event = Core::Variant<
 			SongChangedEvent,
 			SongAddedEvent,
-			SongRemovedEvent>;
+			SongRemovedEvent,
+			PlaybackEndedEvent>;
 
 		using EventReceiver = std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>>;
 

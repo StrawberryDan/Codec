@@ -39,8 +39,14 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (!currentFrames->empty())
+			if (*currentPosition < currentFrames->size())
 			{
+				if (*currentPosition == currentFrames->size() - 1 && nextTracks->empty())
+				{
+					mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
+				}
+
+
 				result = (*currentFrames)[(*currentPosition)++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
@@ -130,7 +136,6 @@ namespace Strawberry::Codec::Audio
 		{
 			currentTrack->Reset();
 			currentFrames->clear();
-
 		}
 		else if (!*currentTrack && index == prevTracks->size())
 		{
@@ -148,6 +153,11 @@ namespace Strawberry::Codec::Audio
 				.index = index,
 			};
 		mEventBroadcaster.Broadcast(event);
+
+		if (Length() == 0)
+		{
+			mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
+		}
 	}
 
 
