@@ -16,9 +16,16 @@ namespace Strawberry::Codec::Audio
 {
 	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)
-		, mParameters(parameters)
+		, mParameters(nullptr)
 	{
 		Assert(av_codec_is_decoder(codec));
+
+
+		mParameters = avcodec_parameters_alloc();
+		Assert(mParameters);
+		auto result = avcodec_parameters_copy(mParameters, parameters);
+		Assert(result >= 0);
+
 
 		mCodecContext = avcodec_alloc_context3(codec);
 		Assert(mCodecContext != nullptr);
@@ -29,7 +36,7 @@ namespace Strawberry::Codec::Audio
 			mCodecContext->ch_layout = AV_CHANNEL_LAYOUT_STEREO;
 		}
 
-		auto result = avcodec_open2(mCodecContext, codec, nullptr);
+		result = avcodec_open2(mCodecContext, codec, nullptr);
 		Assert(result == 0);
 		Assert(avcodec_is_open(mCodecContext));
 		result = avcodec_parameters_to_context(mCodecContext, mParameters);
@@ -62,6 +69,11 @@ namespace Strawberry::Codec::Audio
 
 	Decoder::~Decoder()
 	{
+		if (mParameters)
+		{
+			avcodec_parameters_free(&mParameters);
+		}
+
 		if (mCodecContext)
 		{
 			avcodec_close(mCodecContext);

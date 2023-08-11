@@ -40,7 +40,7 @@ namespace Strawberry::Codec::Audio
 
 	private:
 	    AVCodecContext*          mCodecContext;
-	    const AVCodecParameters* mParameters;
+	    AVCodecParameters*       mParameters;
 		std::deque<Packet>       mPacketBuffer;
 	};
 }
