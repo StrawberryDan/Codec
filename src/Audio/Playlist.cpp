@@ -24,11 +24,6 @@ namespace Strawberry::Codec::Audio
 
 		while (true)
 		{
-			auto currentPosition = mCurrentPosition.Lock();
-			auto currentFrames = mCurrentTrackFrames.Lock();
-			auto nextTracks = mNextTracks.Lock();
-
-
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result;
 
@@ -39,20 +34,20 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (*currentPosition < currentFrames->size())
+			if (mCurrentPosition < mCurrentTrackFrames.size())
 			{
-				if (*currentPosition == currentFrames->size() - 1 && nextTracks->empty())
+				if (mCurrentPosition == mCurrentTrackFrames.size() - 1 && mNextTracks.empty())
 				{
 					mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
 				}
 
 
-				result = (*currentFrames)[(*currentPosition)++];
+				result = (mCurrentTrackFrames)[(mCurrentPosition)++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
 
-			if (!nextTracks->empty())
+			if (!mNextTracks.empty())
 			{
 				GotoNextTrack();
 				continue;
@@ -108,8 +103,7 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		auto nextTracks = mNextTracks.Lock();
-		nextTracks->push_back(track);
+		mNextTracks.push_back(track);
 		SongAddedEvent songAddedEvent
 			{
 				.index = Length() - 1,
@@ -123,29 +117,25 @@ namespace Strawberry::Codec::Audio
 	void Playlist::RemoveTrack(size_t index)
 	{
 		Core::Assert(index < Length());
-		auto nextTracks = mNextTracks.Lock();
-		auto currentTrack = mCurrentTrack.Lock();
-		auto currentFrames = mCurrentTrackFrames.Lock();
-		auto prevTracks = mPreviousTracks.Lock();
 
-		if (index < prevTracks->size())
+		if (index < mPreviousTracks.size())
 		{
-			prevTracks->erase(prevTracks->begin() + static_cast<long>(index));
+			mPreviousTracks.erase(mPreviousTracks.begin() + static_cast<long>(index));
 		}
-		else if (*currentTrack && index == prevTracks->size())
+		else if (mCurrentTrack && index == mPreviousTracks.size())
 		{
-			currentTrack->Reset();
-			currentFrames->clear();
+			mCurrentTrack.Reset();
+			mCurrentTrackFrames.clear();
 		}
-		else if (!*currentTrack && index == prevTracks->size())
+		else if (!mCurrentTrack && index == mPreviousTracks.size())
 		{
-			nextTracks->pop_front();
+			mNextTracks.pop_front();
 		}
 		else
 		{
-			Core::Assert(index >= prevTracks->size() + (currentTrack->HasValue() ? 1 : 0));
-			nextTracks->erase(nextTracks->begin() + static_cast<long>(index) - static_cast<long>(prevTracks->size()) -
-							  (currentTrack->HasValue() ? 1 : 0));
+			Core::Assert(index >= mPreviousTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0));
+			mNextTracks.erase(mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) -
+							  (mCurrentTrack.HasValue() ? 1 : 0));
 		}
 
 		SongRemovedEvent event
@@ -169,73 +159,57 @@ namespace Strawberry::Codec::Audio
 
 	size_t Playlist::Length() const
 	{
-		auto nextTracks = mNextTracks.Lock();
-		auto currentTrack = mCurrentTrack.Lock();
-		auto prevTracks = mPreviousTracks.Lock();
-		return prevTracks->size() + nextTracks->size() + (currentTrack->HasValue() ? 1 : 0);
+		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
 	}
 
 
 	void Playlist::GotoPrevTrack()
 	{
-		auto nextTracks = mNextTracks.Lock();
-		auto currentTrack = mCurrentTrack.Lock();
-		auto prevTracks = mPreviousTracks.Lock();
-		auto currentTrackFrames = mCurrentTrackFrames.Lock();
-		auto currentPosition = mCurrentPosition.Lock();
-
-		if (!prevTracks->empty())
+		if (!mPreviousTracks.empty())
 		{
-			if (currentTrack->HasValue())
+			if (mCurrentTrack.HasValue())
 			{
-				nextTracks->push_front(currentTrack->Unwrap());
+				mNextTracks.push_front(mCurrentTrack.Unwrap());
 			}
 
-			*currentTrack = (*prevTracks)[0];
-			*currentTrackFrames = (*currentTrack)->loader();
-			prevTracks->pop_front();
+			mCurrentTrack = mPreviousTracks[0];
+			mCurrentTrackFrames = mCurrentTrack->loader();
+			mPreviousTracks.pop_front();
 
 			mEventBroadcaster.Broadcast(
 				SongBeganEvent
 					{
-						.index        = prevTracks->size(),
+						.index        = mPreviousTracks.size(),
 						.offset       = -1,
-						.title = (*currentTrack)->title,
-						.path  = (*currentTrack)->fileName,
+						.title = (mCurrentTrack)->title,
+						.path  = (mCurrentTrack)->fileName,
 					});
 		}
 
-		(*currentPosition) = 0;
+		(mCurrentPosition) = 0;
 	}
 
 
 	void Playlist::GotoNextTrack()
 	{
-		auto nextTracks = mNextTracks.Lock();
-		auto currentTrack = mCurrentTrack.Lock();
-		auto prevTracks = mPreviousTracks.Lock();
-		auto currentTrackFrames = mCurrentTrackFrames.Lock();
-		auto currentPosition = mCurrentPosition.Lock();
-
-
-		if (!nextTracks->empty())
+		if (!mNextTracks.empty())
 		{
-			if (currentTrack->HasValue())
-				prevTracks->push_front(currentTrack->Unwrap());
+			if (mCurrentTrack.HasValue())
+				mPreviousTracks.push_front(mCurrentTrack.Unwrap());
 
 
-			*currentTrack = nextTracks->front();
-			*currentTrackFrames = (*currentTrack)->loader();
-			nextTracks->pop_front();
-			(*currentPosition) = 0;
+			mCurrentTrack = mNextTracks.front();
+			mCurrentTrackFrames = (mCurrentTrack)->loader();
+			mNextTracks.pop_front();
+			(mCurrentPosition) = 0;
 
 			mEventBroadcaster.Broadcast(
 				SongBeganEvent
 					{
-						.index        = prevTracks->size(),
+						.index        = mPreviousTracks.size(),
 						.offset       = 1,
-						.title = (*currentTrack)->title,
-						.path  = (*currentTrack)->fileName,
+						.title = (mCurrentTrack)->title,
+						.path  = (mCurrentTrack)->fileName,
 					});
 		}
 	}

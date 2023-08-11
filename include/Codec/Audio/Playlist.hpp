@@ -7,9 +7,8 @@
 #include "Codec/Audio/Resampler.hpp"
 #include "Codec/Audio/FrameResizer.hpp"
 // Core
-#include "Strawberry/Core/Util/Option.hpp"
-#include "Strawberry/Core/Sync/Mutex.hpp"
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/Util/Variant.hpp"
 // Standard Library
 #include <vector>
@@ -106,17 +105,17 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		const Audio::FrameFormat                        mFormat;
-		const size_t                                    mFrameSize;
+		const Audio::FrameFormat      mFormat;
+		const size_t                  mFrameSize;
 
-		Resampler                                       mResampler;
-		FrameResizer                                    mFrameResizer;
+		Resampler                     mResampler;
+		FrameResizer                  mFrameResizer;
 
-		Core::Mutex<std::uint64_t>                      mCurrentPosition = Core::Mutex<uint64_t>(0);
-		Core::Mutex<std::deque<Track>>                  mPreviousTracks;
-		Core::Mutex<Core::Option<Track>>                mCurrentTrack;
-		Core::Mutex<std::vector<Frame>>                 mCurrentTrackFrames;
-		Core::Mutex<std::deque<Track>>                  mNextTracks;
+		std::uint64_t                 mCurrentPosition = 0;
+		std::deque<Track>             mPreviousTracks;
+		Core::Option<Track>           mCurrentTrack;
+		std::vector<Frame>            mCurrentTrackFrames;
+		std::deque<Track>             mNextTracks;
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
