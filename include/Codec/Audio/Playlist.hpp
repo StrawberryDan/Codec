@@ -11,6 +11,7 @@
 #include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/Util/Variant.hpp"
 // Standard Library
+#include <any>
 #include <vector>
 #include <deque>
 #include <functional>
@@ -92,6 +93,12 @@ namespace Strawberry::Codec::Audio
 		size_t                           GetFrameSize() const;
 
 
+		template <typename T>
+		T                                GetTrackAssociatedData(size_t index) const;
+		template <typename T>
+		void                             SetTrackAssociatedData(size_t index, T value);
+
+
 		void                             GotoPrevTrack();
 		void                             GotoNextTrack();
 
@@ -105,6 +112,7 @@ namespace Strawberry::Codec::Audio
 			Core::Option<std::string> title;
 			std::string               fileName;
 			TrackLoader               loader;
+			std::any                  associatedData;
 		};
 
 
@@ -123,4 +131,48 @@ namespace Strawberry::Codec::Audio
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
 	};
+
+
+	template<typename T>
+	T Playlist::GetTrackAssociatedData(size_t index) const
+	{
+		if (index < mPreviousTracks.size())
+		{
+			return std::any_cast<T>(mPreviousTracks[index].associatedData);
+		}
+		else if (index == mPreviousTracks.size() && mCurrentTrack)
+		{
+			return std::any_cast<T>(mCurrentTrack->associatedData);
+		}
+		else if (index > mPreviousTracks.size())
+		{
+			return std::any_cast<T>(mNextTracks[index - mPreviousTracks.size()].associatedData);
+		}
+		else
+		{
+			Core::Unreachable();
+		}
+	}
+
+
+	template<typename T>
+	void Playlist::SetTrackAssociatedData(size_t index, T value)
+	{
+		if (index < mPreviousTracks.size())
+		{
+			mPreviousTracks[index].associatedData = value;
+		}
+		else if (index == mPreviousTracks.size() && mCurrentTrack)
+		{
+			mCurrentTrack->associatedData = value;
+		}
+		else if (index > mPreviousTracks.size())
+		{
+			mNextTracks[index - mPreviousTracks.size()].associatedData = value;
+		}
+		else
+		{
+			Core::Unreachable();
+		}
+	}
 }
