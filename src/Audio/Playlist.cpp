@@ -196,7 +196,7 @@ namespace Strawberry::Codec::Audio
 			prevTracks->pop_front();
 
 			mEventBroadcaster.Broadcast(
-				SongChangedEvent
+				SongBeganEvent
 					{
 						.index        = prevTracks->size(),
 						.offset       = -1,
@@ -230,7 +230,7 @@ namespace Strawberry::Codec::Audio
 			(*currentPosition) = 0;
 
 			mEventBroadcaster.Broadcast(
-				SongChangedEvent
+				SongBeganEvent
 					{
 						.index        = prevTracks->size(),
 						.offset       = 1,

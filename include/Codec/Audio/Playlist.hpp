@@ -25,7 +25,7 @@ namespace Strawberry::Codec::Audio
 	class Playlist
 	{
 	public:
-		struct SongChangedEvent
+		struct SongBeganEvent
 		{
 			/// The index of the new currently playing song
 			size_t                    index;
@@ -63,7 +63,7 @@ namespace Strawberry::Codec::Audio
 
 
 		using Event = Core::Variant<
-			SongChangedEvent,
+			SongBeganEvent,
 			SongAddedEvent,
 			SongRemovedEvent,
 			PlaybackEndedEvent>;
