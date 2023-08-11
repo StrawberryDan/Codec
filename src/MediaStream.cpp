@@ -23,6 +23,11 @@ namespace Strawberry::Codec
 				auto packet = mMediaFile->Read();
 				if (packet)
 				{
+					if ((*packet)->stream_index != mStreamInfo.Index)
+					{
+						continue;
+					}
+
 					mNextPts = mNextPts + (*packet)->duration;
 					if (mNextPts > mStreamInfo.Stream->duration)
 					{
