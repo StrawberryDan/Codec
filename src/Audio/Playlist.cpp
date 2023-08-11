@@ -58,21 +58,9 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path)
+	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path, std::any associatedData)
 	{
 		Track track;
-
-
-		auto file = MediaFile::Open(path);
-		if (!file) return Core::NullOpt;
-
-		auto channel = file->GetBestStream(MediaType::Audio);
-		if (!channel) return Core::NullOpt;
-
-
-		track.title = channel->GetTitle();
-		track.fileName = path;
-
 
 		track.loader = [=]() mutable -> std::vector<Frame>
 		{
@@ -103,12 +91,14 @@ namespace Strawberry::Codec::Audio
 		};
 
 
+		track.associatedData = associatedData;
+
+
 		mNextTracks.push_back(track);
 		SongAddedEvent songAddedEvent
 			{
 				.index = Length() - 1,
-				.title=track.title,
-				.path=track.fileName
+				.associatedData = associatedData,
 			};
 		mEventBroadcaster.Broadcast(songAddedEvent);
 
@@ -199,10 +189,9 @@ namespace Strawberry::Codec::Audio
 			mEventBroadcaster.Broadcast(
 				SongBeganEvent
 					{
-						.index        = mPreviousTracks.size(),
-						.offset       = -1,
-						.title = (mCurrentTrack)->title,
-						.path  = (mCurrentTrack)->fileName,
+						.index          = mPreviousTracks.size(),
+						.offset         = -1,
+						.associatedData = mCurrentTrack->associatedData,
 					});
 		}
 
@@ -226,10 +215,9 @@ namespace Strawberry::Codec::Audio
 			mEventBroadcaster.Broadcast(
 				SongBeganEvent
 					{
-						.index        = mPreviousTracks.size(),
-						.offset       = 1,
-						.title = (mCurrentTrack)->title,
-						.path  = (mCurrentTrack)->fileName,
+						.index          = mPreviousTracks.size(),
+						.offset         = 1,
+						.associatedData = mCurrentTrack->associatedData,
 					});
 		}
 	}

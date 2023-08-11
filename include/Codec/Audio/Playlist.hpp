@@ -31,10 +31,8 @@ namespace Strawberry::Codec::Audio
 			size_t                    index;
 			/// The difference in playlist index.
 			int                       offset;
-			/// The title of the song.
-			Core::Option<std::string> title;
-			/// The file path of the song.
-			std::string path;
+			/// The data associated with the new song
+			std::any                  associatedData;
 		};
 
 
@@ -42,10 +40,8 @@ namespace Strawberry::Codec::Audio
 		{
 			/// The index where the song was inserted.
 			size_t                    index;
-			/// The title of the song.
-			Core::Option<std::string> title;
-			/// The file path of the song.
-			std::string path;
+			/// The data associated with the new song
+			std::any                  associatedData;
 		};
 
 
@@ -79,7 +75,7 @@ namespace Strawberry::Codec::Audio
 
 
 		[[nodiscard]]
-		Core::Option<size_t>             EnqueueFile(const std::string& path);
+		Core::Option<size_t>             EnqueueFile(const std::string& path, std::any associatedData = {});
 
 
 		void                             RemoveTrack(size_t index);
@@ -115,8 +111,6 @@ namespace Strawberry::Codec::Audio
 
 		struct Track
 		{
-			Core::Option<std::string> title;
-			std::string               fileName;
 			TrackLoader               loader;
 			std::any                  associatedData;
 		};
@@ -172,9 +166,20 @@ namespace Strawberry::Codec::Audio
 		{
 			mCurrentTrack->associatedData = value;
 		}
+		else if (index == mPreviousTracks.size() && !mCurrentTrack && !mNextTracks.empty())
+		{
+			mNextTracks.front().associatedData = value;
+		}
 		else if (index > mPreviousTracks.size())
 		{
-			mNextTracks[index - mPreviousTracks.size()].associatedData = value;
+			if (mCurrentTrack)
+			{
+				mNextTracks[index - mPreviousTracks.size()].associatedData = value;
+			}
+			else
+			{
+				mNextTracks[index - mPreviousTracks.size() - 1].associatedData = value;
+			}
 		}
 		else
 		{
