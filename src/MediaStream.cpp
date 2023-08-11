@@ -32,14 +32,14 @@ namespace Strawberry::Codec
 					if (mNextPts > mStreamInfo.Stream->duration)
 					{
 						mIsEOF = true;
-						return Core::NullOpt;
+						continue;
 					}
 
 
 					if (mLastDTS >= (*packet)->dts)
 					{
 						mIsEOF = true;
-						return Core::NullOpt;
+						continue;
 					}
 
 
