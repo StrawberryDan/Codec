@@ -208,7 +208,7 @@ namespace Strawberry::Codec::Audio
 
 
 			mCurrentTrack = mNextTracks.front();
-			mCurrentTrackFrames = (mCurrentTrack)->loader();
+			mCurrentTrackFrames = mCurrentTrack->loader();
 			mNextTracks.pop_front();
 			(mCurrentPosition) = 0;
 
