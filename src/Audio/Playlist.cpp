@@ -34,15 +34,16 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
-			if (mCurrentPosition < mCurrentTrackFrames.size())
+			auto currentFrames = mCurrentTrackFrames.Lock();
+			if (mCurrentPosition < currentFrames->size())
 			{
-				if (mCurrentPosition == mCurrentTrackFrames.size() - 1 && mNextTracks.empty())
+				if (mCurrentPosition == currentFrames->size() - 1 && mNextTracks.empty())
 				{
 					mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
 				}
 
 
-				result = (mCurrentTrackFrames)[(mCurrentPosition)++];
+				result = (*currentFrames)[mCurrentPosition++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
@@ -62,32 +63,27 @@ namespace Strawberry::Codec::Audio
 	{
 		Track track;
 
-		track.loader = [=]() mutable -> std::vector<Frame>
+		track.loader = [=](Core::Mutex<FrameBuffer>& frames) mutable
 		{
+			Core::Assert(frames.Lock()->empty());
+
+
 			auto file = MediaFile::Open(path);
-			if (!file) return {};
+			if (!file) return;
 
 			auto channel = file->GetBestStream(MediaType::Audio);
-			if (!channel) return {};
+			if (!channel) return;
 
-			std::vector<Packet> packets;
+
+			auto decoder = channel->GetDecoder();
 			while (auto packet = channel->Read())
 			{
-				packets.emplace_back(packet.Unwrap());
-			}
-
-			std::vector<Frame> frames;
-			auto decoder = channel->GetDecoder();
-			for (auto& packet: packets)
-			{
-				decoder.Send(std::move(packet));
-				for (auto frame: decoder.Receive())
+				decoder.Send(packet.Unwrap());
+				for (auto frame : decoder.Receive())
 				{
-					frames.emplace_back(std::move(frame));
+					frames.Lock()->emplace_back(std::move(frame));
 				}
 			}
-
-			return frames;
 		};
 
 
@@ -117,7 +113,7 @@ namespace Strawberry::Codec::Audio
 		else if (mCurrentTrack && index == mPreviousTracks.size())
 		{
 			mCurrentTrack.Reset();
-			mCurrentTrackFrames.clear();
+			mCurrentTrackFrames.Lock()->clear();
 		}
 		else if (!mCurrentTrack && index == mPreviousTracks.size())
 		{
@@ -183,7 +179,8 @@ namespace Strawberry::Codec::Audio
 			}
 
 			mCurrentTrack = mPreviousTracks[0];
-			mCurrentTrackFrames = mCurrentTrack->loader();
+			mCurrentTrackFrames.Lock()->clear();
+			mCurrentTrack->loader(mCurrentTrackFrames);
 			mPreviousTracks.pop_front();
 
 			mEventBroadcaster.Broadcast(
@@ -208,7 +205,8 @@ namespace Strawberry::Codec::Audio
 
 
 			mCurrentTrack = mNextTracks.front();
-			mCurrentTrackFrames = mCurrentTrack->loader();
+			mCurrentTrackFrames.Lock()->clear();
+			mCurrentTrack->loader(mCurrentTrackFrames);
 			mNextTracks.pop_front();
 			(mCurrentPosition) = 0;
 

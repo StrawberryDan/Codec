@@ -106,7 +106,8 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		using TrackLoader = std::function<std::vector<Frame>()>;
+		using FrameBuffer = std::vector<Frame>;
+		using TrackLoader = std::function<void(Core::Mutex<FrameBuffer>&)>;
 
 
 		struct Track
@@ -125,7 +126,7 @@ namespace Strawberry::Codec::Audio
 		std::uint64_t                 mCurrentPosition = 0;
 		std::deque<Track>             mPreviousTracks;
 		Core::Option<Track>           mCurrentTrack;
-		std::vector<Frame>            mCurrentTrackFrames;
+		Core::Mutex<FrameBuffer>      mCurrentTrackFrames;
 		std::deque<Track>             mNextTracks;
 
 
