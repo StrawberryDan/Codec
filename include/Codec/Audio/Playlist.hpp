@@ -12,9 +12,10 @@
 #include "Strawberry/Core/Util/Variant.hpp"
 // Standard Library
 #include <any>
-#include <vector>
 #include <deque>
 #include <functional>
+#include <thread>
+#include <vector>
 
 
 //======================================================================================================================
@@ -69,6 +70,11 @@ namespace Strawberry::Codec::Audio
 
 	public:
 		Playlist(Audio::FrameFormat format, size_t sampleCount);
+		Playlist(const Playlist& rhs)            = delete;
+		Playlist& operator=(const Playlist& rhs) = delete;
+		Playlist(Playlist&& rhs)                 = delete;
+		Playlist& operator=(Playlist&& rhs)      = delete;
+		~Playlist();
 
 
 		Core::Option<Frame>              ReadFrame();
@@ -110,6 +116,12 @@ namespace Strawberry::Codec::Audio
 		using TrackLoader = std::function<void(Core::Mutex<FrameBuffer>&)>;
 
 
+	private:
+		void StartLoading(TrackLoader loader);
+		void StopLoading(bool clearFrames);
+
+
+	private:
 		struct Track
 		{
 			TrackLoader               loader;
@@ -128,6 +140,10 @@ namespace Strawberry::Codec::Audio
 		Core::Option<Track>           mCurrentTrack;
 		Core::Mutex<FrameBuffer>      mCurrentTrackFrames;
 		std::deque<Track>             mNextTracks;
+
+
+		std::atomic<bool>             mShouldRead = false;
+		Core::Option<std::thread>     mReadingThread;
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;

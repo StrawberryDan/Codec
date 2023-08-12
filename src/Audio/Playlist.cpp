@@ -18,12 +18,29 @@ namespace Strawberry::Codec::Audio
 		  , mFrameResizer(sampleCount) {}
 
 
+	Playlist::~Playlist()
+	{
+		StopLoading(true);
+	}
+
+
 	Core::Option<Frame> Playlist::ReadFrame()
 	{
 		Core::Option<Frame> result;
 
+
 		while (true)
 		{
+			if (mReadingThread && !mShouldRead)
+			{
+				StopLoading(false);
+			}
+			else if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack)
+			{
+				StartLoading(mCurrentTrack->loader);
+			}
+
+
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result;
 
@@ -34,10 +51,11 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
+
 			auto currentFrames = mCurrentTrackFrames.Lock();
 			if (mCurrentPosition < currentFrames->size())
 			{
-				if (mCurrentPosition == currentFrames->size() - 1 && mNextTracks.empty())
+				if (mCurrentPosition == currentFrames->size() - 1 && mNextTracks.empty() && !mReadingThread)
 				{
 					mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
 				}
@@ -47,6 +65,11 @@ namespace Strawberry::Codec::Audio
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
+			else if (mReadingThread)
+			{
+				continue;
+			}
+
 
 			if (!mNextTracks.empty())
 			{
@@ -63,20 +86,28 @@ namespace Strawberry::Codec::Audio
 	{
 		Track track;
 
-		track.loader = [=](Core::Mutex<FrameBuffer>& frames) mutable
+		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable
 		{
 			Core::Assert(frames.Lock()->empty());
 
 
 			auto file = MediaFile::Open(path);
-			if (!file) return;
+			if (!file)
+			{
+				mShouldRead = false;
+				return;
+			}
 
 			auto channel = file->GetBestStream(MediaType::Audio);
-			if (!channel) return;
+			if (!channel)
+			{
+				mShouldRead = false;
+				return;
+			}
 
 
 			auto decoder = channel->GetDecoder();
-			while (auto packet = channel->Read())
+			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
 			{
 				decoder.Send(packet.Unwrap());
 				for (auto frame : decoder.Receive())
@@ -84,6 +115,8 @@ namespace Strawberry::Codec::Audio
 					frames.Lock()->emplace_back(std::move(frame));
 				}
 			}
+
+			mShouldRead = false;
 		};
 
 
@@ -113,7 +146,7 @@ namespace Strawberry::Codec::Audio
 		else if (mCurrentTrack && index == mPreviousTracks.size())
 		{
 			mCurrentTrack.Reset();
-			mCurrentTrackFrames.Lock()->clear();
+			StopLoading(true);
 		}
 		else if (!mCurrentTrack && index == mPreviousTracks.size())
 		{
@@ -173,14 +206,13 @@ namespace Strawberry::Codec::Audio
 	{
 		if (!mPreviousTracks.empty())
 		{
+			StopLoading(true);
 			if (mCurrentTrack.HasValue())
 			{
 				mNextTracks.push_front(mCurrentTrack.Unwrap());
 			}
 
 			mCurrentTrack = mPreviousTracks[0];
-			mCurrentTrackFrames.Lock()->clear();
-			mCurrentTrack->loader(mCurrentTrackFrames);
 			mPreviousTracks.pop_front();
 
 			mEventBroadcaster.Broadcast(
@@ -192,7 +224,7 @@ namespace Strawberry::Codec::Audio
 					});
 		}
 
-		(mCurrentPosition) = 0;
+		mCurrentPosition = 0;
 	}
 
 
@@ -200,15 +232,14 @@ namespace Strawberry::Codec::Audio
 	{
 		if (!mNextTracks.empty())
 		{
+			StopLoading(true);
 			if (mCurrentTrack.HasValue())
 				mPreviousTracks.push_front(mCurrentTrack.Unwrap());
 
 
 			mCurrentTrack = mNextTracks.front();
-			mCurrentTrackFrames.Lock()->clear();
-			mCurrentTrack->loader(mCurrentTrackFrames);
 			mNextTracks.pop_front();
-			(mCurrentPosition) = 0;
+			mCurrentPosition = 0;
 
 			mEventBroadcaster.Broadcast(
 				SongBeganEvent
@@ -218,5 +249,32 @@ namespace Strawberry::Codec::Audio
 						.associatedData = mCurrentTrack->associatedData,
 					});
 		}
+	}
+
+
+	void Playlist::StartLoading(Playlist::TrackLoader loader)
+	{
+		StopLoading(true);
+		Core::Assert(!mShouldRead);
+		Core::Assert(!mReadingThread.HasValue());
+
+
+		mShouldRead = true;
+		mReadingThread.Emplace([this, loader](){ loader(mCurrentTrackFrames); });
+	}
+
+
+	void Playlist::StopLoading(bool clearFrames)
+	{
+		if (mReadingThread)
+		{
+			mShouldRead = false;
+			mReadingThread->join();
+			mReadingThread.Reset();
+		}
+
+
+		if (clearFrames)
+			mCurrentTrackFrames.Lock()->clear();
 	}
 }
