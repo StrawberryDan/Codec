@@ -67,6 +67,7 @@ namespace Strawberry::Codec::Audio
 			}
 			else if (mReadingThread)
 			{
+				std::this_thread::yield();
 				continue;
 			}
 
