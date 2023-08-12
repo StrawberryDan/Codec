@@ -147,6 +147,7 @@ namespace Strawberry::Codec::Audio
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
+		bool                                          mHasSentPlaybackEnded = false;
 	};
 
 

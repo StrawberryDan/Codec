@@ -42,7 +42,11 @@ namespace Strawberry::Codec::Audio
 
 
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
-			if (result) return result;
+			if (result)
+			{
+				mHasSentPlaybackEnded = false;
+				return result;
+			}
 
 			result = mResampler.ReadFrame();
 			if (result)
@@ -55,12 +59,6 @@ namespace Strawberry::Codec::Audio
 			auto currentFrames = mCurrentTrackFrames.Lock();
 			if (mCurrentPosition < currentFrames->size())
 			{
-				if (mCurrentPosition == currentFrames->size() - 1 && mNextTracks.empty() && !mReadingThread)
-				{
-					mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
-				}
-
-
 				result = (*currentFrames)[mCurrentPosition++];
 				mResampler.SendFrame(result.Unwrap());
 				continue;
@@ -78,6 +76,14 @@ namespace Strawberry::Codec::Audio
 				continue;
 			}
 
+
+			if (!mHasSentPlaybackEnded)
+			{
+				mHasSentPlaybackEnded = true;
+				mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
+			}
+
+
 			return Core::NullOpt;
 		}
 	}
@@ -86,6 +92,7 @@ namespace Strawberry::Codec::Audio
 	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path, std::any associatedData)
 	{
 		Track track;
+
 
 		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable
 		{
