@@ -114,6 +114,9 @@ namespace Strawberry::Codec::Audio
 			}
 
 
+			frames.Lock()->reserve(channel->GetFrameCount().UnwrapOr(10 * 1024));
+
+
 			auto decoder = channel->GetDecoder();
 			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
 			{
