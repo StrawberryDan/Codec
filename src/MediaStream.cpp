@@ -121,6 +121,12 @@ namespace Strawberry::Codec
 	}
 
 
+		Core::Option<size_t> MediaStream::GetFrameCount() const
+	{
+		return mStreamInfo.Stream->nb_frames == 0 ? Core::NullOpt : Core::Option<size_t>(mStreamInfo.Stream->nb_frames);
+	}
+
+
 	const AVCodec* MediaStream::GetCodec() const
 	{
 		auto codec = avcodec_find_decoder(mStreamInfo.CodecParameters->codec_id);

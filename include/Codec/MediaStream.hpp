@@ -50,6 +50,7 @@ namespace Strawberry::Codec
 		[[nodiscard]] Core::Option<std::string>     GetArtist()     const;
 		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase()   const;
 		[[nodiscard]] std::chrono::duration<double> GetDuration()   const;
+		[[nodiscard]] Core::Option<size_t>          GetFrameCount() const;
 
 
 		[[nodiscard]] const AVCodec*           GetCodec() const;
