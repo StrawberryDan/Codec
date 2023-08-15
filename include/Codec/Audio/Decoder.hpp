@@ -12,8 +12,7 @@
 #include <vector>
 
 
-extern "C"
-{
+extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
@@ -43,4 +42,4 @@ namespace Strawberry::Codec::Audio
 		AVCodecParameters* mParameters;
 		std::deque<Packet> mPacketBuffer;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

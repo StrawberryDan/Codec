@@ -5,8 +5,7 @@
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/samplefmt.h>
 }
 
@@ -277,4 +276,5 @@ namespace Strawberry::Codec::Audio
 
 	Frame::Frame(AVFrame* frame)
 		: mFrame(frame)
-	{}// namespace Strawberry::Codec::Audio
+	{}
+} // namespace Strawberry::Codec::Audio

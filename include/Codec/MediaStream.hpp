@@ -20,8 +20,7 @@ namespace Strawberry::Codec
 	class MediaFile;
 
 
-	struct MediaStreamInfo
-	{
+	struct MediaStreamInfo {
 		size_t             Index;
 		MediaType          MediaType;
 		AVStream*          Stream;
@@ -71,4 +70,4 @@ namespace Strawberry::Codec
 		Core::Collection::CircularBuffer<Packet> mPacketBuffer;
 		Core::Option<int>                        mLastDTS;
 	};
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

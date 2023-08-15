@@ -83,4 +83,4 @@ namespace Strawberry::Codec::Audio
 
 	static_assert(std::is_move_constructible_v<Mixer::InputChannel>);
 	static_assert(std::is_move_assignable_v<Mixer::InputChannel>);
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

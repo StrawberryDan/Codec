@@ -48,4 +48,4 @@ namespace Strawberry::Codec::Audio
 		Core::Option<Frame> mWorkingFrame;
 		std::queue<Frame>   mInputFrames;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

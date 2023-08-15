@@ -46,4 +46,4 @@ namespace Strawberry::Codec::Audio
 		Core::Option<FrameResizer> mFrameResizer;
 		std::deque<Frame>          mFrameBuffer;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

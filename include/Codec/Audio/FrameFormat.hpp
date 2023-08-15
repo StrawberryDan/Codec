@@ -7,8 +7,7 @@
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
-extern "C"
-{
+extern "C" {
 #include "libavutil/channel_layout.h"
 }
 
@@ -45,4 +44,4 @@ namespace Strawberry::Codec::Audio
 		int             mSampleFormat;
 		AVChannelLayout mChannels;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

@@ -148,4 +148,4 @@ namespace Strawberry::Codec
 				return Core::IO::Error::Unknown;
 		}
 	}
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

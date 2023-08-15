@@ -12,8 +12,7 @@
 #include <string>
 
 
-extern "C"
-{
+extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
@@ -57,4 +56,4 @@ namespace Strawberry::Codec
 		AVFormatContext*              mFile = nullptr;
 		std::map<size_t, MediaStream> mOpenStreams;
 	};
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

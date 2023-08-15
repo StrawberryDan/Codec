@@ -26,8 +26,7 @@ namespace Strawberry::Codec::Audio
 	class Playlist
 	{
 	public:
-		struct SongBeganEvent
-		{
+		struct SongBeganEvent {
 			/// The index of the new currently playing song
 			size_t   index;
 			/// The difference in playlist index.
@@ -37,8 +36,7 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		struct SongAddedEvent
-		{
+		struct SongAddedEvent {
 			/// The index where the song was inserted.
 			size_t   index;
 			/// The data associated with the new song
@@ -46,8 +44,7 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		struct SongRemovedEvent
-		{
+		struct SongRemovedEvent {
 			/// The index where the song was inserted.
 			size_t index;
 		};
@@ -114,8 +111,7 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		struct Track
-		{
+		struct Track {
 			TrackLoader loader;
 			std::any    associatedData;
 		};
@@ -196,4 +192,4 @@ namespace Strawberry::Codec::Audio
 			Core::Unreachable();
 		}
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

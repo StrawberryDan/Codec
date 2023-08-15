@@ -112,4 +112,4 @@ namespace Strawberry::Codec::Audio
 			return Frame::Silence(mOutputFormat, mOutputFrameSize);
 		}
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

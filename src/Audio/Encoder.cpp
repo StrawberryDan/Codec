@@ -5,8 +5,7 @@
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 }
@@ -131,4 +130,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return mParameters;
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

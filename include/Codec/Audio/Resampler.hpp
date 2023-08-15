@@ -7,8 +7,7 @@
 #include <queue>
 
 
-extern "C"
-{
+extern "C" {
 #include "libavutil/channel_layout.h"
 #include "libswresample/swresample.h"
 }
@@ -40,4 +39,4 @@ namespace Strawberry::Codec::Audio
 		SwrContext*       mContext;
 		std::queue<Frame> mInputFrames;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

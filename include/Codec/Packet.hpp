@@ -4,8 +4,7 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 
 
-extern "C"
-{
+extern "C" {
 #include "libavformat/avformat.h"
 }
 
@@ -45,4 +44,4 @@ namespace Strawberry::Codec
 	private:
 		AVPacket* mAVPacket;
 	};
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

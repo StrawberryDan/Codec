@@ -104,4 +104,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return &mChannels;
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

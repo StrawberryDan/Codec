@@ -10,8 +10,7 @@
 #include "Strawberry/Core/Util/Utilities.hpp"
 
 
-extern "C"
-{
+extern "C" {
 #include "libavutil/opt.h"
 }
 
@@ -93,4 +92,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return !mInputFrames.empty();
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

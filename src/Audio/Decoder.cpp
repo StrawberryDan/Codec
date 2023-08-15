@@ -108,4 +108,4 @@ namespace Strawberry::Codec::Audio
 
 		return frames;
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

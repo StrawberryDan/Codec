@@ -11,8 +11,7 @@
 #include <vector>
 
 
-extern "C"
-{
+extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
@@ -67,4 +66,4 @@ namespace Strawberry::Codec::Audio
 	private:
 		AVFrame* mFrame;
 	};
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

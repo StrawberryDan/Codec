@@ -81,4 +81,4 @@ namespace Strawberry::Codec::Audio
 				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > 0) || !mInputFrames.empty();
 		}
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

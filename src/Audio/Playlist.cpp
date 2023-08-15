@@ -95,8 +95,7 @@ namespace Strawberry::Codec::Audio
 		Track track;
 
 
-		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable
-		{
+		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable {
 			Core::Assert(frames.Lock()->empty());
 
 
@@ -286,4 +285,4 @@ namespace Strawberry::Codec::Audio
 		if (clearFrames)
 			mCurrentTrackFrames.Lock()->clear();
 	}
-}// namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio

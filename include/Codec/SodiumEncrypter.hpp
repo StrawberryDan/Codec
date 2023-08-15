@@ -28,4 +28,4 @@ namespace Strawberry::Codec
 	private:
 		Key mKey;
 	};
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

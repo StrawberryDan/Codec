@@ -97,4 +97,4 @@ namespace Strawberry::Codec
 		avformat_flush(mAVFormatContext);
 		mStage = Finished;
 	}
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

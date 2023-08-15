@@ -73,4 +73,4 @@ namespace Strawberry::Codec
 	{
 		return {mAVPacket->data, static_cast<size_t>(mAVPacket->size)};
 	}
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec

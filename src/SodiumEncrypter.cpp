@@ -24,4 +24,4 @@ namespace Strawberry::Codec
 		Assert(result >= 0);
 		return {nonce, ciphertext};
 	}
-}// namespace Strawberry::Codec
+} // namespace Strawberry::Codec
