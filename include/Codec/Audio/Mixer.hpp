@@ -27,21 +27,21 @@ namespace Strawberry::Codec::Audio
 
 
 	public:
-		Mixer(const FrameFormat& outputFormat, size_t outputFrameSize);
+		Mixer(FrameFormat outputFormat, size_t outputFrameSize);
 
 
 		Frame ReadFrame();
 
 
-		bool IsEmpty() const;
+		[[nodiscard]] bool IsEmpty() const;
 
 
 		std::shared_ptr<InputChannel> CreateInputChannel();
 
 
 	private:
-		const FrameFormat                      mOutputFormat;
-		const size_t                           mOutputFrameSize;
+		const FrameFormat mOutputFormat;
+		const size_t mOutputFrameSize;
 		std::list<std::shared_ptr<InputChannel>> mInputChannels;
 	};
 
@@ -54,10 +54,10 @@ namespace Strawberry::Codec::Audio
 	public:
 		InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize);
 
-		InputChannel(const InputChannel& rhs)            = delete;
+		InputChannel(const InputChannel& rhs) = delete;
 		InputChannel& operator=(const InputChannel& rhs) = delete;
-		InputChannel(InputChannel&& rhs)                 = default;
-		InputChannel& operator=(InputChannel&& rhs)      = default;
+		InputChannel(InputChannel&& rhs) = default;
+		InputChannel& operator=(InputChannel&& rhs) = default;
 
 
 		/// Returns whether there are any queued samples in this channel.
@@ -73,12 +73,13 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		FrameFormat                    mOutputFormat;
-		size_t                         mOutputFrameSize;
+		FrameFormat mOutputFormat;
+		size_t mOutputFrameSize;
 		Core::Mutex<std::deque<Frame>> mFrameBuffer;
-		Resampler                      mResampler;
-		FrameResizer                   mFrameResizer;
+		Resampler mResampler;
+		FrameResizer mFrameResizer;
 	};
+
 
 	static_assert(std::is_move_constructible_v<Mixer::InputChannel>);
 	static_assert(std::is_move_assignable_v<Mixer::InputChannel>);

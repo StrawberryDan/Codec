@@ -11,7 +11,7 @@
 
 namespace Strawberry::Codec::Audio
 {
-	Playlist::Playlist(Audio::FrameFormat format, size_t sampleCount)
+	Playlist::Playlist(const Audio::FrameFormat& format, size_t sampleCount)
 		: mFormat(format)
 		  , mFrameSize()
 		  , mResampler(format)
@@ -89,7 +89,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path, std::any associatedData)
+	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path, const std::any& associatedData)
 	{
 		Track track;
 
@@ -121,7 +121,7 @@ namespace Strawberry::Codec::Audio
 			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
 			{
 				decoder.Send(packet.Unwrap());
-				for (auto frame : decoder.Receive())
+				for (auto frame: decoder.Receive())
 				{
 					frames.Lock()->emplace_back(std::move(frame));
 				}
@@ -166,8 +166,9 @@ namespace Strawberry::Codec::Audio
 		else
 		{
 			Core::Assert(index >= mPreviousTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0));
-			mNextTracks.erase(mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) -
-							  (mCurrentTrack.HasValue() ? 1 : 0));
+			mNextTracks.erase(
+				mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) -
+				(mCurrentTrack.HasValue() ? 1 : 0));
 		}
 
 		SongRemovedEvent event
@@ -263,7 +264,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Playlist::StartLoading(Playlist::TrackLoader loader)
+	void Playlist::StartLoading(const Playlist::TrackLoader& loader)
 	{
 		StopLoading(true);
 		Core::Assert(!mShouldRead);
@@ -271,7 +272,7 @@ namespace Strawberry::Codec::Audio
 
 
 		mShouldRead = true;
-		mReadingThread.Emplace([this, loader](){ loader(mCurrentTrackFrames); });
+		mReadingThread.Emplace([this, loader]() { loader(mCurrentTrackFrames); });
 	}
 
 

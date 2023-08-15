@@ -1,10 +1,8 @@
 #include "Codec/Muxer.hpp"
 
 
-
 #include "Strawberry/Core/Util/Utilities.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
-
 
 
 namespace Strawberry::Codec
@@ -12,11 +10,10 @@ namespace Strawberry::Codec
 	using namespace Strawberry::Core;
 
 
-
 	Muxer::Muxer(const std::string& file)
 		: mAVFormatContext(nullptr)
-		, mStreams()
-		, mStage(Unopened)
+		  , mStreams()
+		  , mStage(Unopened)
 	{
 		auto result = avformat_alloc_output_context2(&mAVFormatContext, nullptr, nullptr, file.c_str());
 		Assert(result >= 0);
@@ -27,24 +24,22 @@ namespace Strawberry::Codec
 	}
 
 
-
 	Muxer::Muxer(Muxer&& other) noexcept
 		: mAVFormatContext(Take(other.mAVFormatContext))
-		, mStreams(Take(other.mStreams))
-		, mStage(Replace(other.mStage, Unopened))
+		  , mStreams(Take(other.mStreams))
+		  , mStage(Replace(other.mStage, Unopened))
 	{
 
 
 	}
 
 
-
-	Muxer& Muxer::operator=(Muxer&& other) noexcept {
+	Muxer& Muxer::operator=(Muxer&& other) noexcept
+	{
 		mAVFormatContext = Take(other.mAVFormatContext);
 		mStreams = Take(other.mStreams);
 		return (*this);
 	}
-
 
 
 	Muxer::~Muxer()
@@ -53,7 +48,6 @@ namespace Strawberry::Codec
 		avio_close(mAVFormatContext->pb);
 		avformat_free_context(mAVFormatContext);
 	}
-
 
 
 	void Muxer::OpenStream(const AVCodecParameters* codecParameters)
@@ -71,7 +65,6 @@ namespace Strawberry::Codec
 	}
 
 
-
 	void Muxer::WriteHeader()
 	{
 		Assert(mStage == Opened);
@@ -79,7 +72,6 @@ namespace Strawberry::Codec
 		Assert(result >= 0);
 		mStage = HeaderWritten;
 	}
-
 
 
 	void Muxer::WritePacket(Packet& packet)
@@ -92,7 +84,6 @@ namespace Strawberry::Codec
 	}
 
 
-
 	void Muxer::WriteTrailer()
 	{
 		Assert(mStage == WritingPackets);
@@ -100,7 +91,6 @@ namespace Strawberry::Codec
 		Assert(result >= 0);
 		mStage = TrailerWritten;
 	}
-
 
 
 	void Muxer::Flush()

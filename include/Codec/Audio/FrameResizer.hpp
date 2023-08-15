@@ -28,12 +28,12 @@ namespace Strawberry::Codec::Audio
 	public:
 		/// Constructor
 		/// @param outputFrameSize The number of samples output audio frames should have
-		FrameResizer(size_t outputFrameSize);
+		explicit FrameResizer(size_t outputFrameSize);
 
-		FrameResizer(const FrameResizer& rhs)            = delete;
+		FrameResizer(const FrameResizer& rhs) = delete;
 		FrameResizer& operator=(const FrameResizer& rhs) = delete;
-		FrameResizer(FrameResizer&& rhs)                 = default;
-		FrameResizer& operator=(FrameResizer&& rhs)      = default;
+		FrameResizer(FrameResizer&& rhs) noexcept = default;
+		FrameResizer& operator=(FrameResizer&& rhs) noexcept = default;
 		/// Processes an input frame and outputs some number
 		/// output audio frames with the size given in the constructor.
 		/// @param frame The input frame
@@ -41,12 +41,12 @@ namespace Strawberry::Codec::Audio
 
 		Core::Option<Frame> ReadFrame(Mode mode);
 
-		bool IsOutputAvailable(Mode mode) const;
+		[[nodiscard]] bool IsOutputAvailable(Mode mode) const;
 
 
 	private:
-		size_t              mOutputFrameSize;
+		size_t mOutputFrameSize;
 		Core::Option<Frame> mWorkingFrame;
-		std::queue<Frame>   mInputFrames;
+		std::queue<Frame> mInputFrames;
 	};
 }

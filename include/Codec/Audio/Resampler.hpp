@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include <queue>
 #include "Frame.hpp"
 #include "FrameFormat.hpp"
@@ -15,32 +14,30 @@ extern "C"
 }
 
 
-
 namespace Strawberry::Codec::Audio
 {
 	class Resampler
 	{
 	public:
 		explicit Resampler(FrameFormat outputFormat);
-		Resampler(const Resampler&)            = delete;
+		Resampler(const Resampler&) = delete;
 		Resampler& operator=(const Resampler&) = delete;
-		Resampler(Resampler&&)                 = default;
-		Resampler& operator=(Resampler&&)      = default;
+		Resampler(Resampler&&) = default;
+		Resampler& operator=(Resampler&&) = default;
 		~Resampler();
 
 
-		const FrameFormat OutputFormat() const { return mOutputFormat; }
+		[[nodiscard]] FrameFormat OutputFormat() const { return mOutputFormat; }
 
 
 		void SendFrame(Frame frame);
 		Core::Option<Frame> ReadFrame();
-		bool IsOutputAvailable() const;
+		[[nodiscard]] bool IsOutputAvailable() const;
 
 
 	private:
-		Core::Option<FrameFormat> mInputFormat;
-		FrameFormat               mOutputFormat;
-		SwrContext*               mContext;
-		std::queue<Frame>         mInputFrames;
+		FrameFormat mOutputFormat;
+		SwrContext* mContext;
+		std::queue<Frame> mInputFrames;
 	};
 }

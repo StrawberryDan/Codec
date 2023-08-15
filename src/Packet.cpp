@@ -4,15 +4,13 @@
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
-
 namespace Strawberry::Codec
 {
 	Packet::Packet()
-		: mAVPacket(av_packet_alloc())
-	{}
+		: mAVPacket(av_packet_alloc()) {}
 
 
-	Packet::Packet(const uint8_t *data, size_t len)
+	Packet::Packet(const uint8_t* data, size_t len)
 		: Packet()
 	{
 		auto avData = av_malloc(len);
@@ -30,7 +28,6 @@ namespace Strawberry::Codec
 	}
 
 
-
 	Packet& Packet::operator=(const Packet& other)
 	{
 		if (this != &other)
@@ -43,13 +40,11 @@ namespace Strawberry::Codec
 	}
 
 
-
 	Packet::Packet(Packet&& other) noexcept
 		: Packet()
 	{
 		av_packet_move_ref(mAVPacket, other.mAVPacket);
 	}
-
 
 
 	Packet& Packet::operator=(Packet&& other) noexcept
@@ -62,7 +57,6 @@ namespace Strawberry::Codec
 
 		return (*this);
 	}
-
 
 
 	Packet::~Packet()

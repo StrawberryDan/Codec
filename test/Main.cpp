@@ -4,8 +4,6 @@
 #include "Codec/Audio/Mixer.hpp"
 #include "Codec/Audio/Encoder.hpp"
 #include "Codec/Muxer.hpp"
-#include "Codec/SodiumEncrypter.hpp"
-#include "Strawberry/Core/Util/Logging.hpp"
 
 
 extern "C"
@@ -52,35 +50,35 @@ void AudioMixing()
 
 
 	std::vector<Audio::Frame> frames[] =
-	{
-		// DecodeAudioFile("data/pd.wav"),
-		// DecodeAudioFile("data/girigiri.wav"),
-		// DecodeAudioFile("data/dcl.wav"),
-		DecodeAudioFile("data/cotn.flac"),
-	};
+		{
+			// DecodeAudioFile("data/pd.wav"),
+			// DecodeAudioFile("data/girigiri.wav"),
+			// DecodeAudioFile("data/dcl.wav"),
+			DecodeAudioFile("data/cotn.flac"),
+		};
 
 
 	Audio::Mixer mixer(Audio::FrameFormat(48000, AV_SAMPLE_FMT_DBL, AV_CHANNEL_LAYOUT_STEREO), 1024);
 	std::vector<std::shared_ptr<Audio::Mixer::InputChannel>> mixerChannels;
-	for (auto& x : frames) mixerChannels.push_back(mixer.CreateInputChannel());
+	for (auto& x: frames) mixerChannels.push_back(mixer.CreateInputChannel());
 
 
 	std::vector<Packet> packets;
 	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
 	{
-		for (auto& frame : frames[i])
+		for (auto& frame: frames[i])
 		{
 			mixerChannels[i]->EnqueueFrame(frame);
 		}
 	}
 
 
-
 	packets.clear();
 	Audio::Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	while (!mixer.IsEmpty())
 	{
-		auto somePackets = encoder.Encode(mixer.ReadFrame());
+		encoder.Send(mixer.ReadFrame());
+		auto somePackets = encoder.Receive();
 		for (const auto p: somePackets)
 		{
 			packets.push_back(p);

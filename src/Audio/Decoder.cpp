@@ -3,20 +3,17 @@
 
 
 #include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
-
 
 
 using Strawberry::Core::Assert;
 using Strawberry::Core::Take;
 
 
-
 namespace Strawberry::Codec::Audio
 {
 	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)
-		, mParameters(nullptr)
+		  , mParameters(nullptr)
 	{
 		Assert(av_codec_is_decoder(codec));
 
@@ -43,14 +40,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-
 	Decoder::Decoder(Decoder&& other) noexcept
 		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
-		, mParameters(std::exchange(other.mParameters, nullptr))
+		  , mParameters(std::exchange(other.mParameters, nullptr))
 	{
 
 	}
-
 
 
 	Decoder& Decoder::operator=(Decoder&& other) noexcept
@@ -63,7 +58,6 @@ namespace Strawberry::Codec::Audio
 
 		return *this;
 	}
-
 
 
 	Decoder::~Decoder()

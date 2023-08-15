@@ -12,12 +12,10 @@
 #include <utility>
 
 
-
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 }
-
 
 
 namespace Strawberry::Codec::Audio
@@ -33,17 +31,17 @@ namespace Strawberry::Codec::Audio
 		Frame();
 		Frame(const Frame& other);
 		Frame& operator=(const Frame& other);
-		Frame(Frame&& other) noexcept ;
-		Frame& operator=(Frame&& other) noexcept ;
+		Frame(Frame&& other) noexcept;
+		Frame& operator=(Frame&& other) noexcept;
 		~Frame();
 
 
-		FrameFormat GetFormat() const;
-		size_t      GetChannelCount() const;
-		size_t      GetNumSamples() const;
-		size_t      GetSampleSize() const;
-		bool        IsFormatPlanar() const;
-		double      GetDuration() const;
+		[[nodiscard]] FrameFormat GetFormat() const;
+		[[nodiscard]] size_t GetChannelCount() const;
+		[[nodiscard]] size_t GetNumSamples() const;
+		[[nodiscard]] size_t GetSampleSize() const;
+		[[nodiscard]] bool IsFormatPlanar() const;
+		[[nodiscard]] double GetDuration() const;
 
 
 		void Append(const Frame& other);
@@ -51,16 +49,20 @@ namespace Strawberry::Codec::Audio
 		[[nodiscard]] Frame Mix(const Frame& other) const;
 
 
-		inline       AVFrame* operator*()        { return mFrame; }
-		inline const AVFrame* operator*()  const { return mFrame; }
-		inline       AVFrame* operator->()       { return mFrame; }
-		inline const AVFrame* operator->() const { return mFrame; }
+		inline AVFrame* operator*() { return mFrame; }
 
+
+		inline const AVFrame* operator*() const { return mFrame; }
+
+
+		inline AVFrame* operator->() { return mFrame; }
+
+
+		inline const AVFrame* operator->() const { return mFrame; }
 
 
 	private:
 		explicit Frame(AVFrame* frame);
-
 
 
 	private:

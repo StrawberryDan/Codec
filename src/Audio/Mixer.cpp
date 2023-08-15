@@ -1,19 +1,18 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "libavutil/channel_layout.h"
-/// Strawberry Codec
+#include <utility>
+
 #include "Codec/Audio/Mixer.hpp"
 // Lib Format
 #include "fmt/format.h"
 
 
-
 namespace Strawberry::Codec::Audio
 {
-	Mixer::Mixer(const FrameFormat& outputFormat, size_t outputFrameSize)
-			: mOutputFormat(outputFormat)
-			, mOutputFrameSize(outputFrameSize)
+	Mixer::Mixer(FrameFormat outputFormat, size_t outputFrameSize)
+		: mOutputFormat(std::move(outputFormat))
+		  , mOutputFrameSize(outputFrameSize)
 	{
 
 	}
@@ -22,11 +21,12 @@ namespace Strawberry::Codec::Audio
 	Frame Mixer::ReadFrame()
 	{
 		// Erase dead channels
-		std::erase_if(mInputChannels, [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
+		std::erase_if(mInputChannels,
+					  [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
 
 		// Mix Input Channels
 		Frame result = Frame::Silence(mOutputFormat, mOutputFrameSize);
-		for (auto& channel : mInputChannels)
+		for (auto& channel: mInputChannels)
 		{
 			auto frame = channel->ReadFrame();
 			result = result.Mix(frame);
@@ -54,10 +54,9 @@ namespace Strawberry::Codec::Audio
 
 	Mixer::InputChannel::InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize)
 		: mOutputFormat(outputFormat)
-		, mOutputFrameSize(outputFrameSize)
-		, mResampler(outputFormat)
-		, mFrameResizer(outputFrameSize)
-	{}
+		  , mOutputFrameSize(outputFrameSize)
+		  , mResampler(outputFormat)
+		  , mFrameResizer(outputFrameSize) {}
 
 
 	bool Mixer::InputChannel::IsOutputAvailable() const
@@ -73,7 +72,7 @@ namespace Strawberry::Codec::Audio
 	{
 		size_t sum = 0;
 		auto frameBuffer = mFrameBuffer.Lock();
-		for (const auto& frame : *frameBuffer)
+		for (const auto& frame: *frameBuffer)
 		{
 			sum += frame->nb_samples;
 		}

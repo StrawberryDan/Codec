@@ -1,11 +1,9 @@
 #pragma once
 
 
-
 #include <string>
 #include <vector>
 #include "Packet.hpp"
-
 
 
 extern "C"
@@ -13,7 +11,6 @@ extern "C"
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 }
-
 
 
 namespace Strawberry::Codec
@@ -24,8 +21,8 @@ namespace Strawberry::Codec
 		explicit Muxer(const std::string& file);
 		Muxer(const Muxer&) = delete;
 		Muxer& operator=(const Muxer&) = delete;
-		Muxer(Muxer&& other) noexcept ;
-		Muxer& operator=(Muxer&& other) noexcept ;
+		Muxer(Muxer&& other) noexcept;
+		Muxer& operator=(Muxer&& other) noexcept;
 		~Muxer();
 
 		void OpenStream(const AVCodecParameters* codecParameters);

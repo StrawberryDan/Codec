@@ -1,9 +1,12 @@
-#include <fmt/format.h>
-#include <Strawberry/Core/Util/Logging.hpp>
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+#include <utility>
+
 #include "Codec/Audio/Resampler.hpp"
+// Core
+#include "Strawberry/Core/Util/Logging.hpp"
 #include "Strawberry/Core/Util/Utilities.hpp"
-
-
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
@@ -21,8 +24,8 @@ using Strawberry::Core::Take;
 namespace Strawberry::Codec::Audio
 {
 	Resampler::Resampler(FrameFormat outputFormat)
-		: mOutputFormat(outputFormat)
-		, mContext(swr_alloc())
+		: mOutputFormat(std::move(outputFormat))
+		  , mContext(swr_alloc())
 	{
 		Core::Assert(mContext != nullptr);
 	}
@@ -58,9 +61,10 @@ namespace Strawberry::Codec::Audio
 
 
 		Frame output = Frame::Allocate();
-		output->sample_rate = mOutputFormat.sampleRate;
-		output->ch_layout   = mOutputFormat.channels;
-		output->format      = mOutputFormat.sampleFormat;
+		output->sample_rate = mOutputFormat.GetSampleRate();
+		auto result = av_channel_layout_copy(&output->ch_layout, mOutputFormat.GetChannels());
+		Core::Assert(result == 0);
+		output->format = mOutputFormat.GetSampleFormat();
 
 
 		while (true)

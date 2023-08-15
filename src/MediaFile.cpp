@@ -1,17 +1,17 @@
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Codec
 #include "Codec/MediaFile.hpp"
+// Core
+#include "Strawberry/Core/IO/Error.hpp"
+#include "Strawberry/Core/Util/Markers.hpp"
 #include "Strawberry/Core/Util/Utilities.hpp"
-
-
-
-#include <iostream>
-#include <Strawberry/Core/Util/Markers.hpp>
-#include <Strawberry/Core/IO/Error.hpp>
 
 
 using Strawberry::Core::Assert;
 using Strawberry::Core::Take;
 using Strawberry::Core::Replace;
-
 
 
 namespace Strawberry::Codec
@@ -30,11 +30,8 @@ namespace Strawberry::Codec
 	}
 
 
-
 	MediaFile::MediaFile(MediaFile&& other) noexcept
-		: mFile(std::exchange(other.mFile, nullptr))
-	{}
-
+		: mFile(std::exchange(other.mFile, nullptr)) {}
 
 
 	MediaFile& MediaFile::operator=(MediaFile&& rhs) noexcept
@@ -47,7 +44,6 @@ namespace Strawberry::Codec
 
 		return (*this);
 	}
-
 
 
 	MediaFile::~MediaFile()
@@ -67,10 +63,18 @@ namespace Strawberry::Codec
 
 		switch (mFile->streams[index]->codecpar->codec_type)
 		{
-			case AVMEDIA_TYPE_VIDEO:    info.MediaType = MediaType::Video;    break;
-			case AVMEDIA_TYPE_AUDIO:    info.MediaType = MediaType::Audio;    break;
-			case AVMEDIA_TYPE_SUBTITLE: info.MediaType = MediaType::Subtitle; break;
-			default:                    info.MediaType = MediaType::Unknown;  break;
+			case AVMEDIA_TYPE_VIDEO:
+				info.MediaType = MediaType::Video;
+				break;
+			case AVMEDIA_TYPE_AUDIO:
+				info.MediaType = MediaType::Audio;
+				break;
+			case AVMEDIA_TYPE_SUBTITLE:
+				info.MediaType = MediaType::Subtitle;
+				break;
+			default:
+				info.MediaType = MediaType::Unknown;
+				break;
 		}
 
 		info.Index = index;
@@ -101,14 +105,18 @@ namespace Strawberry::Codec
 		switch (type)
 		{
 			case MediaType::Audio:
-				streamTypeImpl = AVMEDIA_TYPE_AUDIO; break;
+				streamTypeImpl = AVMEDIA_TYPE_AUDIO;
+				break;
 			case MediaType::Video:
-				streamTypeImpl = AVMEDIA_TYPE_VIDEO; break;
+				streamTypeImpl = AVMEDIA_TYPE_VIDEO;
+				break;
 			case MediaType::Subtitle:
-				streamTypeImpl = AVMEDIA_TYPE_SUBTITLE; break;
+				streamTypeImpl = AVMEDIA_TYPE_SUBTITLE;
+				break;
 			case MediaType::Unknown:
 			default:
-				Core::DebugBreak(); return Core::NullOpt;
+				Core::DebugBreak();
+				return Core::NullOpt;
 		}
 
 		Core::Assert(streamTypeImpl.HasValue());
@@ -130,9 +138,13 @@ namespace Strawberry::Codec
 		auto result = av_read_frame(mFile, *packet);
 		switch (result)
 		{
-			case 0: return packet;
-			case AVERROR_EOF: return Core::IO::Error::EndOfFile;
-			default: Core::DebugBreak(); return Core::IO::Error::Unknown;
+			case 0:
+				return packet;
+			case AVERROR_EOF:
+				return Core::IO::Error::EndOfFile;
+			default:
+				Core::DebugBreak();
+				return Core::IO::Error::Unknown;
 		}
 	}
 }

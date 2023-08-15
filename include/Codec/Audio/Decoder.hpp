@@ -12,12 +12,10 @@
 #include <vector>
 
 
-
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 }
-
 
 
 namespace Strawberry::Codec::Audio
@@ -26,7 +24,7 @@ namespace Strawberry::Codec::Audio
 	{
 	public:
 		Decoder(const AVCodec* codec, const AVCodecParameters* parameters);
-		Decoder(const Decoder& other)            = delete;
+		Decoder(const Decoder& other) = delete;
 		Decoder& operator=(const Decoder& other) = delete;
 		Decoder(Decoder&& other) noexcept;
 		Decoder& operator=(Decoder&& other) noexcept;
@@ -36,11 +34,13 @@ namespace Strawberry::Codec::Audio
 		void Send(Packet packet);
 		std::vector<Frame> Receive();
 
-	    [[nodiscard]] inline const AVCodecParameters* Parameters() const { return mParameters; }
+
+		[[nodiscard]] inline const AVCodecParameters* Parameters() const { return mParameters; }
+
 
 	private:
-	    AVCodecContext*          mCodecContext;
-	    AVCodecParameters*       mParameters;
-		std::deque<Packet>       mPacketBuffer;
+		AVCodecContext* mCodecContext;
+		AVCodecParameters* mParameters;
+		std::deque<Packet> mPacketBuffer;
 	};
 }

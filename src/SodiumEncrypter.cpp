@@ -1,15 +1,12 @@
 #include "Codec/SodiumEncrypter.hpp"
 
 
-
 #include "Strawberry/Core/Util/Assert.hpp"
-
 
 
 namespace Strawberry::Codec
 {
 	using namespace Strawberry::Core;
-
 
 
 	SodiumEncrypter::SodiumEncrypter(Key key)
@@ -18,7 +15,6 @@ namespace Strawberry::Codec
 		auto result = sodium_init();
 		Assert(result >= 0);
 	}
-
 
 
 	SodiumEncrypter::EncryptedPacket SodiumEncrypter::Encrypt(Nonce nonce, const Core::IO::DynamicByteBuffer& packet)

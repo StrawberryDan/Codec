@@ -2,18 +2,14 @@
 #include "Codec/Audio/FrameResizer.hpp"
 
 
-
 #include "Strawberry/Core/Util/Assert.hpp"
-
 
 
 namespace Strawberry::Codec::Audio
 {
 	FrameResizer::FrameResizer(size_t outputFrameSize)
 		: mOutputFrameSize(outputFrameSize)
-		, mWorkingFrame()
-	{}
-
+		  , mWorkingFrame() {}
 
 
 	void FrameResizer::SendFrame(Frame frame)
@@ -47,17 +43,18 @@ namespace Strawberry::Codec::Audio
 				Core::Assert(result->sample_rate > 0);
 				return result;
 			}
-			// If the working frame is the right size we return it.
+				// If the working frame is the right size we return it.
 			else if (mWorkingFrame->GetNumSamples() == mOutputFrameSize)
 			{
 				return mWorkingFrame.Unwrap();
 			}
-			// If the mode is Yield Available, and we have not more input frames, then we yield what we have.
-			else if (mode == Mode::YieldAvailable && mWorkingFrame->GetNumSamples() <= mOutputFrameSize && mInputFrames.empty())
+				// If the mode is Yield Available, and we have not more input frames, then we yield what we have.
+			else if (mode == Mode::YieldAvailable && mWorkingFrame->GetNumSamples() <= mOutputFrameSize &&
+					 mInputFrames.empty())
 			{
 				return mWorkingFrame.Unwrap();
 			}
-			// Otherwise, we append frames to the working frame until it's big enough or we run out of frames.
+				// Otherwise, we append frames to the working frame until it's big enough, or we run out of frames.
 			else if (mWorkingFrame->GetNumSamples() < mOutputFrameSize && !mInputFrames.empty())
 			{
 				while (mWorkingFrame->GetNumSamples() < mOutputFrameSize && !mInputFrames.empty())
@@ -78,7 +75,8 @@ namespace Strawberry::Codec::Audio
 		switch (mode)
 		{
 			case Mode::WaitForFullFrames:
-				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize) || !mInputFrames.empty();
+				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize) ||
+					   !mInputFrames.empty();
 			case Mode::YieldAvailable:
 				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > 0) || !mInputFrames.empty();
 		}

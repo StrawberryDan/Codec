@@ -29,27 +29,27 @@ namespace Strawberry::Codec::Audio
 		struct SongBeganEvent
 		{
 			/// The index of the new currently playing song
-			size_t                    index;
+			size_t index;
 			/// The difference in playlist index.
-			int                       offset;
+			int offset;
 			/// The data associated with the new song
-			std::any                  associatedData;
+			std::any associatedData;
 		};
 
 
 		struct SongAddedEvent
 		{
 			/// The index where the song was inserted.
-			size_t                    index;
+			size_t index;
 			/// The data associated with the new song
-			std::any                  associatedData;
+			std::any associatedData;
 		};
 
 
 		struct SongRemovedEvent
 		{
 			/// The index where the song was inserted.
-			size_t                    index;
+			size_t index;
 		};
 
 
@@ -69,46 +69,46 @@ namespace Strawberry::Codec::Audio
 
 
 	public:
-		Playlist(Audio::FrameFormat format, size_t sampleCount);
-		Playlist(const Playlist& rhs)            = delete;
+		Playlist(const Audio::FrameFormat& format, size_t sampleCount);
+		Playlist(const Playlist& rhs) = delete;
 		Playlist& operator=(const Playlist& rhs) = delete;
-		Playlist(Playlist&& rhs)                 = delete;
-		Playlist& operator=(Playlist&& rhs)      = delete;
+		Playlist(Playlist&& rhs) = delete;
+		Playlist& operator=(Playlist&& rhs) = delete;
 		~Playlist();
 
 
-		Core::Option<Frame>              ReadFrame();
+		Core::Option<Frame> ReadFrame();
 
 
 		[[nodiscard]]
-		Core::Option<size_t>             EnqueueFile(const std::string& path, std::any associatedData = {});
+		Core::Option<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
 
 
-		void                             RemoveTrack(size_t index);
+		void RemoveTrack(size_t index);
 
 
-		EventReceiver                    CreateEventReceiver();
+		EventReceiver CreateEventReceiver();
 
 
 		[[nodiscard]]
-		size_t                           GetCurrentTrackIndex() const;
+		size_t GetCurrentTrackIndex() const;
 		[[nodiscard]]
-		size_t                           Length() const;
+		size_t Length() const;
 		[[nodiscard]]
-		Codec::Audio::FrameFormat        GetFrameFormat() const;
+		Codec::Audio::FrameFormat GetFrameFormat() const;
 		[[nodiscard]]
-		size_t                           GetFrameSize() const;
+		size_t GetFrameSize() const;
 
 
-		template <typename T>
+		template<typename T>
 		[[nodiscard]]
-		T                                GetTrackAssociatedData(size_t index) const;
-		template <typename T>
-		void                             SetTrackAssociatedData(size_t index, T value);
+		T GetTrackAssociatedData(size_t index) const;
+		template<typename T>
+		void SetTrackAssociatedData(size_t index, T value);
 
 
-		void                             GotoPrevTrack();
-		void                             GotoNextTrack();
+		void GotoPrevTrack();
+		void GotoNextTrack();
 
 
 	private:
@@ -117,37 +117,37 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		void StartLoading(TrackLoader loader);
+		void StartLoading(const TrackLoader& loader);
 		void StopLoading(bool clearFrames);
 
 
 	private:
 		struct Track
 		{
-			TrackLoader               loader;
-			std::any                  associatedData;
+			TrackLoader loader;
+			std::any associatedData;
 		};
 
 
-		const Audio::FrameFormat      mFormat;
-		const size_t                  mFrameSize;
+		const Audio::FrameFormat mFormat;
+		const size_t mFrameSize;
 
-		Resampler                     mResampler;
-		FrameResizer                  mFrameResizer;
+		Resampler mResampler;
+		FrameResizer mFrameResizer;
 
-		std::uint64_t                 mCurrentPosition = 0;
-		std::deque<Track>             mPreviousTracks;
-		Core::Option<Track>           mCurrentTrack;
-		Core::Mutex<FrameBuffer>      mCurrentTrackFrames;
-		std::deque<Track>             mNextTracks;
+		std::uint64_t mCurrentPosition = 0;
+		std::deque<Track> mPreviousTracks;
+		Core::Option<Track> mCurrentTrack;
+		Core::Mutex<FrameBuffer> mCurrentTrackFrames;
+		std::deque<Track> mNextTracks;
 
 
-		std::atomic<bool>             mShouldRead = false;
-		Core::Option<std::thread>     mReadingThread;
+		std::atomic<bool> mShouldRead = false;
+		Core::Option<std::thread> mReadingThread;
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
-		bool                                          mHasSentPlaybackEnded = false;
+		bool mHasSentPlaybackEnded = false;
 	};
 
 

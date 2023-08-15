@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include <string>
 #include "Strawberry/Core/Util/Option.hpp"
 #include "Packet.hpp"
@@ -20,7 +19,6 @@ extern "C"
 }
 
 
-
 namespace Strawberry::Codec
 {
 	class MediaFile
@@ -32,7 +30,7 @@ namespace Strawberry::Codec
 		static Core::Option<MediaFile> Open(const std::string& path);
 
 
-		MediaFile(const MediaFile& other)            = delete;
+		MediaFile(const MediaFile& other) = delete;
 		MediaFile& operator=(const MediaFile& other) = delete;
 		MediaFile(MediaFile&& other) noexcept;
 		MediaFile& operator=(MediaFile&& rhs) noexcept;

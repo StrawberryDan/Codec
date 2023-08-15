@@ -39,7 +39,7 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(result >= 0);
 
 
-		FrameFormat format(mContext->sample_rate, mContext->sample_fmt, mContext->ch_layout);
+		FrameFormat format(mContext->sample_rate, mContext->sample_fmt, &mContext->ch_layout);
 		mFrameResampler.Emplace(format);
 		mFrameResizer.Emplace(mContext->frame_size);
 	}

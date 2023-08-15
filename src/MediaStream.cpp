@@ -48,11 +48,16 @@ namespace Strawberry::Codec
 
 					mPacketBuffer.Push(packet.Unwrap());
 				}
-				else switch (packet.Err())
-				{
-					case Core::IO::Error::EndOfFile: mIsEOF = true; break;
-					default: Core::DebugBreak(); return Core::NullOpt;
-				}
+				else
+					switch (packet.Err())
+					{
+						case Core::IO::Error::EndOfFile:
+							mIsEOF = true;
+							break;
+						default:
+							Core::DebugBreak();
+							return Core::NullOpt;
+					}
 			}
 		}
 
@@ -105,10 +110,10 @@ namespace Strawberry::Codec
 	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const
 	{
 		return
-		{
-			mStreamInfo.Stream->time_base.num,
-			mStreamInfo.Stream->time_base.den
-		};
+			{
+				mStreamInfo.Stream->time_base.num,
+				mStreamInfo.Stream->time_base.den
+			};
 	}
 
 
@@ -121,7 +126,7 @@ namespace Strawberry::Codec
 	}
 
 
-		Core::Option<size_t> MediaStream::GetFrameCount() const
+	Core::Option<size_t> MediaStream::GetFrameCount() const
 	{
 		return mStreamInfo.Stream->nb_frames == 0 ? Core::NullOpt : Core::Option<size_t>(mStreamInfo.Stream->nb_frames);
 	}
@@ -144,8 +149,7 @@ namespace Strawberry::Codec
 
 	MediaStream::MediaStream(MediaFile* file, size_t index)
 		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
-		, mMediaFile(file)
-		, mPacketBuffer(256)
-		, mNextPts(0)
-	{}
+		  , mMediaFile(file)
+		  , mPacketBuffer(256)
+		  , mNextPts(0) {}
 }

@@ -6,38 +6,39 @@
 
 namespace Strawberry::Codec::Audio
 {
-	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& inchannels,
-							 int channelLayout)
-		: sampleRate(sampleRate)
-		  , sampleFormat(sampleFormat)
-		  , channels{}
-		  , channelLayout(channelLayout)
+	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout* channels)
+		: mSampleRate(sampleRate)
+		  , mSampleFormat(sampleFormat)
+		  , mChannels{}
 	{
-		auto result = av_channel_layout_copy(&channels, &inchannels);
+		auto result = av_channel_layout_copy(&mChannels, channels);
 		Core::Assert(result == 0);
 
 		Core::Assert(sampleRate > 0);
-		Core::Assert(channels.nb_channels > 0);
+		Core::Assert(channels->nb_channels > 0);
 	}
 
 
+	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& channels)
+		: FrameFormat(sampleRate, sampleFormat, &channels) {}
+
+
 	FrameFormat::FrameFormat(const Frame& frame)
-		: sampleRate(frame->sample_rate)
-		  , sampleFormat(frame->format)
-		  , channels{}
+		: mSampleRate(frame->sample_rate)
+		  , mSampleFormat(frame->format)
+		  , mChannels{}
 	{
-		auto result = av_channel_layout_copy(&channels, &frame->ch_layout);
+		auto result = av_channel_layout_copy(&mChannels, &frame->ch_layout);
 		Core::Assert(result == 0);
 	}
 
 
 	FrameFormat::FrameFormat(const FrameFormat& rhs)
-		: sampleRate(rhs.sampleRate)
-		, sampleFormat(rhs.sampleFormat)
-		, channels{}
-		, channelLayout(rhs.channelLayout)
+		: mSampleRate(rhs.mSampleRate)
+		  , mSampleFormat(rhs.mSampleFormat)
+		  , mChannels{}
 	{
-		auto result = av_channel_layout_copy(&channels, &rhs.channels);
+		auto result = av_channel_layout_copy(&mChannels, &rhs.mChannels);
 		Core::Assert(result == 0);
 	}
 
@@ -53,18 +54,17 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	FrameFormat::FrameFormat(FrameFormat&& rhs)
-		: sampleRate(rhs.sampleRate)
-		, sampleFormat(rhs.sampleFormat)
-		, channels{}
-		, channelLayout(rhs.channelLayout)
+	FrameFormat::FrameFormat(FrameFormat&& rhs) noexcept
+		: mSampleRate(rhs.mSampleRate)
+		  , mSampleFormat(rhs.mSampleFormat)
+		  , mChannels{}
 	{
-		auto result = av_channel_layout_copy(&channels, &rhs.channels);
+		auto result = av_channel_layout_copy(&mChannels, &rhs.mChannels);
 		Core::Assert(result == 0);
 	}
 
 
-	FrameFormat& FrameFormat::operator=(FrameFormat&& rhs)
+	FrameFormat& FrameFormat::operator=(FrameFormat&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -77,17 +77,34 @@ namespace Strawberry::Codec::Audio
 
 	bool FrameFormat::operator==(const FrameFormat& b) const
 	{
-		return sampleRate == b.sampleRate
-			   && sampleFormat == b.sampleFormat
-			   && channels.nb_channels == b.channels.nb_channels
-			   && channels.order == b.channels.order
-			   && (channels.u.mask == b.channels.u.mask || channels.u.map == b.channels.u.map)
-			   && (channelLayout == 0 || b.channelLayout == 0 || channelLayout == b.channelLayout);
+		return mSampleRate == b.mSampleRate
+			   && mSampleFormat == b.mSampleFormat
+			   && mChannels.nb_channels == b.mChannels.nb_channels
+			   && mChannels.order == b.mChannels.order
+			   && (mChannels.u.mask == b.mChannels.u.mask || mChannels.u.map == b.mChannels.u.map);
 	}
 
 
 	bool FrameFormat::operator!=(const FrameFormat& b) const
 	{
 		return !(*this == b);
+	}
+
+
+	int FrameFormat::GetSampleRate() const
+	{
+		return mSampleRate;
+	}
+
+
+	int FrameFormat::GetSampleFormat() const
+	{
+		return mSampleFormat;
+	}
+
+
+	const AVChannelLayout* FrameFormat::GetChannels() const
+	{
+		return &mChannels;
 	}
 }
