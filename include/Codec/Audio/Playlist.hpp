@@ -4,8 +4,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Codec
 #include "Codec/Audio/Frame.hpp"
-#include "Codec/Audio/Resampler.hpp"
 #include "Codec/Audio/FrameResizer.hpp"
+#include "Codec/Audio/Resampler.hpp"
 // Core
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
 #include "Strawberry/Core/Util/Option.hpp"
@@ -29,9 +29,9 @@ namespace Strawberry::Codec::Audio
 		struct SongBeganEvent
 		{
 			/// The index of the new currently playing song
-			size_t index;
+			size_t   index;
 			/// The difference in playlist index.
-			int offset;
+			int      offset;
 			/// The data associated with the new song
 			std::any associatedData;
 		};
@@ -40,7 +40,7 @@ namespace Strawberry::Codec::Audio
 		struct SongAddedEvent
 		{
 			/// The index where the song was inserted.
-			size_t index;
+			size_t   index;
 			/// The data associated with the new song
 			std::any associatedData;
 		};
@@ -55,7 +55,6 @@ namespace Strawberry::Codec::Audio
 
 		struct PlaybackEndedEvent
 		{
-
 		};
 
 
@@ -70,18 +69,17 @@ namespace Strawberry::Codec::Audio
 
 	public:
 		Playlist(const Audio::FrameFormat& format, size_t sampleCount);
-		Playlist(const Playlist& rhs) = delete;
+		Playlist(const Playlist& rhs)            = delete;
 		Playlist& operator=(const Playlist& rhs) = delete;
-		Playlist(Playlist&& rhs) = delete;
-		Playlist& operator=(Playlist&& rhs) = delete;
+		Playlist(Playlist&& rhs)                 = delete;
+		Playlist& operator=(Playlist&& rhs)      = delete;
 		~Playlist();
 
 
 		Core::Option<Frame> ReadFrame();
 
 
-		[[nodiscard]]
-		Core::Option<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
+		[[nodiscard]] Core::Option<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
 
 
 		void RemoveTrack(size_t index);
@@ -90,20 +88,15 @@ namespace Strawberry::Codec::Audio
 		EventReceiver CreateEventReceiver();
 
 
-		[[nodiscard]]
-		size_t GetCurrentTrackIndex() const;
-		[[nodiscard]]
-		size_t Length() const;
-		[[nodiscard]]
-		Codec::Audio::FrameFormat GetFrameFormat() const;
-		[[nodiscard]]
-		size_t GetFrameSize() const;
+		[[nodiscard]] size_t                    GetCurrentTrackIndex() const;
+		[[nodiscard]] size_t                    Length() const;
+		[[nodiscard]] Codec::Audio::FrameFormat GetFrameFormat() const;
+		[[nodiscard]] size_t                    GetFrameSize() const;
 
 
-		template<typename T>
-		[[nodiscard]]
-		T GetTrackAssociatedData(size_t index) const;
-		template<typename T>
+		template <typename T>
+		[[nodiscard]] T GetTrackAssociatedData(size_t index) const;
+		template <typename T>
 		void SetTrackAssociatedData(size_t index, T value);
 
 
@@ -125,33 +118,33 @@ namespace Strawberry::Codec::Audio
 		struct Track
 		{
 			TrackLoader loader;
-			std::any associatedData;
+			std::any    associatedData;
 		};
 
 
 		const Audio::FrameFormat mFormat;
-		const size_t mFrameSize;
+		const size_t             mFrameSize;
 
-		Resampler mResampler;
+		Resampler    mResampler;
 		FrameResizer mFrameResizer;
 
-		std::uint64_t mCurrentPosition = 0;
-		std::deque<Track> mPreviousTracks;
-		Core::Option<Track> mCurrentTrack;
+		std::uint64_t            mCurrentPosition = 0;
+		std::deque<Track>        mPreviousTracks;
+		Core::Option<Track>      mCurrentTrack;
 		Core::Mutex<FrameBuffer> mCurrentTrackFrames;
-		std::deque<Track> mNextTracks;
+		std::deque<Track>        mNextTracks;
 
 
-		std::atomic<bool> mShouldRead = false;
+		std::atomic<bool>         mShouldRead = false;
 		Core::Option<std::thread> mReadingThread;
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
-		bool mHasSentPlaybackEnded = false;
+		bool                                          mHasSentPlaybackEnded = false;
 	};
 
 
-	template<typename T>
+	template <typename T>
 	T Playlist::GetTrackAssociatedData(size_t index) const
 	{
 		if (index < mPreviousTracks.size())
@@ -173,7 +166,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	template<typename T>
+	template <typename T>
 	void Playlist::SetTrackAssociatedData(size_t index, T value)
 	{
 		if (index < mPreviousTracks.size())
@@ -204,4 +197,4 @@ namespace Strawberry::Codec::Audio
 			Core::Unreachable();
 		}
 	}
-}
+}// namespace Strawberry::Codec::Audio

@@ -1,9 +1,9 @@
-#include <iostream>
-#include <Strawberry/Core/Util/ScopedTimer.hpp>
-#include "Codec/MediaFile.hpp"
-#include "Codec/Audio/Mixer.hpp"
 #include "Codec/Audio/Encoder.hpp"
+#include "Codec/Audio/Mixer.hpp"
+#include "Codec/MediaFile.hpp"
 #include "Codec/Muxer.hpp"
+#include <Strawberry/Core/Util/ScopedTimer.hpp>
+#include <iostream>
 
 
 extern "C"
@@ -12,15 +12,14 @@ extern "C"
 }
 
 
-
 using namespace Strawberry::Codec;
 using namespace Strawberry;
 
 
 std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 {
-	MediaFile file = MediaFile::Open(filePath).Unwrap();
-	auto stream = file.GetBestStream(MediaType::Audio).Unwrap();
+	MediaFile           file   = MediaFile::Open(filePath).Unwrap();
+	auto                stream = file.GetBestStream(MediaType::Audio).Unwrap();
 	std::vector<Packet> packets;
 	while (auto packet = stream->Read())
 	{
@@ -29,12 +28,12 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 
 
 	std::vector<Audio::Frame> frames;
-	Audio::Decoder decoder = stream->GetDecoder();
-	for (auto& packet: packets)
+	Audio::Decoder            decoder = stream->GetDecoder();
+	for (auto& packet : packets)
 	{
 		decoder.Send(std::move(packet));
 		auto someFrames = decoder.Receive();
-		for (auto& f: someFrames)
+		for (auto& f : someFrames)
 		{
 			frames.push_back(std::move(f));
 		}
@@ -58,15 +57,15 @@ void AudioMixing()
 		};
 
 
-	Audio::Mixer mixer(Audio::FrameFormat(48000, AV_SAMPLE_FMT_DBL, AV_CHANNEL_LAYOUT_STEREO), 1024);
+	Audio::Mixer                                             mixer(Audio::FrameFormat(48000, AV_SAMPLE_FMT_DBL, AV_CHANNEL_LAYOUT_STEREO), 1024);
 	std::vector<std::shared_ptr<Audio::Mixer::InputChannel>> mixerChannels;
-	for (auto& x: frames) mixerChannels.push_back(mixer.CreateInputChannel());
+	for (auto& x : frames) mixerChannels.push_back(mixer.CreateInputChannel());
 
 
 	std::vector<Packet> packets;
 	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
 	{
-		for (auto& frame: frames[i])
+		for (auto& frame : frames[i])
 		{
 			mixerChannels[i]->EnqueueFrame(frame);
 		}
@@ -79,7 +78,7 @@ void AudioMixing()
 	{
 		encoder.Send(mixer.ReadFrame());
 		auto somePackets = encoder.Receive();
-		for (const auto p: somePackets)
+		for (const auto p : somePackets)
 		{
 			packets.push_back(p);
 		}
@@ -90,10 +89,10 @@ void AudioMixing()
 	muxer.OpenStream(encoder.Parameters());
 	muxer.WriteHeader();
 	int pts = 0;
-	for (auto& packet: packets)
+	for (auto& packet : packets)
 	{
-		packet->pts = pts;
-		pts += packet->duration;
+		packet->pts  = pts;
+		pts         += packet->duration;
 		muxer.WritePacket(packet);
 	}
 	muxer.WriteTrailer();

@@ -5,16 +5,15 @@
 
 #include "Codec/Audio/Resampler.hpp"
 // Core
+#include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/Logging.hpp"
 #include "Strawberry/Core/Util/Utilities.hpp"
-#include "Strawberry/Core/Util/Assert.hpp"
 
 
 extern "C"
 {
 #include "libavutil/opt.h"
 }
-
 
 
 using Strawberry::Core::Assert;
@@ -25,7 +24,7 @@ namespace Strawberry::Codec::Audio
 {
 	Resampler::Resampler(FrameFormat outputFormat)
 		: mOutputFormat(std::move(outputFormat))
-		  , mContext(swr_alloc())
+		, mContext(swr_alloc())
 	{
 		Core::Assert(mContext != nullptr);
 	}
@@ -60,9 +59,9 @@ namespace Strawberry::Codec::Audio
 		}
 
 
-		Frame output = Frame::Allocate();
+		Frame output        = Frame::Allocate();
 		output->sample_rate = mOutputFormat.GetSampleRate();
-		auto result = av_channel_layout_copy(&output->ch_layout, mOutputFormat.GetChannels());
+		auto result         = av_channel_layout_copy(&output->ch_layout, mOutputFormat.GetChannels());
 		Core::Assert(result == 0);
 		output->format = mOutputFormat.GetSampleFormat();
 
@@ -94,4 +93,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return !mInputFrames.empty();
 	}
-}
+}// namespace Strawberry::Codec::Audio

@@ -109,19 +109,17 @@ namespace Strawberry::Codec
 
 	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const
 	{
-		return
-			{
-				mStreamInfo.Stream->time_base.num,
-				mStreamInfo.Stream->time_base.den
-			};
+		return {
+			mStreamInfo.Stream->time_base.num,
+			mStreamInfo.Stream->time_base.den};
 	}
 
 
 	std::chrono::duration<double> MediaStream::GetDuration() const
 	{
-		auto timeBase = GetTimeBase();
+		auto timeBase      = GetTimeBase();
 		auto timeBaseCount = mStreamInfo.Stream->duration;
-		timeBase = timeBase * timeBaseCount;
+		timeBase           = timeBase * timeBaseCount;
 		return std::chrono::duration<double>(timeBase.Evaluate());
 	}
 
@@ -149,7 +147,9 @@ namespace Strawberry::Codec
 
 	MediaStream::MediaStream(MediaFile* file, size_t index)
 		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
-		  , mMediaFile(file)
-		  , mPacketBuffer(256)
-		  , mNextPts(0) {}
-}
+		, mMediaFile(file)
+		, mPacketBuffer(256)
+		, mNextPts(0)
+	{
+	}
+}// namespace Strawberry::Codec

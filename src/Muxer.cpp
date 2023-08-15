@@ -1,8 +1,8 @@
 #include "Codec/Muxer.hpp"
 
 
-#include "Strawberry/Core/Util/Utilities.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
 namespace Strawberry::Codec
@@ -12,8 +12,8 @@ namespace Strawberry::Codec
 
 	Muxer::Muxer(const std::string& file)
 		: mAVFormatContext(nullptr)
-		  , mStreams()
-		  , mStage(Unopened)
+		, mStreams()
+		, mStage(Unopened)
 	{
 		auto result = avformat_alloc_output_context2(&mAVFormatContext, nullptr, nullptr, file.c_str());
 		Assert(result >= 0);
@@ -26,18 +26,16 @@ namespace Strawberry::Codec
 
 	Muxer::Muxer(Muxer&& other) noexcept
 		: mAVFormatContext(Take(other.mAVFormatContext))
-		  , mStreams(Take(other.mStreams))
-		  , mStage(Replace(other.mStage, Unopened))
+		, mStreams(Take(other.mStreams))
+		, mStage(Replace(other.mStage, Unopened))
 	{
-
-
 	}
 
 
 	Muxer& Muxer::operator=(Muxer&& other) noexcept
 	{
 		mAVFormatContext = Take(other.mAVFormatContext);
-		mStreams = Take(other.mStreams);
+		mStreams         = Take(other.mStreams);
 		return (*this);
 	}
 
@@ -55,7 +53,7 @@ namespace Strawberry::Codec
 		Assert(mStage == Opened);
 		auto encoder = avcodec_find_encoder(codecParameters->codec_id);
 
-		auto stream = avformat_new_stream(mAVFormatContext, encoder);
+		auto stream  = avformat_new_stream(mAVFormatContext, encoder);
 		Assert(stream != nullptr);
 
 		auto result = avcodec_parameters_copy(stream->codecpar, codecParameters);
@@ -100,4 +98,4 @@ namespace Strawberry::Codec
 		avformat_flush(mAVFormatContext);
 		mStage = Finished;
 	}
-}
+}// namespace Strawberry::Codec

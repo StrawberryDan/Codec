@@ -20,8 +20,8 @@ namespace Strawberry::Codec
 	SodiumEncrypter::EncryptedPacket SodiumEncrypter::Encrypt(Nonce nonce, const Core::IO::DynamicByteBuffer& packet)
 	{
 		auto ciphertext = Core::IO::DynamicByteBuffer::Zeroes(crypto_secretbox_MACBYTES + packet.Size());
-		auto result = crypto_secretbox_easy(ciphertext.Data(), packet.Data(), packet.Size(), nonce.data(), mKey.data());
+		auto result     = crypto_secretbox_easy(ciphertext.Data(), packet.Data(), packet.Size(), nonce.data(), mKey.data());
 		Assert(result >= 0);
 		return {nonce, ciphertext};
 	}
-}
+}// namespace Strawberry::Codec

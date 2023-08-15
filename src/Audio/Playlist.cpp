@@ -13,9 +13,11 @@ namespace Strawberry::Codec::Audio
 {
 	Playlist::Playlist(const Audio::FrameFormat& format, size_t sampleCount)
 		: mFormat(format)
-		  , mFrameSize()
-		  , mResampler(format)
-		  , mFrameResizer(sampleCount) {}
+		, mFrameSize()
+		, mResampler(format)
+		, mFrameResizer(sampleCount)
+	{
+	}
 
 
 	Playlist::~Playlist()
@@ -121,7 +123,7 @@ namespace Strawberry::Codec::Audio
 			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
 			{
 				decoder.Send(packet.Unwrap());
-				for (auto frame: decoder.Receive())
+				for (auto frame : decoder.Receive())
 				{
 					frames.Lock()->emplace_back(std::move(frame));
 				}
@@ -135,11 +137,10 @@ namespace Strawberry::Codec::Audio
 
 
 		mNextTracks.push_back(track);
-		SongAddedEvent songAddedEvent
-			{
-				.index = Length() - 1,
-				.associatedData = associatedData,
-			};
+		SongAddedEvent songAddedEvent{
+			.index          = Length() - 1,
+			.associatedData = associatedData,
+		};
 		mEventBroadcaster.Broadcast(songAddedEvent);
 
 		return Length() - 1;
@@ -171,10 +172,9 @@ namespace Strawberry::Codec::Audio
 				(mCurrentTrack.HasValue() ? 1 : 0));
 		}
 
-		SongRemovedEvent event
-			{
-				.index = index,
-			};
+		SongRemovedEvent event{
+			.index = index,
+		};
 		mEventBroadcaster.Broadcast(event);
 
 		if (Length() == 0)
@@ -228,12 +228,11 @@ namespace Strawberry::Codec::Audio
 			mPreviousTracks.pop_front();
 
 			mEventBroadcaster.Broadcast(
-				SongBeganEvent
-					{
-						.index          = mPreviousTracks.size(),
-						.offset         = -1,
-						.associatedData = mCurrentTrack->associatedData,
-					});
+				SongBeganEvent{
+					.index          = mPreviousTracks.size(),
+					.offset         = -1,
+					.associatedData = mCurrentTrack->associatedData,
+				});
 		}
 
 		mCurrentPosition = 0;
@@ -254,12 +253,11 @@ namespace Strawberry::Codec::Audio
 			mCurrentPosition = 0;
 
 			mEventBroadcaster.Broadcast(
-				SongBeganEvent
-					{
-						.index          = mPreviousTracks.size(),
-						.offset         = 1,
-						.associatedData = mCurrentTrack->associatedData,
-					});
+				SongBeganEvent{
+					.index          = mPreviousTracks.size(),
+					.offset         = 1,
+					.associatedData = mCurrentTrack->associatedData,
+				});
 		}
 	}
 
@@ -289,4 +287,4 @@ namespace Strawberry::Codec::Audio
 		if (clearFrames)
 			mCurrentTrackFrames.Lock()->clear();
 	}
-}
+}// namespace Strawberry::Codec::Audio

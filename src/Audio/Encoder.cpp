@@ -16,7 +16,7 @@ namespace Strawberry::Codec::Audio
 {
 	Encoder::Encoder(AVCodecID codecID, AVChannelLayout channelLayout)
 		: mContext(nullptr)
-		  , mParameters(nullptr)
+		, mParameters(nullptr)
 	{
 		const AVCodec* codec = avcodec_find_encoder(codecID);
 		Core::Assert(codec != nullptr);
@@ -24,12 +24,12 @@ namespace Strawberry::Codec::Audio
 		mContext = avcodec_alloc_context3(codec);
 		Core::Assert(mContext != nullptr);
 		mContext->strict_std_compliance = -2;
-		mContext->sample_rate = codec->supported_samplerates[0];
-		mContext->time_base = AVRational{1, mContext->sample_rate};
-		mContext->sample_fmt = codec->sample_fmts[0];
-		mContext->ch_layout = channelLayout;
+		mContext->sample_rate           = codec->supported_samplerates[0];
+		mContext->time_base             = AVRational{1, mContext->sample_rate};
+		mContext->sample_fmt            = codec->sample_fmts[0];
+		mContext->ch_layout             = channelLayout;
 
-		auto result = avcodec_open2(mContext, codec, nullptr);
+		auto result                     = avcodec_open2(mContext, codec, nullptr);
 		Core::Assert(result == 0);
 		Core::Assert(avcodec_is_open(mContext));
 
@@ -88,8 +88,7 @@ namespace Strawberry::Codec::Audio
 					{
 						packets.push_back(packet);
 					}
-				}
-				while (receive == 0);
+				} while (receive == 0);
 			}
 		}
 
@@ -120,8 +119,7 @@ namespace Strawberry::Codec::Audio
 					{
 						packets.push_back(packet);
 					}
-				}
-				while (receive == 0);
+				} while (receive == 0);
 			}
 		}
 
@@ -133,4 +131,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return mParameters;
 	}
-}
+}// namespace Strawberry::Codec::Audio

@@ -1,8 +1,8 @@
 #include "Codec/Audio/Frame.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Math/Rational.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 extern "C"
@@ -25,18 +25,17 @@ namespace Strawberry::Codec::Audio
 	{
 		int result;
 
-		Frame frame = Frame::Allocate();
+		Frame frame   = Frame::Allocate();
 		frame->format = format.GetSampleFormat();
-		result = av_channel_layout_copy(&frame->ch_layout, format.GetChannels());
+		result        = av_channel_layout_copy(&frame->ch_layout, format.GetChannels());
 		Core::Assert(result == 0);
 		frame->sample_rate = format.GetSampleRate();
-		frame->nb_samples = samples;
+		frame->nb_samples  = samples;
 
-		result = av_frame_get_buffer(*frame, 0);
+		result             = av_frame_get_buffer(*frame, 0);
 		Core::Assert(result == 0);
 
-		result = av_samples_set_silence(frame->data, 0, frame->nb_samples, frame->ch_layout.nb_channels,
-										static_cast<AVSampleFormat>(frame->format));
+		result = av_samples_set_silence(frame->data, 0, frame->nb_samples, frame->ch_layout.nb_channels, static_cast<AVSampleFormat>(frame->format));
 		Core::Assert(result == 0);
 		Core::Assert(frame.GetFormat() == format);
 		Core::Assert(frame.GetNumSamples() == samples);
@@ -46,7 +45,9 @@ namespace Strawberry::Codec::Audio
 
 
 	Frame::Frame()
-		: mFrame(nullptr) {}
+		: mFrame(nullptr)
+	{
+	}
 
 
 	Frame::Frame(const Frame& other)
@@ -134,22 +135,16 @@ namespace Strawberry::Codec::Audio
 
 	void Frame::Append(const Frame& other)
 	{
-		AVFrame* newFrame = av_frame_alloc();
-		newFrame->format = mFrame->format;
-		newFrame->nb_samples = mFrame->nb_samples + other->nb_samples;
-		newFrame->ch_layout = mFrame->ch_layout;
+		AVFrame* newFrame     = av_frame_alloc();
+		newFrame->format      = mFrame->format;
+		newFrame->nb_samples  = mFrame->nb_samples + other->nb_samples;
+		newFrame->ch_layout   = mFrame->ch_layout;
 		newFrame->sample_rate = mFrame->sample_rate;
-		auto error = av_frame_get_buffer(newFrame, 1);
+		auto error            = av_frame_get_buffer(newFrame, 1);
 		Core::Assert(error == 0);
 
-		av_samples_copy(newFrame->data, mFrame->data,
-						0, 0,
-						mFrame->nb_samples, mFrame->ch_layout.nb_channels,
-						static_cast<AVSampleFormat>(mFrame->format));
-		av_samples_copy(newFrame->data, other->data,
-						mFrame->nb_samples, 0,
-						other->nb_samples, other->ch_layout.nb_channels,
-						static_cast<AVSampleFormat>(other->format));
+		av_samples_copy(newFrame->data, mFrame->data, 0, 0, mFrame->nb_samples, mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
+		av_samples_copy(newFrame->data, other->data, mFrame->nb_samples, 0, other->nb_samples, other->ch_layout.nb_channels, static_cast<AVSampleFormat>(other->format));
 
 		Core::Assert(newFrame->nb_samples == mFrame->nb_samples + other->nb_samples);
 		std::destroy_at(this);
@@ -159,15 +154,15 @@ namespace Strawberry::Codec::Audio
 
 	std::pair<Frame, Frame> Frame::Split(size_t pos) const
 	{
-		pos = std::clamp<size_t>(pos, 0, mFrame->nb_samples);
+		pos                    = std::clamp<size_t>(pos, 0, mFrame->nb_samples);
 
-		AVFrame* frames[2] = {av_frame_alloc(), av_frame_alloc()};
-		frames[0]->format = mFrame->format;
-		frames[1]->format = mFrame->format;
-		frames[0]->ch_layout = mFrame->ch_layout;
-		frames[1]->ch_layout = mFrame->ch_layout;
-		frames[0]->nb_samples = static_cast<int>(pos);
-		frames[1]->nb_samples = static_cast<int>(mFrame->nb_samples - pos);
+		AVFrame* frames[2]     = {av_frame_alloc(), av_frame_alloc()};
+		frames[0]->format      = mFrame->format;
+		frames[1]->format      = mFrame->format;
+		frames[0]->ch_layout   = mFrame->ch_layout;
+		frames[1]->ch_layout   = mFrame->ch_layout;
+		frames[0]->nb_samples  = static_cast<int>(pos);
+		frames[1]->nb_samples  = static_cast<int>(mFrame->nb_samples - pos);
 		frames[0]->sample_rate = mFrame->sample_rate;
 		frames[1]->sample_rate = mFrame->sample_rate;
 
@@ -181,21 +176,15 @@ namespace Strawberry::Codec::Audio
 		error = av_frame_make_writable(frames[1]);
 		Core::Assert(error == 0);
 
-		av_samples_copy(frames[0]->data, mFrame->data,
-						0, 0,
-						pos, mFrame->ch_layout.nb_channels,
-						static_cast<AVSampleFormat>(mFrame->format));
-		av_samples_copy(frames[1]->data, mFrame->data,
-						0, static_cast<int>(pos),
-						mFrame->nb_samples - static_cast<int>(pos), mFrame->ch_layout.nb_channels,
-						static_cast<AVSampleFormat>(mFrame->format));
+		av_samples_copy(frames[0]->data, mFrame->data, 0, 0, pos, mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
+		av_samples_copy(frames[1]->data, mFrame->data, 0, static_cast<int>(pos), mFrame->nb_samples - static_cast<int>(pos), mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
 
 		Core::Assert(frames[0]->nb_samples + frames[1]->nb_samples == mFrame->nb_samples);
 		return {Frame(frames[0]), Frame(frames[1])};
 	}
 
 
-	template<typename T>
+	template <typename T>
 	requires (std::integral<T> || std::floating_point<T>)
 	static void MixArrays(T* a, T* b, size_t count)
 	{
@@ -206,7 +195,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	template<typename T>
+	template <typename T>
 	requires (std::integral<T> || std::floating_point<T>)
 	static void MixArrays(void* a, void* b, size_t count)
 	{
@@ -219,17 +208,17 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(GetFormat() == other.GetFormat());
 		const size_t samplesToCopy = std::min(GetNumSamples(), other.GetNumSamples());
 
-		Frame result;
-		Frame* bigger = &result;
+		Frame        result;
+		Frame*       bigger = &result;
 		const Frame* smaller;
 		if (GetNumSamples() > other.GetNumSamples())
 		{
-			result = (*this);
+			result  = (*this);
 			smaller = &other;
 		}
 		else
 		{
-			result = other;
+			result  = other;
 			smaller = this;
 		}
 
@@ -288,5 +277,7 @@ namespace Strawberry::Codec::Audio
 
 
 	Frame::Frame(AVFrame* frame)
-		: mFrame(frame) {}
-}
+		: mFrame(frame)
+	{
+	}
+}// namespace Strawberry::Codec::Audio

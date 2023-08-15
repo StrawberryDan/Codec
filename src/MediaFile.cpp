@@ -10,8 +10,8 @@
 
 
 using Strawberry::Core::Assert;
-using Strawberry::Core::Take;
 using Strawberry::Core::Replace;
+using Strawberry::Core::Take;
 
 
 namespace Strawberry::Codec
@@ -31,7 +31,9 @@ namespace Strawberry::Codec
 
 
 	MediaFile::MediaFile(MediaFile&& other) noexcept
-		: mFile(std::exchange(other.mFile, nullptr)) {}
+		: mFile(std::exchange(other.mFile, nullptr))
+	{
+	}
 
 
 	MediaFile& MediaFile::operator=(MediaFile&& rhs) noexcept
@@ -77,8 +79,8 @@ namespace Strawberry::Codec
 				break;
 		}
 
-		info.Index = index;
-		info.Stream = mFile->streams[index];
+		info.Index           = index;
+		info.Stream          = mFile->streams[index];
 		info.CodecParameters = info.Stream->codecpar;
 
 		return info;
@@ -135,7 +137,7 @@ namespace Strawberry::Codec
 	Core::Result<Packet, Core::IO::Error> MediaFile::Read()
 	{
 		Packet packet;
-		auto result = av_read_frame(mFile, *packet);
+		auto   result = av_read_frame(mFile, *packet);
 		switch (result)
 		{
 			case 0:
@@ -147,4 +149,4 @@ namespace Strawberry::Codec
 				return Core::IO::Error::Unknown;
 		}
 	}
-}
+}// namespace Strawberry::Codec

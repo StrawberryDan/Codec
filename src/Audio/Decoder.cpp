@@ -13,7 +13,7 @@ namespace Strawberry::Codec::Audio
 {
 	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)
-		  , mParameters(nullptr)
+		, mParameters(nullptr)
 	{
 		Assert(av_codec_is_decoder(codec));
 
@@ -42,9 +42,8 @@ namespace Strawberry::Codec::Audio
 
 	Decoder::Decoder(Decoder&& other) noexcept
 		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
-		  , mParameters(std::exchange(other.mParameters, nullptr))
+		, mParameters(std::exchange(other.mParameters, nullptr))
 	{
-
 	}
 
 
@@ -96,19 +95,18 @@ namespace Strawberry::Codec::Audio
 		Assert(sendResult == 0 || sendResult == AVERROR(EAGAIN));
 
 		std::vector<Frame> frames;
-		int receiveResult;
+		int                receiveResult;
 		do
 		{
-			Frame frame = Frame::Allocate();
+			Frame frame   = Frame::Allocate();
 			receiveResult = avcodec_receive_frame(mCodecContext, *frame);
 			Assert(receiveResult == 0 || receiveResult == AVERROR(EAGAIN) || receiveResult == AVERROR_EOF);
 			if (receiveResult == 0)
 			{
 				frames.push_back(std::move(frame));
 			}
-		}
-		while (receiveResult == 0);
+		} while (receiveResult == 0);
 
 		return frames;
 	}
-}
+}// namespace Strawberry::Codec::Audio

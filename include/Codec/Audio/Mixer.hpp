@@ -5,17 +5,17 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Codec
-#include "FrameResizer.hpp"
 #include "Codec/Audio/Resampler.hpp"
 #include "Frame.hpp"
+#include "FrameResizer.hpp"
 // Strawberry Libraries
-#include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 // Standard Library
-#include <unordered_set>
-#include <memory>
-#include <list>
 #include <deque>
+#include <list>
+#include <memory>
+#include <unordered_set>
 
 
 namespace Strawberry::Codec::Audio
@@ -40,8 +40,8 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		const FrameFormat mOutputFormat;
-		const size_t mOutputFrameSize;
+		const FrameFormat                        mOutputFormat;
+		const size_t                             mOutputFrameSize;
 		std::list<std::shared_ptr<InputChannel>> mInputChannels;
 	};
 
@@ -54,18 +54,18 @@ namespace Strawberry::Codec::Audio
 	public:
 		InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize);
 
-		InputChannel(const InputChannel& rhs) = delete;
+		InputChannel(const InputChannel& rhs)            = delete;
 		InputChannel& operator=(const InputChannel& rhs) = delete;
-		InputChannel(InputChannel&& rhs) = default;
-		InputChannel& operator=(InputChannel&& rhs) = default;
+		InputChannel(InputChannel&& rhs)                 = default;
+		InputChannel& operator=(InputChannel&& rhs)      = default;
 
 
 		/// Returns whether there are any queued samples in this channel.
-		bool IsOutputAvailable() const;
+		bool   IsOutputAvailable() const;
 		/// Returns the number of samples currently buffered.
 		size_t QueueLength() const;
 		/// Enqueues a frame in this channel's buffer.
-		void EnqueueFrame(Frame frame);
+		void   EnqueueFrame(Frame frame);
 
 
 	protected:
@@ -73,14 +73,14 @@ namespace Strawberry::Codec::Audio
 
 
 	private:
-		FrameFormat mOutputFormat;
-		size_t mOutputFrameSize;
+		FrameFormat                    mOutputFormat;
+		size_t                         mOutputFrameSize;
 		Core::Mutex<std::deque<Frame>> mFrameBuffer;
-		Resampler mResampler;
-		FrameResizer mFrameResizer;
+		Resampler                      mResampler;
+		FrameResizer                   mFrameResizer;
 	};
 
 
 	static_assert(std::is_move_constructible_v<Mixer::InputChannel>);
 	static_assert(std::is_move_assignable_v<Mixer::InputChannel>);
-}
+}// namespace Strawberry::Codec::Audio

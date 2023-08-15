@@ -12,24 +12,22 @@ namespace Strawberry::Codec::Audio
 {
 	Mixer::Mixer(FrameFormat outputFormat, size_t outputFrameSize)
 		: mOutputFormat(std::move(outputFormat))
-		  , mOutputFrameSize(outputFrameSize)
+		, mOutputFrameSize(outputFrameSize)
 	{
-
 	}
 
 
 	Frame Mixer::ReadFrame()
 	{
 		// Erase dead channels
-		std::erase_if(mInputChannels,
-					  [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
+		std::erase_if(mInputChannels, [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
 
 		// Mix Input Channels
 		Frame result = Frame::Silence(mOutputFormat, mOutputFrameSize);
-		for (auto& channel: mInputChannels)
+		for (auto& channel : mInputChannels)
 		{
 			auto frame = channel->ReadFrame();
-			result = result.Mix(frame);
+			result     = result.Mix(frame);
 		}
 
 		return result;
@@ -54,9 +52,11 @@ namespace Strawberry::Codec::Audio
 
 	Mixer::InputChannel::InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize)
 		: mOutputFormat(outputFormat)
-		  , mOutputFrameSize(outputFrameSize)
-		  , mResampler(outputFormat)
-		  , mFrameResizer(outputFrameSize) {}
+		, mOutputFrameSize(outputFrameSize)
+		, mResampler(outputFormat)
+		, mFrameResizer(outputFrameSize)
+	{
+	}
 
 
 	bool Mixer::InputChannel::IsOutputAvailable() const
@@ -70,9 +70,9 @@ namespace Strawberry::Codec::Audio
 
 	size_t Mixer::InputChannel::QueueLength() const
 	{
-		size_t sum = 0;
-		auto frameBuffer = mFrameBuffer.Lock();
-		for (const auto& frame: *frameBuffer)
+		size_t sum         = 0;
+		auto   frameBuffer = mFrameBuffer.Lock();
+		for (const auto& frame : *frameBuffer)
 		{
 			sum += frame->nb_samples;
 		}
@@ -102,7 +102,7 @@ namespace Strawberry::Codec::Audio
 			}
 
 			auto frameBuffer = mFrameBuffer.Lock();
-			result = frameBuffer->empty() ? Core::NullOpt : Core::Option(std::move(frameBuffer->front()));
+			result           = frameBuffer->empty() ? Core::NullOpt : Core::Option(std::move(frameBuffer->front()));
 			if (result)
 			{
 				Core::Assert(result.Value()->sample_rate > 0);
@@ -114,4 +114,4 @@ namespace Strawberry::Codec::Audio
 			return Frame::Silence(mOutputFormat, mOutputFrameSize);
 		}
 	}
-}
+}// namespace Strawberry::Codec::Audio

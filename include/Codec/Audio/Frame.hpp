@@ -1,15 +1,14 @@
 #pragma once
 
 
-
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Codec
 #include "FrameFormat.hpp"
 // C++ Standard
-#include <vector>
 #include <utility>
+#include <vector>
 
 
 extern "C"
@@ -37,16 +36,16 @@ namespace Strawberry::Codec::Audio
 
 
 		[[nodiscard]] FrameFormat GetFormat() const;
-		[[nodiscard]] size_t GetChannelCount() const;
-		[[nodiscard]] size_t GetNumSamples() const;
-		[[nodiscard]] size_t GetSampleSize() const;
-		[[nodiscard]] bool IsFormatPlanar() const;
-		[[nodiscard]] double GetDuration() const;
+		[[nodiscard]] size_t      GetChannelCount() const;
+		[[nodiscard]] size_t      GetNumSamples() const;
+		[[nodiscard]] size_t      GetSampleSize() const;
+		[[nodiscard]] bool        IsFormatPlanar() const;
+		[[nodiscard]] double      GetDuration() const;
 
 
-		void Append(const Frame& other);
+		void                                  Append(const Frame& other);
 		[[nodiscard]] std::pair<Frame, Frame> Split(size_t pos) const;
-		[[nodiscard]] Frame Mix(const Frame& other) const;
+		[[nodiscard]] Frame                   Mix(const Frame& other) const;
 
 
 		inline AVFrame* operator*() { return mFrame; }
@@ -68,4 +67,4 @@ namespace Strawberry::Codec::Audio
 	private:
 		AVFrame* mFrame;
 	};
-}
+}// namespace Strawberry::Codec::Audio

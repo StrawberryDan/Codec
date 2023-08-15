@@ -8,8 +8,8 @@ namespace Strawberry::Codec::Audio
 {
 	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout* channels)
 		: mSampleRate(sampleRate)
-		  , mSampleFormat(sampleFormat)
-		  , mChannels{}
+		, mSampleFormat(sampleFormat)
+		, mChannels{}
 	{
 		auto result = av_channel_layout_copy(&mChannels, channels);
 		Core::Assert(result == 0);
@@ -20,13 +20,15 @@ namespace Strawberry::Codec::Audio
 
 
 	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& channels)
-		: FrameFormat(sampleRate, sampleFormat, &channels) {}
+		: FrameFormat(sampleRate, sampleFormat, &channels)
+	{
+	}
 
 
 	FrameFormat::FrameFormat(const Frame& frame)
 		: mSampleRate(frame->sample_rate)
-		  , mSampleFormat(frame->format)
-		  , mChannels{}
+		, mSampleFormat(frame->format)
+		, mChannels{}
 	{
 		auto result = av_channel_layout_copy(&mChannels, &frame->ch_layout);
 		Core::Assert(result == 0);
@@ -35,8 +37,8 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat::FrameFormat(const FrameFormat& rhs)
 		: mSampleRate(rhs.mSampleRate)
-		  , mSampleFormat(rhs.mSampleFormat)
-		  , mChannels{}
+		, mSampleFormat(rhs.mSampleFormat)
+		, mChannels{}
 	{
 		auto result = av_channel_layout_copy(&mChannels, &rhs.mChannels);
 		Core::Assert(result == 0);
@@ -56,8 +58,8 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat::FrameFormat(FrameFormat&& rhs) noexcept
 		: mSampleRate(rhs.mSampleRate)
-		  , mSampleFormat(rhs.mSampleFormat)
-		  , mChannels{}
+		, mSampleFormat(rhs.mSampleFormat)
+		, mChannels{}
 	{
 		auto result = av_channel_layout_copy(&mChannels, &rhs.mChannels);
 		Core::Assert(result == 0);
@@ -77,11 +79,7 @@ namespace Strawberry::Codec::Audio
 
 	bool FrameFormat::operator==(const FrameFormat& b) const
 	{
-		return mSampleRate == b.mSampleRate
-			   && mSampleFormat == b.mSampleFormat
-			   && mChannels.nb_channels == b.mChannels.nb_channels
-			   && mChannels.order == b.mChannels.order
-			   && (mChannels.u.mask == b.mChannels.u.mask || mChannels.u.map == b.mChannels.u.map);
+		return mSampleRate == b.mSampleRate && mSampleFormat == b.mSampleFormat && mChannels.nb_channels == b.mChannels.nb_channels && mChannels.order == b.mChannels.order && (mChannels.u.mask == b.mChannels.u.mask || mChannels.u.map == b.mChannels.u.map);
 	}
 
 
@@ -107,4 +105,4 @@ namespace Strawberry::Codec::Audio
 	{
 		return &mChannels;
 	}
-}
+}// namespace Strawberry::Codec::Audio

@@ -1,15 +1,15 @@
 #pragma once
 
 
+#include "Packet.hpp"
 #include <string>
 #include <vector>
-#include "Packet.hpp"
 
 
 extern "C"
 {
-#include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 }
 
 
@@ -19,7 +19,7 @@ namespace Strawberry::Codec
 	{
 	public:
 		explicit Muxer(const std::string& file);
-		Muxer(const Muxer&) = delete;
+		Muxer(const Muxer&)            = delete;
 		Muxer& operator=(const Muxer&) = delete;
 		Muxer(Muxer&& other) noexcept;
 		Muxer& operator=(Muxer&& other) noexcept;
@@ -32,7 +32,6 @@ namespace Strawberry::Codec
 		void Flush();
 
 	private:
-
 		enum WritingStage
 		{
 			Unopened,
@@ -43,8 +42,8 @@ namespace Strawberry::Codec
 			Finished,
 		};
 
-		AVFormatContext* mAVFormatContext;
+		AVFormatContext*       mAVFormatContext;
 		std::vector<AVStream*> mStreams;
-		WritingStage mStage;
+		WritingStage           mStage;
 	};
-}
+}// namespace Strawberry::Codec

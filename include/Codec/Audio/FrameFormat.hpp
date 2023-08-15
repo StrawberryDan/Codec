@@ -35,14 +35,14 @@ namespace Strawberry::Codec::Audio
 		bool operator!=(const FrameFormat& b) const;
 
 
-		[[nodiscard]] int GetSampleRate() const;
-		[[nodiscard]] int GetSampleFormat() const;
+		[[nodiscard]] int                    GetSampleRate() const;
+		[[nodiscard]] int                    GetSampleFormat() const;
 		[[nodiscard]] const AVChannelLayout* GetChannels() const;
 
 
 	private:
-		int mSampleRate;
-		int mSampleFormat;
+		int             mSampleRate;
+		int             mSampleFormat;
 		AVChannelLayout mChannels;
 	};
-}
+}// namespace Strawberry::Codec::Audio

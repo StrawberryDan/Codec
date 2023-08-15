@@ -44,7 +44,5 @@ namespace Strawberry::Codec
 
 	private:
 		AVPacket* mAVPacket;
-
-
 	};
-}
+}// namespace Strawberry::Codec
