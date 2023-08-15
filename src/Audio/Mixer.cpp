@@ -13,8 +13,7 @@ namespace Strawberry::Codec::Audio
 	Mixer::Mixer(FrameFormat outputFormat, size_t outputFrameSize)
 		: mOutputFormat(std::move(outputFormat))
 		, mOutputFrameSize(outputFrameSize)
-	{
-	}
+	{}
 
 
 	Frame Mixer::ReadFrame()
@@ -55,8 +54,7 @@ namespace Strawberry::Codec::Audio
 		, mOutputFrameSize(outputFrameSize)
 		, mResampler(outputFormat)
 		, mFrameResizer(outputFrameSize)
-	{
-	}
+	{}
 
 
 	bool Mixer::InputChannel::IsOutputAvailable() const

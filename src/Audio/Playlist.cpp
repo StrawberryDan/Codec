@@ -16,8 +16,7 @@ namespace Strawberry::Codec::Audio
 		, mFrameSize()
 		, mResampler(format)
 		, mFrameResizer(sampleCount)
-	{
-	}
+	{}
 
 
 	Playlist::~Playlist()

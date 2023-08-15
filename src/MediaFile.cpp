@@ -32,8 +32,7 @@ namespace Strawberry::Codec
 
 	MediaFile::MediaFile(MediaFile&& other) noexcept
 		: mFile(std::exchange(other.mFile, nullptr))
-	{
-	}
+	{}
 
 
 	MediaFile& MediaFile::operator=(MediaFile&& rhs) noexcept

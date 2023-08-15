@@ -10,8 +10,7 @@ namespace Strawberry::Codec::Audio
 	FrameResizer::FrameResizer(size_t outputFrameSize)
 		: mOutputFrameSize(outputFrameSize)
 		, mWorkingFrame()
-	{
-	}
+	{}
 
 
 	void FrameResizer::SendFrame(Frame frame)

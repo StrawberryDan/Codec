@@ -8,8 +8,7 @@ namespace Strawberry::Codec
 {
 	Packet::Packet()
 		: mAVPacket(av_packet_alloc())
-	{
-	}
+	{}
 
 
 	Packet::Packet(const uint8_t* data, size_t len)

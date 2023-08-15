@@ -28,8 +28,7 @@ namespace Strawberry::Codec
 		: mAVFormatContext(Take(other.mAVFormatContext))
 		, mStreams(Take(other.mStreams))
 		, mStage(Replace(other.mStage, Unopened))
-	{
-	}
+	{}
 
 
 	Muxer& Muxer::operator=(Muxer&& other) noexcept

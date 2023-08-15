@@ -21,8 +21,7 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& channels)
 		: FrameFormat(sampleRate, sampleFormat, &channels)
-	{
-	}
+	{}
 
 
 	FrameFormat::FrameFormat(const Frame& frame)

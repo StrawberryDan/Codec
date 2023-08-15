@@ -150,6 +150,4 @@ namespace Strawberry::Codec
 		, mMediaFile(file)
 		, mPacketBuffer(256)
 		, mNextPts(0)
-	{
-	}
-}// namespace Strawberry::Codec
+	{}// namespace Strawberry::Codec

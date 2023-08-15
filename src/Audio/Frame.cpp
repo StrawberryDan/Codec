@@ -46,8 +46,7 @@ namespace Strawberry::Codec::Audio
 
 	Frame::Frame()
 		: mFrame(nullptr)
-	{
-	}
+	{}
 
 
 	Frame::Frame(const Frame& other)
@@ -278,6 +277,4 @@ namespace Strawberry::Codec::Audio
 
 	Frame::Frame(AVFrame* frame)
 		: mFrame(frame)
-	{
-	}
-}// namespace Strawberry::Codec::Audio
+	{}// namespace Strawberry::Codec::Audio

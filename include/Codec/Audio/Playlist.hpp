@@ -53,8 +53,7 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		struct PlaybackEndedEvent
-		{
+		struct PlaybackEndedEvent {
 		};
 
 

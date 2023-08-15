@@ -43,8 +43,7 @@ namespace Strawberry::Codec::Audio
 	Decoder::Decoder(Decoder&& other) noexcept
 		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
 		, mParameters(std::exchange(other.mParameters, nullptr))
-	{
-	}
+	{}
 
 
 	Decoder& Decoder::operator=(Decoder&& other) noexcept
