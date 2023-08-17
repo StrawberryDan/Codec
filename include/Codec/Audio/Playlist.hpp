@@ -50,15 +50,10 @@ namespace Strawberry::Codec::Audio
 		};
 
 
-		struct PlaybackEndedEvent {
-		};
+		struct PlaybackEndedEvent {};
 
 
-		using Event = Core::Variant<
-			SongBeganEvent,
-			SongAddedEvent,
-			SongRemovedEvent,
-			PlaybackEndedEvent>;
+		using Event         = Core::Variant<SongBeganEvent, SongAddedEvent, SongRemovedEvent, PlaybackEndedEvent>;
 
 		using EventReceiver = std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>>;
 
@@ -90,10 +85,8 @@ namespace Strawberry::Codec::Audio
 		[[nodiscard]] size_t                    GetFrameSize() const;
 
 
-		template <typename T>
-		[[nodiscard]] T GetTrackAssociatedData(size_t index) const;
-		template <typename T>
-		void SetTrackAssociatedData(size_t index, T value);
+		template <typename T> [[nodiscard]] T GetTrackAssociatedData(size_t index) const;
+		template <typename T> void            SetTrackAssociatedData(size_t index, T value);
 
 
 		void GotoPrevTrack();
@@ -139,57 +132,25 @@ namespace Strawberry::Codec::Audio
 	};
 
 
-	template <typename T>
-	T Playlist::GetTrackAssociatedData(size_t index) const
+	template <typename T> T Playlist::GetTrackAssociatedData(size_t index) const
 	{
-		if (index < mPreviousTracks.size())
-		{
-			return std::any_cast<T>(mPreviousTracks[index].associatedData);
-		}
-		else if (index == mPreviousTracks.size() && mCurrentTrack)
-		{
-			return std::any_cast<T>(mCurrentTrack->associatedData);
-		}
-		else if (index > mPreviousTracks.size())
-		{
-			return std::any_cast<T>(mNextTracks[index - mPreviousTracks.size()].associatedData);
-		}
-		else
-		{
-			Core::Unreachable();
-		}
+		if (index < mPreviousTracks.size()) { return std::any_cast<T>(mPreviousTracks[index].associatedData); }
+		else if (index == mPreviousTracks.size() && mCurrentTrack) { return std::any_cast<T>(mCurrentTrack->associatedData); }
+		else if (index > mPreviousTracks.size()) { return std::any_cast<T>(mNextTracks[index - mPreviousTracks.size()].associatedData); }
+		else { Core::Unreachable(); }
 	}
 
 
-	template <typename T>
-	void Playlist::SetTrackAssociatedData(size_t index, T value)
+	template <typename T> void Playlist::SetTrackAssociatedData(size_t index, T value)
 	{
-		if (index < mPreviousTracks.size())
-		{
-			mPreviousTracks[index].associatedData = value;
-		}
-		else if (index == mPreviousTracks.size() && mCurrentTrack)
-		{
-			mCurrentTrack->associatedData = value;
-		}
-		else if (index == mPreviousTracks.size() && !mCurrentTrack && !mNextTracks.empty())
-		{
-			mNextTracks.front().associatedData = value;
-		}
+		if (index < mPreviousTracks.size()) { mPreviousTracks[index].associatedData = value; }
+		else if (index == mPreviousTracks.size() && mCurrentTrack) { mCurrentTrack->associatedData = value; }
+		else if (index == mPreviousTracks.size() && !mCurrentTrack && !mNextTracks.empty()) { mNextTracks.front().associatedData = value; }
 		else if (index > mPreviousTracks.size())
 		{
-			if (mCurrentTrack)
-			{
-				mNextTracks[index - mPreviousTracks.size()].associatedData = value;
-			}
-			else
-			{
-				mNextTracks[index - mPreviousTracks.size() - 1].associatedData = value;
-			}
+			if (mCurrentTrack) { mNextTracks[index - mPreviousTracks.size()].associatedData = value; }
+			else { mNextTracks[index - mPreviousTracks.size() - 1].associatedData = value; }
 		}
-		else
-		{
-			Core::Unreachable();
-		}
+		else { Core::Unreachable(); }
 	}
 } // namespace Strawberry::Codec::Audio

@@ -52,10 +52,7 @@ namespace Strawberry::Codec::Audio
 		Frame input(std::move(mInputFrames.front()));
 		mInputFrames.pop();
 		Core::Assert(input->sample_rate > 0);
-		if (input.GetFormat() == mOutputFormat)
-		{
-			return input;
-		}
+		if (input.GetFormat() == mOutputFormat) { return input; }
 
 
 		Frame output        = Frame::Allocate();
@@ -68,10 +65,7 @@ namespace Strawberry::Codec::Audio
 		while (true)
 		{
 			auto result = swr_convert_frame(mContext, *output, *input);
-			if (result == 0)
-			{
-				return output;
-			}
+			if (result == 0) { return output; }
 			else if (result == AVERROR_INPUT_CHANGED)
 			{
 				swr_close(mContext);
@@ -88,8 +82,5 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	bool Resampler::IsOutputAvailable() const
-	{
-		return !mInputFrames.empty();
-	}
+	bool Resampler::IsOutputAvailable() const { return !mInputFrames.empty(); }
 } // namespace Strawberry::Codec::Audio

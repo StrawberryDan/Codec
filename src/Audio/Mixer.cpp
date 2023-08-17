@@ -35,9 +35,7 @@ namespace Strawberry::Codec::Audio
 
 	bool Mixer::IsEmpty() const
 	{
-		return std::all_of(
-			mInputChannels.begin(), mInputChannels.end(),
-			[](auto& x) { return !x->IsOutputAvailable(); });
+		return std::all_of(mInputChannels.begin(), mInputChannels.end(), [](auto& x) { return !x->IsOutputAvailable(); });
 	}
 
 
@@ -70,10 +68,7 @@ namespace Strawberry::Codec::Audio
 	{
 		size_t sum         = 0;
 		auto   frameBuffer = mFrameBuffer.Lock();
-		for (const auto& frame : *frameBuffer)
-		{
-			sum += frame->nb_samples;
-		}
+		for (const auto& frame : *frameBuffer) { sum += frame->nb_samples; }
 		return sum;
 	}
 

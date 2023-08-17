@@ -62,15 +62,9 @@ namespace Strawberry::Codec
 
 	Packet::~Packet()
 	{
-		if (mAVPacket)
-		{
-			av_packet_free(&mAVPacket);
-		}
+		if (mAVPacket) { av_packet_free(&mAVPacket); }
 	}
 
 
-	Core::IO::DynamicByteBuffer Packet::AsBytes() const
-	{
-		return {mAVPacket->data, static_cast<size_t>(mAVPacket->size)};
-	}
+	Core::IO::DynamicByteBuffer Packet::AsBytes() const { return {mAVPacket->data, static_cast<size_t>(mAVPacket->size)}; }
 } // namespace Strawberry::Codec

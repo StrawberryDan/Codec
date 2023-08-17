@@ -20,10 +20,7 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 	MediaFile           file   = MediaFile::Open(filePath).Unwrap();
 	auto                stream = file.GetBestStream(MediaType::Audio).Unwrap();
 	std::vector<Packet> packets;
-	while (auto packet = stream->Read())
-	{
-		packets.push_back(packet.Unwrap());
-	}
+	while (auto packet = stream->Read()) { packets.push_back(packet.Unwrap()); }
 
 
 	std::vector<Audio::Frame> frames;
@@ -32,14 +29,11 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 	{
 		decoder.Send(std::move(packet));
 		auto someFrames = decoder.Receive();
-		for (auto& f : someFrames)
-		{
-			frames.push_back(std::move(f));
-		}
+		for (auto& f : someFrames) { frames.push_back(std::move(f)); }
 	}
 
 	return frames;
-};
+}
 
 
 void AudioMixing()
@@ -47,13 +41,12 @@ void AudioMixing()
 	Core::ScopedTimer timer("Audio Mixing");
 
 
-	std::vector<Audio::Frame> frames[] =
-		{
-			// DecodeAudioFile("data/pd.wav"),
-			// DecodeAudioFile("data/girigiri.wav"),
-			// DecodeAudioFile("data/dcl.wav"),
-			DecodeAudioFile("data/cotn.flac"),
-		};
+	std::vector<Audio::Frame> frames[] = {
+		// DecodeAudioFile("data/pd.wav"),
+		// DecodeAudioFile("data/girigiri.wav"),
+		// DecodeAudioFile("data/dcl.wav"),
+		DecodeAudioFile("data/cotn.flac"),
+	};
 
 
 	Audio::Mixer                                             mixer(Audio::FrameFormat(48000, AV_SAMPLE_FMT_DBL, AV_CHANNEL_LAYOUT_STEREO), 1024);
@@ -64,10 +57,7 @@ void AudioMixing()
 	std::vector<Packet> packets;
 	for (int i = 0; i < std::extent_v<decltype(frames)>; i++)
 	{
-		for (auto& frame : frames[i])
-		{
-			mixerChannels[i]->EnqueueFrame(frame);
-		}
+		for (auto& frame : frames[i]) { mixerChannels[i]->EnqueueFrame(frame); }
 	}
 
 
@@ -77,10 +67,7 @@ void AudioMixing()
 	{
 		encoder.Send(mixer.ReadFrame());
 		auto somePackets = encoder.Receive();
-		for (const auto p : somePackets)
-		{
-			packets.push_back(p);
-		}
+		for (const auto p : somePackets) { packets.push_back(p); }
 	}
 
 

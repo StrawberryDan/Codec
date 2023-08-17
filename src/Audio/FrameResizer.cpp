@@ -45,10 +45,7 @@ namespace Strawberry::Codec::Audio
 				return result;
 			}
 			// If the working frame is the right size we return it.
-			else if (mWorkingFrame->GetNumSamples() == mOutputFrameSize)
-			{
-				return mWorkingFrame.Unwrap();
-			}
+			else if (mWorkingFrame->GetNumSamples() == mOutputFrameSize) { return mWorkingFrame.Unwrap(); }
 			// If the mode is Yield Available, and we have not more input frames, then we yield what we have.
 			else if (mode == Mode::YieldAvailable && mWorkingFrame->GetNumSamples() <= mOutputFrameSize && mInputFrames.empty())
 			{
@@ -75,8 +72,7 @@ namespace Strawberry::Codec::Audio
 		switch (mode)
 		{
 			case Mode::WaitForFullFrames:
-				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize) ||
-					   !mInputFrames.empty();
+				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize) || !mInputFrames.empty();
 			case Mode::YieldAvailable:
 				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > 0) || !mInputFrames.empty();
 		}

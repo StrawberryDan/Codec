@@ -60,10 +60,7 @@ namespace Strawberry::Codec::Audio
 
 	Decoder::~Decoder()
 	{
-		if (mParameters)
-		{
-			avcodec_parameters_free(&mParameters);
-		}
+		if (mParameters) { avcodec_parameters_free(&mParameters); }
 
 		if (mCodecContext)
 		{
@@ -73,16 +70,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Decoder::Send(Packet packet)
-	{
-		mPacketBuffer.push_back(std::move(packet));
-	}
+	void Decoder::Send(Packet packet) { mPacketBuffer.push_back(std::move(packet)); }
 
 
 	std::vector<Frame> Decoder::Receive()
 	{
-		if (mPacketBuffer.empty())
-			return {};
+		if (mPacketBuffer.empty()) return {};
 
 
 		Packet packet(std::move(mPacketBuffer.front()));
@@ -95,15 +88,11 @@ namespace Strawberry::Codec::Audio
 
 		std::vector<Frame> frames;
 		int                receiveResult;
-		do
-		{
+		do {
 			Frame frame   = Frame::Allocate();
 			receiveResult = avcodec_receive_frame(mCodecContext, *frame);
 			Assert(receiveResult == 0 || receiveResult == AVERROR(EAGAIN) || receiveResult == AVERROR_EOF);
-			if (receiveResult == 0)
-			{
-				frames.push_back(std::move(frame));
-			}
+			if (receiveResult == 0) { frames.push_back(std::move(frame)); }
 		} while (receiveResult == 0);
 
 		return frames;

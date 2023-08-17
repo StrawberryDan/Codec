@@ -19,10 +19,7 @@ namespace Strawberry::Codec::Audio
 	{}
 
 
-	Playlist::~Playlist()
-	{
-		StopLoading(true);
-	}
+	Playlist::~Playlist() { StopLoading(true); }
 
 
 	Core::Option<Frame> Playlist::ReadFrame()
@@ -32,14 +29,8 @@ namespace Strawberry::Codec::Audio
 
 		while (true)
 		{
-			if (mReadingThread && !mShouldRead)
-			{
-				StopLoading(false);
-			}
-			else if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack)
-			{
-				StartLoading(mCurrentTrack->loader);
-			}
+			if (mReadingThread && !mShouldRead) { StopLoading(false); }
+			else if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack) { StartLoading(mCurrentTrack->loader); }
 
 
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
@@ -121,10 +112,7 @@ namespace Strawberry::Codec::Audio
 			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
 			{
 				decoder.Send(packet.Unwrap());
-				for (auto frame : decoder.Receive())
-				{
-					frames.Lock()->emplace_back(std::move(frame));
-				}
+				for (auto frame : decoder.Receive()) { frames.Lock()->emplace_back(std::move(frame)); }
 			}
 
 			mShouldRead = false;
@@ -149,25 +137,17 @@ namespace Strawberry::Codec::Audio
 	{
 		Core::Assert(index < Length());
 
-		if (index < mPreviousTracks.size())
-		{
-			mPreviousTracks.erase(mPreviousTracks.begin() + static_cast<long>(index));
-		}
+		if (index < mPreviousTracks.size()) { mPreviousTracks.erase(mPreviousTracks.begin() + static_cast<long>(index)); }
 		else if (mCurrentTrack && index == mPreviousTracks.size())
 		{
 			mCurrentTrack.Reset();
 			StopLoading(true);
 		}
-		else if (!mCurrentTrack && index == mPreviousTracks.size())
-		{
-			mNextTracks.pop_front();
-		}
+		else if (!mCurrentTrack && index == mPreviousTracks.size()) { mNextTracks.pop_front(); }
 		else
 		{
 			Core::Assert(index >= mPreviousTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0));
-			mNextTracks.erase(
-				mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) -
-				(mCurrentTrack.HasValue() ? 1 : 0));
+			mNextTracks.erase(mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) - (mCurrentTrack.HasValue() ? 1 : 0));
 		}
 
 		SongRemovedEvent event{
@@ -175,41 +155,23 @@ namespace Strawberry::Codec::Audio
 		};
 		mEventBroadcaster.Broadcast(event);
 
-		if (Length() == 0)
-		{
-			mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
-		}
+		if (Length() == 0) { mEventBroadcaster.Broadcast(PlaybackEndedEvent{}); }
 	}
 
 
-	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
-	{
-		return mEventBroadcaster.CreateReceiver();
-	}
+	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver() { return mEventBroadcaster.CreateReceiver(); }
 
 
-	size_t Playlist::GetCurrentTrackIndex() const
-	{
-		return mPreviousTracks.size();
-	}
+	size_t Playlist::GetCurrentTrackIndex() const { return mPreviousTracks.size(); }
 
 
-	size_t Playlist::Length() const
-	{
-		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
-	}
+	size_t Playlist::Length() const { return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0); }
 
 
-	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const
-	{
-		return mFormat;
-	}
+	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const { return mFormat; }
 
 
-	size_t Playlist::GetFrameSize() const
-	{
-		return mFrameSize;
-	}
+	size_t Playlist::GetFrameSize() const { return mFrameSize; }
 
 
 	void Playlist::GotoPrevTrack()
@@ -217,20 +179,16 @@ namespace Strawberry::Codec::Audio
 		if (!mPreviousTracks.empty())
 		{
 			StopLoading(true);
-			if (mCurrentTrack.HasValue())
-			{
-				mNextTracks.push_front(mCurrentTrack.Unwrap());
-			}
+			if (mCurrentTrack.HasValue()) { mNextTracks.push_front(mCurrentTrack.Unwrap()); }
 
 			mCurrentTrack = mPreviousTracks[0];
 			mPreviousTracks.pop_front();
 
-			mEventBroadcaster.Broadcast(
-				SongBeganEvent{
-					.index          = mPreviousTracks.size(),
-					.offset         = -1,
-					.associatedData = mCurrentTrack->associatedData,
-				});
+			mEventBroadcaster.Broadcast(SongBeganEvent{
+				.index          = mPreviousTracks.size(),
+				.offset         = -1,
+				.associatedData = mCurrentTrack->associatedData,
+			});
 		}
 
 		mCurrentPosition = 0;
@@ -242,20 +200,18 @@ namespace Strawberry::Codec::Audio
 		if (!mNextTracks.empty())
 		{
 			StopLoading(true);
-			if (mCurrentTrack.HasValue())
-				mPreviousTracks.push_front(mCurrentTrack.Unwrap());
+			if (mCurrentTrack.HasValue()) mPreviousTracks.push_front(mCurrentTrack.Unwrap());
 
 
 			mCurrentTrack = mNextTracks.front();
 			mNextTracks.pop_front();
 			mCurrentPosition = 0;
 
-			mEventBroadcaster.Broadcast(
-				SongBeganEvent{
-					.index          = mPreviousTracks.size(),
-					.offset         = 1,
-					.associatedData = mCurrentTrack->associatedData,
-				});
+			mEventBroadcaster.Broadcast(SongBeganEvent{
+				.index          = mPreviousTracks.size(),
+				.offset         = 1,
+				.associatedData = mCurrentTrack->associatedData,
+			});
 		}
 	}
 
@@ -282,7 +238,6 @@ namespace Strawberry::Codec::Audio
 		}
 
 
-		if (clearFrames)
-			mCurrentTrackFrames.Lock()->clear();
+		if (clearFrames) mCurrentTrackFrames.Lock()->clear();
 	}
 } // namespace Strawberry::Codec::Audio

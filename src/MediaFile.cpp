@@ -49,10 +49,7 @@ namespace Strawberry::Codec
 
 	MediaFile::~MediaFile()
 	{
-		if (mFile)
-		{
-			avformat_close_input(&mFile);
-		}
+		if (mFile) { avformat_close_input(&mFile); }
 	}
 
 

@@ -89,46 +89,25 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Frame::~Frame()
-	{
-		av_frame_free(&mFrame);
-	}
+	Frame::~Frame() { av_frame_free(&mFrame); }
 
 
-	FrameFormat Frame::GetFormat() const
-	{
-		return {mFrame->sample_rate, mFrame->format, &mFrame->ch_layout};
-	}
+	FrameFormat Frame::GetFormat() const { return {mFrame->sample_rate, mFrame->format, &mFrame->ch_layout}; }
 
 
-	size_t Frame::GetChannelCount() const
-	{
-		return mFrame->ch_layout.nb_channels;
-	}
+	size_t Frame::GetChannelCount() const { return mFrame->ch_layout.nb_channels; }
 
 
-	size_t Frame::GetNumSamples() const
-	{
-		return static_cast<size_t>(mFrame->nb_samples);
-	}
+	size_t Frame::GetNumSamples() const { return static_cast<size_t>(mFrame->nb_samples); }
 
 
-	size_t Frame::GetSampleSize() const
-	{
-		return av_get_bytes_per_sample(static_cast<AVSampleFormat>(mFrame->format));
-	}
+	size_t Frame::GetSampleSize() const { return av_get_bytes_per_sample(static_cast<AVSampleFormat>(mFrame->format)); }
 
 
-	bool Frame::IsFormatPlanar() const
-	{
-		return av_sample_fmt_is_planar(static_cast<AVSampleFormat>(mFrame->format));
-	}
+	bool Frame::IsFormatPlanar() const { return av_sample_fmt_is_planar(static_cast<AVSampleFormat>(mFrame->format)); }
 
 
-	double Frame::GetDuration() const
-	{
-		return (mFrame->nb_samples * Core::Math::Rational(1, mFrame->sample_rate)).Evaluate();
-	}
+	double Frame::GetDuration() const { return (mFrame->nb_samples * Core::Math::Rational(1, mFrame->sample_rate)).Evaluate(); }
 
 
 	void Frame::Append(const Frame& other)
@@ -142,7 +121,8 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(error == 0);
 
 		av_samples_copy(newFrame->data, mFrame->data, 0, 0, mFrame->nb_samples, mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
-		av_samples_copy(newFrame->data, other->data, mFrame->nb_samples, 0, other->nb_samples, other->ch_layout.nb_channels, static_cast<AVSampleFormat>(other->format));
+		av_samples_copy(
+			newFrame->data, other->data, mFrame->nb_samples, 0, other->nb_samples, other->ch_layout.nb_channels, static_cast<AVSampleFormat>(other->format));
 
 		Core::Assert(newFrame->nb_samples == mFrame->nb_samples + other->nb_samples);
 		std::destroy_at(this);
@@ -175,26 +155,23 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(error == 0);
 
 		av_samples_copy(frames[0]->data, mFrame->data, 0, 0, pos, mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
-		av_samples_copy(frames[1]->data, mFrame->data, 0, static_cast<int>(pos), mFrame->nb_samples - static_cast<int>(pos), mFrame->ch_layout.nb_channels, static_cast<AVSampleFormat>(mFrame->format));
+		av_samples_copy(
+			frames[1]->data, mFrame->data, 0, static_cast<int>(pos), mFrame->nb_samples - static_cast<int>(pos), mFrame->ch_layout.nb_channels,
+			static_cast<AVSampleFormat>(mFrame->format));
 
 		Core::Assert(frames[0]->nb_samples + frames[1]->nb_samples == mFrame->nb_samples);
 		return {Frame(frames[0]), Frame(frames[1])};
 	}
 
 
-	template <typename T>
-	requires (std::integral<T> || std::floating_point<T>)
+	template <typename T> requires (std::integral<T> || std::floating_point<T>)
 	static void MixArrays(T* a, T* b, size_t count)
 	{
-		for (int i = 0; i < count; i++)
-		{
-			*(a + i) = *(a + i) + *(b + i);
-		}
+		for (int i = 0; i < count; i++) { *(a + i) = *(a + i) + *(b + i); }
 	}
 
 
-	template <typename T>
-	requires (std::integral<T> || std::floating_point<T>)
+	template <typename T> requires (std::integral<T> || std::floating_point<T>)
 	static void MixArrays(void* a, void* b, size_t count)
 	{
 		MixArrays(reinterpret_cast<T*>(a), reinterpret_cast<T*>(b), count);
@@ -243,28 +220,22 @@ namespace Strawberry::Codec::Audio
 				break;
 
 			case AV_SAMPLE_FMT_U8P:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<uint8_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<uint8_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S16P:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int16_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<int16_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S32P:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int32_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<int32_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_S64P:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<int64_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<int64_t>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_FLTP:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<float>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<float>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			case AV_SAMPLE_FMT_DBLP:
-				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i)
-					MixArrays<double>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
+				for (auto i = 0; i < mFrame->ch_layout.nb_channels; ++i) MixArrays<double>((*bigger)->data[i], (*smaller)->data[i], samplesToCopy);
 				break;
 			default:
 				Core::Unreachable();

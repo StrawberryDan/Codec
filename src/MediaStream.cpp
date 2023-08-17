@@ -22,10 +22,7 @@ namespace Strawberry::Codec
 				auto packet = mMediaFile->Read();
 				if (packet)
 				{
-					if ((*packet)->stream_index != mStreamInfo.Index)
-					{
-						continue;
-					}
+					if ((*packet)->stream_index != mStreamInfo.Index) { continue; }
 
 					mNextPts = mNextPts + (*packet)->duration;
 					if (mNextPts > mStreamInfo.Stream->duration)
@@ -67,51 +64,28 @@ namespace Strawberry::Codec
 	Core::Option<std::string> MediaStream::GetTitle() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "title", nullptr, 0);
-		if (entry)
-		{
-			return std::string(entry->value);
-		}
-		else
-		{
-			return Core::NullOpt;
-		}
+		if (entry) { return std::string(entry->value); }
+		else { return Core::NullOpt; }
 	}
 
 
 	Core::Option<std::string> MediaStream::GetAlbum() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "album", nullptr, 0);
-		if (entry)
-		{
-			return std::string(entry->value);
-		}
-		else
-		{
-			return Core::NullOpt;
-		}
+		if (entry) { return std::string(entry->value); }
+		else { return Core::NullOpt; }
 	}
 
 
 	Core::Option<std::string> MediaStream::GetArtist() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "artist", nullptr, 0);
-		if (entry)
-		{
-			return std::string(entry->value);
-		}
-		else
-		{
-			return Core::NullOpt;
-		}
+		if (entry) { return std::string(entry->value); }
+		else { return Core::NullOpt; }
 	}
 
 
-	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const
-	{
-		return {
-			mStreamInfo.Stream->time_base.num,
-			mStreamInfo.Stream->time_base.den};
-	}
+	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const { return {mStreamInfo.Stream->time_base.num, mStreamInfo.Stream->time_base.den}; }
 
 
 	std::chrono::duration<double> MediaStream::GetDuration() const

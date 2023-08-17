@@ -52,16 +52,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Encoder::Send(Frame frame)
-	{
-		mFrameBuffer.push_back(std::move(frame));
-	}
+	void Encoder::Send(Frame frame) { mFrameBuffer.push_back(std::move(frame)); }
 
 
 	std::vector<Packet> Encoder::Receive()
 	{
-		if (mFrameBuffer.empty())
-			return {};
+		if (mFrameBuffer.empty()) return {};
 
 		Frame frame = std::move(mFrameBuffer.front());
 		mFrameBuffer.pop_back();
@@ -77,16 +73,12 @@ namespace Strawberry::Codec::Audio
 				Core::Assert(send == 0);
 
 				int receive;
-				do
-				{
+				do {
 					Packet packet;
 					receive = avcodec_receive_packet(mContext, *packet);
 					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
 
-					if (receive == 0)
-					{
-						packets.push_back(packet);
-					}
+					if (receive == 0) { packets.push_back(packet); }
 				} while (receive == 0);
 			}
 		}
@@ -108,16 +100,12 @@ namespace Strawberry::Codec::Audio
 				Core::Assert(send == 0);
 
 				int receive;
-				do
-				{
+				do {
 					Packet packet;
 					receive = avcodec_receive_packet(mContext, *packet);
 					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
 
-					if (receive == 0)
-					{
-						packets.push_back(packet);
-					}
+					if (receive == 0) { packets.push_back(packet); }
 				} while (receive == 0);
 			}
 		}
@@ -126,8 +114,5 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	AVCodecParameters* Encoder::Parameters() const
-	{
-		return mParameters;
-	}
+	AVCodecParameters* Encoder::Parameters() const { return mParameters; }
 } // namespace Strawberry::Codec::Audio

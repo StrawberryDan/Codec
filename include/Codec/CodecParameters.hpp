@@ -63,15 +63,13 @@ namespace Strawberry::Codec
 	};
 
 
-	struct AudioCodecParameters
-		: public CodecParameters {
+	struct AudioCodecParameters : public CodecParameters {
 		Core::Option<int>          sampleRate;
 		Core::Option<SampleFormat> sampleFormat;
 	};
 
 
-	struct VideoCodecParameters
-		: public CodecParameters {
+	struct VideoCodecParameters : public CodecParameters {
 		Core::Option<int>         width;
 		Core::Option<int>         height;
 		Core::Option<PixelFormat> pixelFormat;
