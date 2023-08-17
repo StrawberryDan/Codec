@@ -82,5 +82,8 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	bool Resampler::IsOutputAvailable() const { return !mInputFrames.empty(); }
+	bool Resampler::IsOutputAvailable() const
+	{
+		return !mInputFrames.empty();
+	}
 } // namespace Strawberry::Codec::Audio

@@ -66,5 +66,8 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::IO::DynamicByteBuffer Packet::AsBytes() const { return {mAVPacket->data, static_cast<size_t>(mAVPacket->size)}; }
+	Core::IO::DynamicByteBuffer Packet::AsBytes() const
+	{
+		return {mAVPacket->data, static_cast<size_t>(mAVPacket->size)};
+	}
 } // namespace Strawberry::Codec

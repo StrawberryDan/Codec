@@ -85,8 +85,10 @@ namespace Strawberry::Codec::Audio
 		[[nodiscard]] size_t                    GetFrameSize() const;
 
 
-		template <typename T> [[nodiscard]] T GetTrackAssociatedData(size_t index) const;
-		template <typename T> void            SetTrackAssociatedData(size_t index, T value);
+		template <typename T>
+		[[nodiscard]] T GetTrackAssociatedData(size_t index) const;
+		template <typename T>
+		void SetTrackAssociatedData(size_t index, T value);
 
 
 		void GotoPrevTrack();
@@ -132,7 +134,8 @@ namespace Strawberry::Codec::Audio
 	};
 
 
-	template <typename T> T Playlist::GetTrackAssociatedData(size_t index) const
+	template <typename T>
+	T Playlist::GetTrackAssociatedData(size_t index) const
 	{
 		if (index < mPreviousTracks.size()) { return std::any_cast<T>(mPreviousTracks[index].associatedData); }
 		else if (index == mPreviousTracks.size() && mCurrentTrack) { return std::any_cast<T>(mCurrentTrack->associatedData); }
@@ -141,7 +144,8 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	template <typename T> void Playlist::SetTrackAssociatedData(size_t index, T value)
+	template <typename T>
+	void Playlist::SetTrackAssociatedData(size_t index, T value)
 	{
 		if (index < mPreviousTracks.size()) { mPreviousTracks[index].associatedData = value; }
 		else if (index == mPreviousTracks.size() && mCurrentTrack) { mCurrentTrack->associatedData = value; }

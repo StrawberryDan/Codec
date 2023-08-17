@@ -70,7 +70,10 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Decoder::Send(Packet packet) { mPacketBuffer.push_back(std::move(packet)); }
+	void Decoder::Send(Packet packet)
+	{
+		mPacketBuffer.push_back(std::move(packet));
+	}
 
 
 	std::vector<Frame> Decoder::Receive()

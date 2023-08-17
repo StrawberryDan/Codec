@@ -52,7 +52,10 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Encoder::Send(Frame frame) { mFrameBuffer.push_back(std::move(frame)); }
+	void Encoder::Send(Frame frame)
+	{
+		mFrameBuffer.push_back(std::move(frame));
+	}
 
 
 	std::vector<Packet> Encoder::Receive()
@@ -114,5 +117,8 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	AVCodecParameters* Encoder::Parameters() const { return mParameters; }
+	AVCodecParameters* Encoder::Parameters() const
+	{
+		return mParameters;
+	}
 } // namespace Strawberry::Codec::Audio

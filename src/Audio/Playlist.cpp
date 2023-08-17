@@ -19,7 +19,10 @@ namespace Strawberry::Codec::Audio
 	{}
 
 
-	Playlist::~Playlist() { StopLoading(true); }
+	Playlist::~Playlist()
+	{
+		StopLoading(true);
+	}
 
 
 	Core::Option<Frame> Playlist::ReadFrame()
@@ -159,19 +162,34 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver() { return mEventBroadcaster.CreateReceiver(); }
+	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
+	{
+		return mEventBroadcaster.CreateReceiver();
+	}
 
 
-	size_t Playlist::GetCurrentTrackIndex() const { return mPreviousTracks.size(); }
+	size_t Playlist::GetCurrentTrackIndex() const
+	{
+		return mPreviousTracks.size();
+	}
 
 
-	size_t Playlist::Length() const { return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0); }
+	size_t Playlist::Length() const
+	{
+		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
+	}
 
 
-	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const { return mFormat; }
+	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const
+	{
+		return mFormat;
+	}
 
 
-	size_t Playlist::GetFrameSize() const { return mFrameSize; }
+	size_t Playlist::GetFrameSize() const
+	{
+		return mFrameSize;
+	}
 
 
 	void Playlist::GotoPrevTrack()

@@ -77,14 +77,26 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	bool FrameFormat::operator!=(const FrameFormat& b) const { return !(*this == b); }
+	bool FrameFormat::operator!=(const FrameFormat& b) const
+	{
+		return !(*this == b);
+	}
 
 
-	int FrameFormat::GetSampleRate() const { return mSampleRate; }
+	int FrameFormat::GetSampleRate() const
+	{
+		return mSampleRate;
+	}
 
 
-	int FrameFormat::GetSampleFormat() const { return mSampleFormat; }
+	int FrameFormat::GetSampleFormat() const
+	{
+		return mSampleFormat;
+	}
 
 
-	const AVChannelLayout* FrameFormat::GetChannels() const { return &mChannels; }
+	const AVChannelLayout* FrameFormat::GetChannels() const
+	{
+		return &mChannels;
+	}
 } // namespace Strawberry::Codec::Audio

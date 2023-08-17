@@ -85,7 +85,10 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const { return {mStreamInfo.Stream->time_base.num, mStreamInfo.Stream->time_base.den}; }
+	Core::Math::Rational<int64_t> MediaStream::GetTimeBase() const
+	{
+		return {mStreamInfo.Stream->time_base.num, mStreamInfo.Stream->time_base.den};
+	}
 
 
 	std::chrono::duration<double> MediaStream::GetDuration() const
