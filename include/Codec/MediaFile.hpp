@@ -12,11 +12,11 @@
 #include <string>
 
 
-extern "C" {
+extern "C"
+{
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
-
 
 namespace Strawberry::Codec
 {
