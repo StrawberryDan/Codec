@@ -84,7 +84,7 @@ namespace Strawberry::Codec::Audio
 	{
 		while (true)
 		{
-			Core::Option<Frame> result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
+			Core::Optional<Frame> result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result) return result.Unwrap();
 
 			result = mResampler.ReadFrame();
@@ -95,7 +95,7 @@ namespace Strawberry::Codec::Audio
 			}
 
 			auto frameBuffer = mFrameBuffer.Lock();
-			result           = frameBuffer->empty() ? Core::NullOpt : Core::Option(std::move(frameBuffer->front()));
+			result           = frameBuffer->empty() ? Core::NullOpt : Core::Optional(std::move(frameBuffer->front()));
 			if (result)
 			{
 				Core::Assert(result.Value()->sample_rate > 0);

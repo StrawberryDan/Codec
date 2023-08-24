@@ -42,8 +42,7 @@ namespace Strawberry::Codec::Audio
 		mInputFrames.emplace(std::move(frame));
 	}
 
-
-	Core::Option<Frame> Resampler::ReadFrame()
+	Core::Optional<Frame> Resampler::ReadFrame()
 	{
 		if (!IsOutputAvailable()) return Core::NullOpt;
 

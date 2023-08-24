@@ -5,7 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Frame.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <cstddef>
 #include <queue>
 
@@ -38,14 +38,14 @@ namespace Strawberry::Codec::Audio
 		/// @param frame The input frame
 		void          SendFrame(Frame frame);
 
-		Core::Option<Frame> ReadFrame(Mode mode);
+		Core::Optional<Frame> ReadFrame(Mode mode);
 
 		[[nodiscard]] bool IsOutputAvailable(Mode mode) const;
 
 
 	private:
 		size_t              mOutputFrameSize;
-		Core::Option<Frame> mWorkingFrame;
+		Core::Optional<Frame> mWorkingFrame;
 		std::queue<Frame>   mInputFrames;
 	};
 } // namespace Strawberry::Codec::Audio

@@ -5,7 +5,7 @@
 #include "Codec/Audio/Resampler.hpp"
 #include "MediaStream.hpp"
 #include "Packet.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <Strawberry/Core/IO/Error.hpp>
 #include <map>
 #include <memory>
@@ -26,7 +26,7 @@ namespace Strawberry::Codec
 
 
 	public:
-		static Core::Option<MediaFile> Open(const std::string& path);
+		static Core::Optional<MediaFile> Open(const std::string& path);
 
 
 		MediaFile(const MediaFile& other)            = delete;
@@ -36,11 +36,11 @@ namespace Strawberry::Codec
 		~MediaFile();
 
 
-		Core::Option<MediaStreamInfo> GetStreamInfo(size_t index);
-		Core::Option<MediaStream*>    GetStream(size_t index);
+		Core::Optional<MediaStreamInfo> GetStreamInfo(size_t index);
+		Core::Optional<MediaStream*>    GetStream(size_t index);
 
 
-		Core::Option<MediaStream*> GetBestStream(MediaType type);
+		Core::Optional<MediaStream*> GetBestStream(MediaType type);
 
 
 	protected:

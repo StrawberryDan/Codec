@@ -5,7 +5,7 @@
 #include "Codec/Audio/FrameResizer.hpp"
 #include "Codec/Audio/Resampler.hpp"
 #include "Codec/Packet.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -42,8 +42,8 @@ namespace Strawberry::Codec::Audio
 	private:
 		AVCodecContext*            mContext;
 		AVCodecParameters*         mParameters;
-		Core::Option<Resampler>    mFrameResampler;
-		Core::Option<FrameResizer> mFrameResizer;
+		Core::Optional<Resampler>    mFrameResampler;
+		Core::Optional<FrameResizer> mFrameResizer;
 		std::deque<Frame>          mFrameBuffer;
 	};
 } // namespace Strawberry::Codec::Audio

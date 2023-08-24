@@ -19,8 +19,7 @@ namespace Strawberry::Codec::Audio
 		mInputFrames.emplace(std::move(frame));
 	}
 
-
-	Core::Option<Frame> FrameResizer::ReadFrame(FrameResizer::Mode mode)
+	Core::Optional<Frame> FrameResizer::ReadFrame(FrameResizer::Mode mode)
 	{
 		while (true)
 		{

@@ -8,7 +8,7 @@
 #include "Codec/Audio/Resampler.hpp"
 // Core
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include "Strawberry/Core/Util/Variant.hpp"
 // Standard Library
 #include <any>
@@ -67,10 +67,10 @@ namespace Strawberry::Codec::Audio
 		~Playlist();
 
 
-		Core::Option<Frame> ReadFrame();
+		Core::Optional<Frame> ReadFrame();
 
 
-		[[nodiscard]] Core::Option<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
+		[[nodiscard]] Core::Optional<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
 
 
 		void RemoveTrack(size_t index);
@@ -120,13 +120,13 @@ namespace Strawberry::Codec::Audio
 
 		std::uint64_t            mCurrentPosition = 0;
 		std::deque<Track>        mPreviousTracks;
-		Core::Option<Track>      mCurrentTrack;
+		Core::Optional<Track>    mCurrentTrack;
 		Core::Mutex<FrameBuffer> mCurrentTrackFrames;
 		std::deque<Track>        mNextTracks;
 
 
 		std::atomic<bool>         mShouldRead = false;
-		Core::Option<std::thread> mReadingThread;
+		Core::Optional<std::thread> mReadingThread;
 
 
 		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;

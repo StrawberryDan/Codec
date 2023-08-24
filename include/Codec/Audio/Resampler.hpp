@@ -3,7 +3,7 @@
 
 #include "Frame.hpp"
 #include "FrameFormat.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <queue>
 
 
@@ -30,7 +30,7 @@ namespace Strawberry::Codec::Audio
 
 
 		void                SendFrame(Frame frame);
-		Core::Option<Frame> ReadFrame();
+		Core::Optional<Frame> ReadFrame();
 		[[nodiscard]] bool  IsOutputAvailable() const;
 
 

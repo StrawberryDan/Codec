@@ -1,8 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Option.hpp"
-
+#include "Strawberry/Core/Util/Optional.hpp"
 
 namespace Strawberry::Codec
 {
@@ -59,19 +58,19 @@ namespace Strawberry::Codec
 
 
 	struct CodecParameters {
-		Core::Option<int64_t> bitrate;
+		Core::Optional<int64_t> bitrate;
 	};
 
 
 	struct AudioCodecParameters : public CodecParameters {
-		Core::Option<int>          sampleRate;
-		Core::Option<SampleFormat> sampleFormat;
+		Core::Optional<int>          sampleRate;
+		Core::Optional<SampleFormat> sampleFormat;
 	};
 
 
 	struct VideoCodecParameters : public CodecParameters {
-		Core::Option<int>         width;
-		Core::Option<int>         height;
-		Core::Option<PixelFormat> pixelFormat;
+		Core::Optional<int>         width;
+		Core::Optional<int>         height;
+		Core::Optional<PixelFormat> pixelFormat;
 	};
 } // namespace Strawberry::Codec

@@ -12,7 +12,7 @@ extern "C" {
 
 namespace Strawberry::Codec
 {
-	Core::Option<Packet> MediaStream::Read()
+	Core::Optional<Packet> MediaStream::Read()
 	{
 		if (mPacketBuffer.Empty() && !mIsEOF)
 		{
@@ -60,24 +60,21 @@ namespace Strawberry::Codec
 		return mPacketBuffer.Pop();
 	}
 
-
-	Core::Option<std::string> MediaStream::GetTitle() const
+	Core::Optional<std::string> MediaStream::GetTitle() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "title", nullptr, 0);
 		if (entry) { return std::string(entry->value); }
 		else { return Core::NullOpt; }
 	}
 
-
-	Core::Option<std::string> MediaStream::GetAlbum() const
+	Core::Optional<std::string> MediaStream::GetAlbum() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "album", nullptr, 0);
 		if (entry) { return std::string(entry->value); }
 		else { return Core::NullOpt; }
 	}
 
-
-	Core::Option<std::string> MediaStream::GetArtist() const
+	Core::Optional<std::string> MediaStream::GetArtist() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "artist", nullptr, 0);
 		if (entry) { return std::string(entry->value); }
@@ -99,10 +96,9 @@ namespace Strawberry::Codec
 		return std::chrono::duration<double>(timeBase.Evaluate());
 	}
 
-
-	Core::Option<size_t> MediaStream::GetFrameCount() const
+	Core::Optional<size_t> MediaStream::GetFrameCount() const
 	{
-		return mStreamInfo.Stream->nb_frames == 0 ? Core::NullOpt : Core::Option<size_t>(mStreamInfo.Stream->nb_frames);
+		return mStreamInfo.Stream->nb_frames == 0 ? Core::NullOpt : Core::Optional<size_t>(mStreamInfo.Stream->nb_frames);
 	}
 
 

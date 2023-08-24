@@ -16,7 +16,7 @@ using Strawberry::Core::Take;
 
 namespace Strawberry::Codec
 {
-	Core::Option<MediaFile> MediaFile::Open(const std::string& path)
+	Core::Optional<MediaFile> MediaFile::Open(const std::string& path)
 	{
 		MediaFile file;
 
@@ -52,8 +52,7 @@ namespace Strawberry::Codec
 		if (mFile) { avformat_close_input(&mFile); }
 	}
 
-
-	Core::Option<MediaStreamInfo> MediaFile::GetStreamInfo(size_t index)
+	Core::Optional<MediaStreamInfo> MediaFile::GetStreamInfo(size_t index)
 	{
 		if (index >= mFile->nb_streams) return Core::NullOpt;
 
@@ -82,8 +81,7 @@ namespace Strawberry::Codec
 		return info;
 	}
 
-
-	Core::Option<MediaStream*> MediaFile::GetStream(size_t index)
+	Core::Optional<MediaStream*> MediaFile::GetStream(size_t index)
 	{
 		if (index >= mFile->nb_streams) return Core::NullOpt;
 
@@ -96,10 +94,9 @@ namespace Strawberry::Codec
 		return &mOpenStreams.at(index);
 	}
 
-
-	Core::Option<MediaStream*> MediaFile::GetBestStream(MediaType type)
+	Core::Optional<MediaStream*> MediaFile::GetBestStream(MediaType type)
 	{
-		Core::Option<AVMediaType> streamTypeImpl;
+		Core::Optional<AVMediaType> streamTypeImpl;
 		switch (type)
 		{
 			case MediaType::Audio:

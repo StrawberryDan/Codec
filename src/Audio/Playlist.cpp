@@ -24,10 +24,9 @@ namespace Strawberry::Codec::Audio
 		StopLoading(true);
 	}
 
-
-	Core::Option<Frame> Playlist::ReadFrame()
+	Core::Optional<Frame> Playlist::ReadFrame()
 	{
-		Core::Option<Frame> result;
+		Core::Optional<Frame> result;
 
 
 		while (true)
@@ -83,8 +82,7 @@ namespace Strawberry::Codec::Audio
 		}
 	}
 
-
-	Core::Option<size_t> Playlist::EnqueueFile(const std::string& path, const std::any& associatedData)
+	Core::Optional<size_t> Playlist::EnqueueFile(const std::string& path, const std::any& associatedData)
 	{
 		Track track;
 
