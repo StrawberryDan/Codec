@@ -26,6 +26,7 @@ namespace Strawberry::Codec::Audio
 		, mContext(swr_alloc())
 	{
 		Core::Assert(mContext != nullptr);
+		Core::Assert(mOutputFormat.GetSampleRate() > 0);
 	}
 
 
