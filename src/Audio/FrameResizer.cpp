@@ -74,6 +74,8 @@ namespace Strawberry::Codec::Audio
 				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > mOutputFrameSize) || !mInputFrames.empty();
 			case Mode::YieldAvailable:
 				return (mWorkingFrame.HasValue() && mWorkingFrame->GetNumSamples() > 0) || !mInputFrames.empty();
+			default:
+				Core::Unreachable();
 		}
 	}
 } // namespace Strawberry::Codec::Audio
