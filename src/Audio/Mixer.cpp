@@ -6,6 +6,8 @@
 #include "Codec/Audio/Mixer.hpp"
 // Lib Format
 #include "fmt/format.h"
+// Standard Library
+#include <algorithm>
 
 
 namespace Strawberry::Codec::Audio

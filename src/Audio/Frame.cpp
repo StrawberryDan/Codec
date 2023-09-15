@@ -1,8 +1,11 @@
 #include "Codec/Audio/Frame.hpp"
 
 
+// Strawberry Core
 #include "Strawberry/Core/Math/Rational.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
+// Standard Library
+#include <algorithm>
 
 
 extern "C" {
