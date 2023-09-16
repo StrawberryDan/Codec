@@ -70,7 +70,7 @@ endif ()
 
 target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
-target_link_directories(StrawberryCodec PUBLIC FFMPEG)
+target_link_directories(StrawberryCodec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 add_executable(StrawberryCodecTest test/Main.cpp)
