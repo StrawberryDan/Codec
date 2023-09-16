@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 23)
 find_package(PkgConfig REQUIRED)
 
 
-set(ENV{PKG_CONFIG_PATH} ${CMAKE_CURRENT_BINARY_DIR}/Vendor/FFMPEG/install/lib/pkgconfig)
 pkg_check_modules(FFMPEG REQUIRED
 		libavcodec
 		libavdevice
