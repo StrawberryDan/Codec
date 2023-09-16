@@ -1,22 +1,25 @@
 #pragma once
 
 
+// This Project
 #include "Codec/Audio/Decoder.hpp"
 #include "Codec/Audio/Resampler.hpp"
-#include "MediaStream.hpp"
-#include "Packet.hpp"
+#include "Codec/MediaStream.hpp"
+#include "Codec/Packet.hpp"
+// Strawberry Core
 #include "Strawberry/Core/Util/Optional.hpp"
-#include <Strawberry/Core/IO/Error.hpp>
-#include <map>
-#include <memory>
-#include <string>
-
-
+#include "Strawberry/Core/IO/Error.hpp"
+// FFMPEG
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
+// Standard Library
+#include <map>
+#include <filesystem>
+#include <memory>
+#include <string>
 
 namespace Strawberry::Codec
 {
@@ -26,7 +29,7 @@ namespace Strawberry::Codec
 
 
 	public:
-		static Core::Optional<MediaFile> Open(const std::string& path);
+		static Core::Optional<MediaFile> Open(const std::filesystem::path& path);
 
 
 		MediaFile(const MediaFile& other)            = delete;

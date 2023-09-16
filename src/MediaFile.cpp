@@ -16,11 +16,12 @@ using Strawberry::Core::Take;
 
 namespace Strawberry::Codec
 {
-	Core::Optional<MediaFile> MediaFile::Open(const std::string& path)
+	Core::Optional<MediaFile> MediaFile::Open(const std::filesystem::path& path)
 	{
-		MediaFile file;
+		if (!std::filesystem::exists(path)) return Core::NullOpt;
 
-		auto result = avformat_open_input(&file.mFile, path.c_str(), nullptr, nullptr);
+		MediaFile file;
+		auto result = avformat_open_input(&file.mFile, path.string().c_str(), nullptr, nullptr);
 		if (result != 0) return Core::NullOpt;
 
 		result = avformat_find_stream_info(file.mFile, nullptr);
