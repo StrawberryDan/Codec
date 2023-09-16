@@ -16,6 +16,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include <filesystem>
 
 
 //======================================================================================================================
@@ -70,7 +71,7 @@ namespace Strawberry::Codec::Audio
 		Core::Optional<Frame> ReadFrame();
 
 
-		[[nodiscard]] Core::Optional<size_t> EnqueueFile(const std::string& path, const std::any& associatedData = {});
+		[[nodiscard]] Core::Optional<size_t> EnqueueFile(const std::filesystem::path& path, const std::any& associatedData = {});
 
 
 		void RemoveTrack(size_t index);

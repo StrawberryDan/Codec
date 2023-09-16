@@ -82,7 +82,7 @@ namespace Strawberry::Codec::Audio
 		}
 	}
 
-	Core::Optional<size_t> Playlist::EnqueueFile(const std::string& path, const std::any& associatedData)
+	Core::Optional<size_t> Playlist::EnqueueFile(const std::filesystem::path& path, const std::any& associatedData)
 	{
 		Track track;
 
