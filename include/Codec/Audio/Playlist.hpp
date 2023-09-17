@@ -13,52 +13,44 @@
 // Standard Library
 #include <any>
 #include <deque>
+#include <filesystem>
 #include <functional>
 #include <thread>
 #include <vector>
-#include <filesystem>
-
 
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
-namespace Strawberry::Codec::Audio
+namespace Strawberry::Codec::Audio::Playlist
 {
-	class Playlist
+	struct SongBeganEvent {
+		/// The index of the new currently playing song
+		size_t   index;
+		/// The difference in playlist index.
+		int      offset;
+		/// The data associated with the new song
+		std::any associatedData;
+	};
+
+	struct SongAddedEvent {
+		/// The index where the song was inserted.
+		size_t   index;
+		/// The data associated with the new song
+		std::any associatedData;
+	};
+
+	struct SongRemovedEvent {
+		/// The index where the song was inserted.
+		size_t index;
+	};
+
+	struct PlaybackEndedEvent {};
+
+	using EventBroadcaster = Core::IO::ChannelBroadcaster<SongBeganEvent, SongAddedEvent, SongRemovedEvent, PlaybackEndedEvent>;
+	using EventReceiver    = Core::IO::ChannelReceiver<SongBeganEvent, SongAddedEvent, SongRemovedEvent, PlaybackEndedEvent>;
+
+	class Playlist : public EventBroadcaster
 	{
-	public:
-		struct SongBeganEvent {
-			/// The index of the new currently playing song
-			size_t   index;
-			/// The difference in playlist index.
-			int      offset;
-			/// The data associated with the new song
-			std::any associatedData;
-		};
-
-
-		struct SongAddedEvent {
-			/// The index where the song was inserted.
-			size_t   index;
-			/// The data associated with the new song
-			std::any associatedData;
-		};
-
-
-		struct SongRemovedEvent {
-			/// The index where the song was inserted.
-			size_t index;
-		};
-
-
-		struct PlaybackEndedEvent {};
-
-
-		using Event         = Core::Variant<SongBeganEvent, SongAddedEvent, SongRemovedEvent, PlaybackEndedEvent>;
-
-		using EventReceiver = std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>>;
-
-
 	public:
 		Playlist(const Audio::FrameFormat& format, size_t sampleCount);
 		Playlist(const Playlist& rhs)            = delete;
@@ -75,9 +67,6 @@ namespace Strawberry::Codec::Audio
 
 
 		void RemoveTrack(size_t index);
-
-
-		EventReceiver CreateEventReceiver();
 
 
 		[[nodiscard]] size_t                    GetCurrentTrackIndex() const;
@@ -112,7 +101,6 @@ namespace Strawberry::Codec::Audio
 			std::any    associatedData;
 		};
 
-
 		const Audio::FrameFormat mFormat;
 		const size_t             mFrameSize;
 
@@ -126,14 +114,10 @@ namespace Strawberry::Codec::Audio
 		std::deque<Track>        mNextTracks;
 
 
-		std::atomic<bool>         mShouldRead = false;
+		std::atomic<bool>           mShouldRead = false;
 		Core::Optional<std::thread> mReadingThread;
-
-
-		Core::IO::ChannelBroadcaster<Playlist::Event> mEventBroadcaster;
-		bool                                          mHasSentPlaybackEnded = false;
+		bool                        mHasSentPlaybackEnded = false;
 	};
-
 
 	template <typename T>
 	T Playlist::GetTrackAssociatedData(size_t index) const
@@ -143,7 +127,6 @@ namespace Strawberry::Codec::Audio
 		else if (index > mPreviousTracks.size()) { return std::any_cast<T>(mNextTracks[index - mPreviousTracks.size()].associatedData); }
 		else { Core::Unreachable(); }
 	}
-
 
 	template <typename T>
 	void Playlist::SetTrackAssociatedData(size_t index, T value)
@@ -158,4 +141,4 @@ namespace Strawberry::Codec::Audio
 		}
 		else { Core::Unreachable(); }
 	}
-} // namespace Strawberry::Codec::Audio
+} // namespace Strawberry::Codec::Audio::Playlist

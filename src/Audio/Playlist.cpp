@@ -8,8 +8,7 @@
 // Standard Library
 #include <vector>
 
-
-namespace Strawberry::Codec::Audio
+namespace Strawberry::Codec::Audio::Playlist
 {
 	Playlist::Playlist(const Audio::FrameFormat& format, size_t sampleCount)
 		: mFormat(format)
@@ -17,7 +16,6 @@ namespace Strawberry::Codec::Audio
 		, mResampler(format)
 		, mFrameResizer(sampleCount)
 	{}
-
 
 	Playlist::~Playlist()
 	{
@@ -74,7 +72,7 @@ namespace Strawberry::Codec::Audio
 			if (!mHasSentPlaybackEnded)
 			{
 				mHasSentPlaybackEnded = true;
-				mEventBroadcaster.Broadcast(PlaybackEndedEvent{});
+				Broadcast(PlaybackEndedEvent{});
 			}
 
 
@@ -124,15 +122,14 @@ namespace Strawberry::Codec::Audio
 
 
 		mNextTracks.push_back(track);
-		SongAddedEvent songAddedEvent{
+
+		Broadcast(SongAddedEvent{
 			.index          = Length() - 1,
 			.associatedData = associatedData,
-		};
-		mEventBroadcaster.Broadcast(songAddedEvent);
+		});
 
 		return Length() - 1;
 	}
-
 
 	void Playlist::RemoveTrack(size_t index)
 	{
@@ -151,44 +148,32 @@ namespace Strawberry::Codec::Audio
 			mNextTracks.erase(mNextTracks.begin() + static_cast<long>(index) - static_cast<long>(mPreviousTracks.size()) - (mCurrentTrack.HasValue() ? 1 : 0));
 		}
 
-		SongRemovedEvent event{
+		Broadcast(SongRemovedEvent{
 			.index = index,
-		};
-		mEventBroadcaster.Broadcast(event);
+		});
 
-		if (Length() == 0) { mEventBroadcaster.Broadcast(PlaybackEndedEvent{}); }
+		if (Length() == 0) { Broadcast(PlaybackEndedEvent{}); }
 	}
-
-
-	std::shared_ptr<Core::IO::ChannelReceiver<Playlist::Event>> Playlist::CreateEventReceiver()
-	{
-		return mEventBroadcaster.CreateReceiver();
-	}
-
 
 	size_t Playlist::GetCurrentTrackIndex() const
 	{
 		return mPreviousTracks.size();
 	}
 
-
 	size_t Playlist::Length() const
 	{
 		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
 	}
-
 
 	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const
 	{
 		return mFormat;
 	}
 
-
 	size_t Playlist::GetFrameSize() const
 	{
 		return mFrameSize;
 	}
-
 
 	void Playlist::GotoPrevTrack()
 	{
@@ -200,7 +185,7 @@ namespace Strawberry::Codec::Audio
 			mCurrentTrack = mPreviousTracks[0];
 			mPreviousTracks.pop_front();
 
-			mEventBroadcaster.Broadcast(SongBeganEvent{
+			Broadcast(SongBeganEvent{
 				.index          = mPreviousTracks.size(),
 				.offset         = -1,
 				.associatedData = mCurrentTrack->associatedData,
@@ -209,7 +194,6 @@ namespace Strawberry::Codec::Audio
 
 		mCurrentPosition = 0;
 	}
-
 
 	void Playlist::GotoNextTrack()
 	{
@@ -223,14 +207,13 @@ namespace Strawberry::Codec::Audio
 			mNextTracks.pop_front();
 			mCurrentPosition = 0;
 
-			mEventBroadcaster.Broadcast(SongBeganEvent{
+			Broadcast(SongBeganEvent{
 				.index          = mPreviousTracks.size(),
 				.offset         = 1,
 				.associatedData = mCurrentTrack->associatedData,
 			});
 		}
 	}
-
 
 	void Playlist::StartLoading(const Playlist::TrackLoader& loader)
 	{
@@ -242,7 +225,6 @@ namespace Strawberry::Codec::Audio
 		mShouldRead = true;
 		mReadingThread.Emplace([this, loader]() { loader(mCurrentTrackFrames); });
 	}
-
 
 	void Playlist::StopLoading(bool clearFrames)
 	{
