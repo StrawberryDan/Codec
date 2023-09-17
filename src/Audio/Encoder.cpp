@@ -43,12 +43,22 @@ namespace Strawberry::Codec::Audio
 		mFrameResizer.Emplace(mContext->frame_size);
 	}
 
+	Encoder::Encoder(Encoder&& rhs)
+		: mContext(std::exchange(rhs.mContext, nullptr))
+		, mParameters(std::exchange(rhs.mParameters, nullptr))
+		, mFrameResampler(std::move(rhs.mFrameResampler))
+		, mFrameResizer(std::move(rhs.mFrameResizer))
+		, mFrameBuffer(std::move(rhs.mFrameBuffer))
+	{}
 
 	Encoder::~Encoder()
 	{
-		avcodec_parameters_free(&mParameters);
-		avcodec_close(mContext);
-		avcodec_free_context(&mContext);
+		if (mContext && mParameters)
+		{
+			avcodec_parameters_free(&mParameters);
+			avcodec_close(mContext);
+			avcodec_free_context(&mContext);
+		}
 	}
 
 
@@ -115,7 +125,6 @@ namespace Strawberry::Codec::Audio
 
 		return packets;
 	}
-
 
 	AVCodecParameters* Encoder::Parameters() const
 	{

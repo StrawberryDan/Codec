@@ -9,13 +9,13 @@
 #include <cstdint>
 #include <vector>
 
-
 namespace Strawberry::Codec::Audio
 {
 	class Encoder
 	{
 	public:
 		Encoder(AVCodecID codecID, AVChannelLayout channelLayout);
+		Encoder(Encoder&& rhs);
 		~Encoder();
 
 
@@ -23,27 +23,22 @@ namespace Strawberry::Codec::Audio
 		std::vector<Packet> Receive();
 		std::vector<Packet> Flush();
 
-
 		inline AVCodecContext* operator*() { return mContext; }
-
 
 		inline const AVCodecContext* operator*() const { return mContext; }
 
-
 		inline AVCodecContext* operator->() { return mContext; }
 
-
 		inline const AVCodecContext* operator->() const { return mContext; }
-
 
 		[[nodiscard]] AVCodecParameters* Parameters() const;
 
 
 	private:
-		AVCodecContext*            mContext;
-		AVCodecParameters*         mParameters;
+		AVCodecContext*              mContext;
+		AVCodecParameters*           mParameters;
 		Core::Optional<Resampler>    mFrameResampler;
 		Core::Optional<FrameResizer> mFrameResizer;
-		std::deque<Frame>          mFrameBuffer;
+		std::deque<Frame>            mFrameBuffer;
 	};
 } // namespace Strawberry::Codec::Audio
