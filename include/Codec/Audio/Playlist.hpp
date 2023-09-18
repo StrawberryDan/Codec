@@ -63,7 +63,7 @@ namespace Strawberry::Codec::Audio::Playlist
 		Core::Optional<Frame> ReadFrame();
 
 
-		[[nodiscard]] Core::Optional<size_t> EnqueueFile(const std::filesystem::path& path, const std::any& associatedData = {});
+		[[nodiscard]] Core::Optional<size_t> EnqueueFile(const std::filesystem::path& path, const std::any& associatedData = {}, bool repeat = false);
 
 
 		void RemoveTrack(size_t index);
@@ -79,6 +79,9 @@ namespace Strawberry::Codec::Audio::Playlist
 		[[nodiscard]] T GetTrackAssociatedData(size_t index) const;
 		template <typename T>
 		void SetTrackAssociatedData(size_t index, T value);
+
+		bool GetTrackRepeating(size_t index) const;
+		void SetTrackRepeating(size_t index, bool repeating);
 
 
 		void GotoPrevTrack();
@@ -99,6 +102,7 @@ namespace Strawberry::Codec::Audio::Playlist
 		struct Track {
 			TrackLoader loader;
 			std::any    associatedData;
+			bool        repeat;
 		};
 
 		const Audio::FrameFormat mFormat;

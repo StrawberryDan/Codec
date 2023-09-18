@@ -62,9 +62,14 @@ namespace Strawberry::Codec::Audio::Playlist
 			}
 
 
-			if (!mNextTracks.empty())
+			if (!mNextTracks.empty() && (!mCurrentTrack || !mCurrentTrack->repeat))
 			{
 				GotoNextTrack();
+				continue;
+			}
+			else if (mCurrentTrack && mCurrentTrack->repeat)
+			{
+				mCurrentPosition = 0;
 				continue;
 			}
 
@@ -80,7 +85,7 @@ namespace Strawberry::Codec::Audio::Playlist
 		}
 	}
 
-	Core::Optional<size_t> Playlist::EnqueueFile(const std::filesystem::path& path, const std::any& associatedData)
+	Core::Optional<size_t> Playlist::EnqueueFile(const std::filesystem::path& path, const std::any& associatedData, bool repeat)
 	{
 		Track track;
 
@@ -119,6 +124,7 @@ namespace Strawberry::Codec::Audio::Playlist
 
 
 		track.associatedData = associatedData;
+		track.repeat         = repeat;
 
 
 		mNextTracks.push_back(track);
@@ -238,4 +244,43 @@ namespace Strawberry::Codec::Audio::Playlist
 
 		if (clearFrames) mCurrentTrackFrames.Lock()->clear();
 	}
-} // namespace Strawberry::Codec::Audio
+
+	bool Playlist::GetTrackRepeating(size_t index) const
+	{
+		if (index < mPreviousTracks.size()) { return mPreviousTracks[index].repeat; }
+
+		index -= mPreviousTracks.size();
+		if (index == 0) { return mCurrentTrack->repeat; }
+
+		index -= 1;
+		if (index < mNextTracks.size()) { return mNextTracks[index].repeat; }
+
+		Core::Unreachable();
+	}
+
+	void Playlist::SetTrackRepeating(size_t index, bool repeating)
+	{
+		if (index < mPreviousTracks.size())
+		{
+			mPreviousTracks[index].repeat = repeating;
+			return;
+		}
+
+		index -= mPreviousTracks.size();
+		if (index == 0)
+		{
+			mCurrentTrack->repeat = repeating;
+			return;
+		}
+
+		index -= 1;
+		if (index < mNextTracks.size())
+		{
+			mNextTracks[index].repeat = repeating;
+			return;
+		}
+
+		Core::Unreachable();
+	}
+
+} // namespace Strawberry::Codec::Audio::Playlist
