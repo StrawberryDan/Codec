@@ -28,6 +28,8 @@ namespace Strawberry::Codec::Audio::Playlist
 		size_t   index;
 		/// The difference in playlist index.
 		int      offset;
+		/// Whether the track is repeating
+		bool     repeating;
 		/// The data associated with the new song
 		std::any associatedData;
 	};

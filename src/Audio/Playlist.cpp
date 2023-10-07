@@ -194,6 +194,7 @@ namespace Strawberry::Codec::Audio::Playlist
 			Broadcast(SongBeganEvent{
 				.index          = mPreviousTracks.size(),
 				.offset         = -1,
+				.repeating      = mCurrentTrack->repeat,
 				.associatedData = mCurrentTrack->associatedData,
 			});
 		}
