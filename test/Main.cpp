@@ -2,7 +2,7 @@
 #include "Codec/Audio/Mixer.hpp"
 #include "Codec/MediaFile.hpp"
 #include "Codec/Muxer.hpp"
-#include <Strawberry/Core/Util/ScopedTimer.hpp>
+#include <Strawberry/Core/Timing/ScopedTimer.hpp>
 #include <iostream>
 
 

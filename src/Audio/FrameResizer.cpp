@@ -2,7 +2,7 @@
 #include <fmt/format.h>
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 
 
 namespace Strawberry::Codec::Audio

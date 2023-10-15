@@ -5,9 +5,9 @@
 
 #include "Codec/Audio/Resampler.hpp"
 // Core
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Logging.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 extern "C" {

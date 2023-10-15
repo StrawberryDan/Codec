@@ -1,8 +1,8 @@
 #include "Codec/Muxer.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 namespace Strawberry::Codec

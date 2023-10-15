@@ -2,7 +2,7 @@
 
 
 #include "Codec/Packet.hpp"
-#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 
 
 extern "C" {

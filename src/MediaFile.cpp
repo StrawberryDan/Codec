@@ -5,8 +5,8 @@
 #include "Codec/MediaFile.hpp"
 // Core
 #include "Strawberry/Core/IO/Error.hpp"
-#include "Strawberry/Core/Util/Markers.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Markers.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 using Strawberry::Core::Assert;

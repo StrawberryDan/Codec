@@ -1,7 +1,7 @@
 #include "Codec/SodiumEncrypter.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 
 
 namespace Strawberry::Codec
