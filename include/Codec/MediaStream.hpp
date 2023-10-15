@@ -10,7 +10,7 @@
 // Core
 #include "Strawberry/Core/Collection/CircularBuffer.hpp"
 #include "Strawberry/Core/Math/Rational.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <chrono>
 

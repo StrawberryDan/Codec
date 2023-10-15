@@ -8,8 +8,8 @@
 #include "Codec/Audio/Resampler.hpp"
 // Core
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
-#include "Strawberry/Core/Util/Variant.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 // Standard Library
 #include <any>
 #include <deque>

@@ -10,7 +10,7 @@
 #include "FrameResizer.hpp"
 // Strawberry Libraries
 #include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <deque>
 #include <list>

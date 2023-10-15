@@ -7,7 +7,7 @@
 #include "Codec/MediaStream.hpp"
 #include "Codec/Packet.hpp"
 // Strawberry Core
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
 // FFMPEG
 extern "C"

@@ -5,7 +5,7 @@
 #include "Codec/Audio/FrameResizer.hpp"
 #include "Codec/Audio/Resampler.hpp"
 #include "Codec/Packet.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 #include <cstdint>
 #include <vector>
 

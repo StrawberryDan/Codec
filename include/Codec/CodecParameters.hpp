@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 
 namespace Strawberry::Codec
 {
