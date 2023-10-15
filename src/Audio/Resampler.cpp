@@ -16,7 +16,6 @@ extern "C" {
 
 
 using Strawberry::Core::Assert;
-using Strawberry::Core::Take;
 
 
 namespace Strawberry::Codec::Audio

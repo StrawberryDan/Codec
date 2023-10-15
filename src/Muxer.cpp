@@ -25,16 +25,20 @@ namespace Strawberry::Codec
 
 
 	Muxer::Muxer(Muxer&& other) noexcept
-		: mAVFormatContext(Take(other.mAVFormatContext))
-		, mStreams(Take(other.mStreams))
-		, mStage(Replace(other.mStage, Unopened))
+		: mAVFormatContext(std::exchange(other.mAVFormatContext, nullptr))
+		  , mStreams(std::move(other.mStreams))
+		  , mStage(std::exchange(other.mStage, Unopened))
 	{}
 
 
 	Muxer& Muxer::operator=(Muxer&& other) noexcept
 	{
-		mAVFormatContext = Take(other.mAVFormatContext);
-		mStreams         = Take(other.mStreams);
+		if (this != &other)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+
 		return (*this);
 	}
 

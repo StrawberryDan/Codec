@@ -10,8 +10,6 @@
 
 
 using Strawberry::Core::Assert;
-using Strawberry::Core::Replace;
-using Strawberry::Core::Take;
 
 
 namespace Strawberry::Codec
