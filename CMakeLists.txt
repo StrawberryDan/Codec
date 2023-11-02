@@ -29,34 +29,34 @@ endif ()
 
 
 add_library(StrawberryCodec STATIC
-		include/Codec/Audio/Decoder.hpp
-		include/Codec/Audio/Encoder.hpp
-		include/Codec/Audio/Frame.hpp
-		include/Codec/Audio/FrameFormat.hpp
-		include/Codec/Audio/FrameResizer.hpp
-		include/Codec/Audio/Mixer.hpp
-		include/Codec/Audio/Playlist.hpp
-		include/Codec/Audio/Resampler.hpp
-		include/Codec/CodecParameters.hpp
-		include/Codec/Constants.hpp
-		include/Codec/MediaFile.hpp
-		include/Codec/MediaStream.hpp
-		include/Codec/Muxer.hpp
-		include/Codec/Packet.hpp
-		include/Codec/SodiumEncrypter.hpp
-		src/Audio/Decoder.cpp
-		src/Audio/Encoder.cpp
-		src/Audio/Frame.cpp
-		src/Audio/FrameFormat.cpp
-		src/Audio/FrameResizer.cpp
-		src/Audio/Mixer.cpp
-		src/Audio/Playlist.cpp
-		src/Audio/Resampler.cpp
-		src/MediaFile.cpp
-		src/MediaStream.cpp
-		src/Muxer.cpp
-		src/Packet.cpp
-		src/SodiumEncrypter.cpp
+		src/Codec/Audio/Decoder.cpp
+		src/Codec/Audio/Decoder.hpp
+		src/Codec/Audio/Encoder.cpp
+		src/Codec/Audio/Encoder.hpp
+		src/Codec/Audio/Frame.cpp
+		src/Codec/Audio/Frame.hpp
+		src/Codec/Audio/FrameFormat.cpp
+		src/Codec/Audio/FrameFormat.hpp
+		src/Codec/Audio/FrameResizer.cpp
+		src/Codec/Audio/FrameResizer.hpp
+		src/Codec/Audio/Mixer.cpp
+		src/Codec/Audio/Mixer.hpp
+		src/Codec/Audio/Playlist.cpp
+		src/Codec/Audio/Playlist.hpp
+		src/Codec/Audio/Resampler.cpp
+		src/Codec/Audio/Resampler.hpp
+		src/Codec/CodecParameters.hpp
+		src/Codec/Constants.hpp
+		src/Codec/MediaFile.hpp
+		src/Codec/MediaStream.hpp
+		src/Codec/Muxer.hpp
+		src/Codec/Packet.hpp
+		src/Codec/SodiumEncrypter.hpp
+        src/Codec/MediaFile.cpp
+        src/Codec/MediaStream.cpp
+        src/Codec/Muxer.cpp
+        src/Codec/Packet.cpp
+        src/Codec/SodiumEncrypter.cpp
 )
 
 
@@ -68,7 +68,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif ()
 
 
-target_include_directories(StrawberryCodec PUBLIC include ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
+target_include_directories(StrawberryCodec PUBLIC src ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
 target_link_directories(StrawberryCodec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
