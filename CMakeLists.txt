@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 project(StrawberryCodec)
-set(CMAKE_CXX_STANDARD 23)
 find_package(PkgConfig REQUIRED)
 
 
@@ -67,11 +66,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	target_link_libraries(StrawberryCodec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices" "-framework CoreImage" "-framework CoreGraphics" "-framework VideoToolbox" "-framework OpenGL" "-framework Metal" "-framework Foundation" "-framework AppKit")
 endif ()
 
-
+target_link_options(StrawberryCodec PUBLIC "-static")
 target_include_directories(StrawberryCodec PUBLIC src ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
 target_link_directories(StrawberryCodec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set_target_properties(StrawberryCodec PROPERTIES CXX_STANDARD 20)
 
 
 add_executable(StrawberryCodecTest test/Main.cpp)
 target_link_libraries(StrawberryCodecTest PRIVATE StrawberryCodec)
+set_target_properties(StrawberryCodecTest PROPERTIES CXX_STANDARD 20)
