@@ -66,11 +66,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	target_link_libraries(StrawberryCodec PUBLIC "-framework Security" "-framework VideoToolbox" "-framework AudioToolbox" "-framework CoreFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework CoreServices" "-framework CoreImage" "-framework CoreGraphics" "-framework VideoToolbox" "-framework OpenGL" "-framework Metal" "-framework Foundation" "-framework AppKit")
 endif ()
 
-target_link_options(StrawberryCodec PUBLIC "-static")
 target_include_directories(StrawberryCodec PUBLIC src ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
-target_link_directories(StrawberryCodec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set_target_properties(StrawberryCodec PROPERTIES CXX_STANDARD 20)
+
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+	target_link_options(StrawberryCodec PRIVATE "-static")
+endif()
 
 
 add_executable(StrawberryCodecTest test/Main.cpp)
