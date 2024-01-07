@@ -7,7 +7,7 @@
 // Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/IO/Logging.hpp"
-#include "Strawberry/Core/Util/Stubs.hpp"
+#include "Strawberry/Core/Util/Strings.hpp"
 
 
 extern "C" {

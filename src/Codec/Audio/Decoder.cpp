@@ -1,5 +1,5 @@
 #include "Codec/Audio/Decoder.hpp"
-#include "Strawberry/Core/Util/Stubs.hpp"
+#include "Strawberry/Core/Util/Strings.hpp"
 
 
 #include "Strawberry/Core/Assert.hpp"
