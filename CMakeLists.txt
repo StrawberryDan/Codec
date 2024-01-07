@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(StrawberryCodec)
+include(FetchContent)
+
+
+FetchContent_Declare(StrawberryConfig
+		GIT_REPOSITORY "https://github.com/StrawberryDan/Config.git"
+		GIT_TAG "main")
+FetchContent_MakeAvailable(StrawberryConfig)
+include(StrawberryConfig)
+
+
 find_package(PkgConfig REQUIRED)
 
 
