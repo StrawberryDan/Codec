@@ -271,6 +271,67 @@ namespace Strawberry::Codec::Audio
 	}
 
 
+	template<typename T>
+	static void MultiplyTypes(float multiplier, void* data, size_t count)
+	{
+		T* cast = reinterpret_cast<T*>(data);
+		for (int i = 0; i < count; i++)
+		{
+			*(cast + i) = multiplier * cast[i];
+		}
+	}
+
+
+	void Frame::Multiply(float multiplier)
+	{
+		for (int i = 0; i < AV_NUM_DATA_POINTERS; i++)
+		{
+			switch (GetFormat().GetSampleFormat())
+			{
+				case AV_SAMPLE_FMT_U8:
+					MultiplyTypes<uint8_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(uint8_t));
+					break;
+				case AV_SAMPLE_FMT_S16:
+					MultiplyTypes<int16_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int16_t));
+					break;
+				case AV_SAMPLE_FMT_S32:
+					MultiplyTypes<int32_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int32_t));
+					break;
+				case AV_SAMPLE_FMT_FLT:
+					MultiplyTypes<float>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(float));
+					break;
+				case AV_SAMPLE_FMT_DBL:
+					MultiplyTypes<double>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(double));
+					break;
+				case AV_SAMPLE_FMT_U8P:
+					MultiplyTypes<uint8_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(uint8_t));
+					break;
+				case AV_SAMPLE_FMT_S16P:
+					MultiplyTypes<int16_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int16_t));
+					break;
+				case AV_SAMPLE_FMT_S32P:
+					MultiplyTypes<int32_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int32_t));
+					break;
+				case AV_SAMPLE_FMT_FLTP:
+					MultiplyTypes<float>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(float));
+					break;
+				case AV_SAMPLE_FMT_DBLP:
+					MultiplyTypes<double>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(double));
+					break;
+				case AV_SAMPLE_FMT_S64:
+					MultiplyTypes<int64_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int64_t));
+					break;
+				case AV_SAMPLE_FMT_S64P:
+					MultiplyTypes<int64_t>(multiplier, mFrame->data[i], mFrame->linesize[i] / sizeof(int64_t));
+					break;
+				case AV_SAMPLE_FMT_NB:
+				case AV_SAMPLE_FMT_NONE:
+					Core::Unreachable();
+			}
+		}
+	}
+
+
 	Frame::Frame(AVFrame* frame)
 		: mFrame(frame)
 	{}
