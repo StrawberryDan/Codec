@@ -89,14 +89,20 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	int FrameFormat::GetSampleFormat() const
+	AVSampleFormat FrameFormat::GetSampleFormat() const
 	{
-		return mSampleFormat;
+		return static_cast<AVSampleFormat>(mSampleFormat);
 	}
 
 
 	const AVChannelLayout* FrameFormat::GetChannels() const
 	{
 		return &mChannels;
+	}
+
+
+	int FrameFormat::GetSizeInBytes() const
+	{
+		return av_get_bytes_per_sample(static_cast<AVSampleFormat>(mSampleFormat));
 	}
 } // namespace Strawberry::Codec::Audio

@@ -9,6 +9,7 @@
 
 extern "C" {
 #include "libavutil/channel_layout.h"
+#include "libavutil/samplefmt.h"
 }
 
 
@@ -35,8 +36,9 @@ namespace Strawberry::Codec::Audio
 
 
 		[[nodiscard]] int                    GetSampleRate() const;
-		[[nodiscard]] int                    GetSampleFormat() const;
+		[[nodiscard]] AVSampleFormat         GetSampleFormat() const;
 		[[nodiscard]] const AVChannelLayout* GetChannels() const;
+		[[nodiscard]] int                    GetSizeInBytes() const;
 
 
 	private:
