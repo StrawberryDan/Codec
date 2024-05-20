@@ -77,10 +77,9 @@ namespace Strawberry::Codec::Audio::Playlist
 		[[nodiscard]] size_t                    GetFrameSize() const;
 
 
-		template <typename T>
-		[[nodiscard]] T GetTrackAssociatedData(size_t index) const;
-		template <typename T>
-		void SetTrackAssociatedData(size_t index, T value);
+		template <typename T> [[nodiscard]] T GetTrackAssociatedData(size_t index) const;
+		template <typename T> void            SetTrackAssociatedData(size_t index, T value);
+
 
 		bool GetTrackRepeating(size_t index) const;
 		void SetTrackRepeating(size_t index, bool repeating);
