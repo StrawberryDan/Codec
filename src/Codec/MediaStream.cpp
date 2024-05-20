@@ -60,6 +60,7 @@ namespace Strawberry::Codec
 		return mPacketBuffer.Pop();
 	}
 
+
 	Core::Optional<std::string> MediaStream::GetTitle() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "title", nullptr, 0);
@@ -98,7 +99,7 @@ namespace Strawberry::Codec
 
 	Core::Optional<size_t> MediaStream::GetFrameCount() const
 	{
-		return mStreamInfo.Stream->nb_frames == 0 ? Core::NullOpt : Core::Optional<size_t>(mStreamInfo.Stream->nb_frames);
+		return mPacketBuffer.Size();
 	}
 
 
@@ -117,7 +118,7 @@ namespace Strawberry::Codec
 	}
 
 
-	MediaStream::MediaStream(MediaFile* file, size_t index)
+	MediaStream::MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index)
 		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
 		, mMediaFile(file)
 		, mPacketBuffer(256)

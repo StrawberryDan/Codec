@@ -19,6 +19,7 @@ namespace Strawberry::Codec
 		if (!std::filesystem::exists(path)) return Core::NullOpt;
 
 		MediaFile file;
+		file.mPath = path;
 		auto result = avformat_open_input(&file.mFile, path.string().c_str(), nullptr, nullptr);
 		if (result != 0) return Core::NullOpt;
 
@@ -30,7 +31,10 @@ namespace Strawberry::Codec
 
 
 	MediaFile::MediaFile(MediaFile&& other) noexcept
-		: mFile(std::exchange(other.mFile, nullptr))
+		: Core::EnableReflexivePointer<MediaFile>(std::move(other))
+		, mPath(std::exchange(other.mPath, {}))
+		, mFile(std::exchange(other.mFile, nullptr))
+		, mOpenStreams(std::move(other.mOpenStreams))
 	{}
 
 
@@ -80,20 +84,20 @@ namespace Strawberry::Codec
 		return info;
 	}
 
-	Core::Optional<MediaStream*> MediaFile::GetStream(size_t index)
+	Core::ReflexivePointer<MediaStream> MediaFile::GetStream(size_t index)
 	{
-		if (index >= mFile->nb_streams) return Core::NullOpt;
+		if (index >= mFile->nb_streams) return nullptr;
 
 		if (!mOpenStreams.contains(index))
 		{
-			MediaStream stream(this, index);
+			MediaStream stream(GetReflexivePointer(), index);
 			mOpenStreams.emplace(index, std::move(stream));
 		}
 
-		return &mOpenStreams.at(index);
+		return mOpenStreams.at(index).GetReflexivePointer();
 	}
 
-	Core::Optional<MediaStream*> MediaFile::GetBestStream(MediaType type)
+	Core::ReflexivePointer<MediaStream> MediaFile::GetBestStream(MediaType type)
 	{
 		Core::Optional<AVMediaType> streamTypeImpl;
 		switch (type)
@@ -110,18 +114,18 @@ namespace Strawberry::Codec
 			case MediaType::Unknown:
 			default:
 				Core::DebugBreak();
-				return Core::NullOpt;
+				return nullptr;
 		}
 
 		Core::Assert(streamTypeImpl.HasValue());
 		auto index = av_find_best_stream(mFile, *streamTypeImpl, -1, -1, nullptr, 0);
-		return (index >= 0) ? GetStream(index) : Core::NullOpt;
+		return (index >= 0) ? GetStream(index) : nullptr;
 	}
 
 
 	void MediaFile::Seek(size_t stream, size_t pts)
 	{
-		auto result = av_seek_frame(mFile, static_cast<int>(stream), static_cast<int>(pts), 0);
+		auto result = avformat_seek_file(mFile, static_cast<int>(stream), 0, static_cast<int>(pts), static_cast<int>(pts), AVSEEK_FLAG_FRAME);
 		Assert(result >= 0);
 	}
 
@@ -140,5 +144,11 @@ namespace Strawberry::Codec
 				Core::DebugBreak();
 				return Core::IO::Error::Unknown;
 		}
+	}
+
+
+	const std::filesystem::path& MediaFile::GetPath() const
+	{
+		return mPath;
 	}
 } // namespace Strawberry::Codec

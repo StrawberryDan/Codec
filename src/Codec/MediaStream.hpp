@@ -11,6 +11,7 @@
 #include "Strawberry/Core/Collection/CircularBuffer.hpp"
 #include "Strawberry/Core/Math/Rational.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Standard Library
 #include <chrono>
 
@@ -29,6 +30,7 @@ namespace Strawberry::Codec
 
 
 	class MediaStream
+		: public Core::EnableReflexivePointer<MediaStream>
 	{
 		friend class MediaFile;
 
@@ -37,7 +39,7 @@ namespace Strawberry::Codec
 		MediaStream(const MediaStream&)            = delete;
 		MediaStream& operator=(const MediaStream&) = delete;
 		MediaStream(MediaStream&&) noexcept        = default;
-		MediaStream& operator=(MediaStream&&)      = delete;
+		MediaStream& operator=(MediaStream&&)      = default;
 
 
 		[[nodiscard]] Core::Optional<Packet> Read();
@@ -59,12 +61,12 @@ namespace Strawberry::Codec
 
 
 	private:
-		MediaStream(MediaFile* file, size_t index);
+		MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index);
 
 
 	private:
 		MediaStreamInfo                          mStreamInfo;
-		MediaFile*                               mMediaFile = nullptr;
+		Core::ReflexivePointer<MediaFile>        mMediaFile = nullptr;
 		bool                                     mIsEOF     = false;
 		size_t                                   mNextPts   = 0;
 		Core::Collection::CircularBuffer<Packet> mPacketBuffer;

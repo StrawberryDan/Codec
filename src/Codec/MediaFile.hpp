@@ -9,6 +9,7 @@
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // FFMPEG
 extern "C"
 {
@@ -24,6 +25,7 @@ extern "C"
 namespace Strawberry::Codec
 {
 	class MediaFile
+		: public Core::EnableReflexivePointer<MediaFile>
 	{
 		friend class MediaStream;
 
@@ -39,11 +41,14 @@ namespace Strawberry::Codec
 		~MediaFile();
 
 
+		const std::filesystem::path& GetPath() const;
+
+
 		Core::Optional<MediaStreamInfo> GetStreamInfo(size_t index);
-		Core::Optional<MediaStream*>    GetStream(size_t index);
+		Core::ReflexivePointer<MediaStream> GetStream(size_t index);
 
 
-		Core::Optional<MediaStream*> GetBestStream(MediaType type);
+		Core::ReflexivePointer<MediaStream> GetBestStream(MediaType type);
 
 
 	protected:
@@ -56,6 +61,7 @@ namespace Strawberry::Codec
 
 
 	private:
+		std::filesystem::path         mPath;
 		AVFormatContext*              mFile = nullptr;
 		std::map<size_t, MediaStream> mOpenStreams;
 	};
