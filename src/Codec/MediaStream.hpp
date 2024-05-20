@@ -43,12 +43,12 @@ namespace Strawberry::Codec
 		[[nodiscard]] Core::Optional<Packet> Read();
 
 
-		[[nodiscard]] Core::Optional<std::string>     GetTitle() const;
-		[[nodiscard]] Core::Optional<std::string>     GetAlbum() const;
-		[[nodiscard]] Core::Optional<std::string>     GetArtist() const;
+		[[nodiscard]] Core::Optional<std::string>   GetTitle() const;
+		[[nodiscard]] Core::Optional<std::string>   GetAlbum() const;
+		[[nodiscard]] Core::Optional<std::string>   GetArtist() const;
 		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase() const;
 		[[nodiscard]] std::chrono::duration<double> GetDuration() const;
-		[[nodiscard]] Core::Optional<size_t>          GetFrameCount() const;
+		[[nodiscard]] Core::Optional<size_t>        GetFrameCount() const;
 
 
 		[[nodiscard]] const AVCodec*           GetCodec() const;
