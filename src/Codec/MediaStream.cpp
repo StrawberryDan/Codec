@@ -16,7 +16,6 @@ namespace Strawberry::Codec
 	{
 		if (mPacketBuffer.Empty() && !mIsEOF)
 		{
-			mMediaFile->Seek(mStreamInfo.Index, mNextPts);
 			while (!mPacketBuffer.AtCapacity() && !mIsEOF)
 			{
 				auto packet = mMediaFile->Read();
