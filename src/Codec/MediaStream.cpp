@@ -43,8 +43,7 @@ namespace Strawberry::Codec
 
 	void MediaStream::Seek(Core::Seconds time)
 	{
-		Core::Assert(time < GetDuration());
-		int ts = time * static_cast<double>(mStreamInfo.Stream->time_base.num) / static_cast<double>(mStreamInfo.Stream->time_base.den);
+		int ts = time * static_cast<double>(mStreamInfo.Stream->time_base.den) / static_cast<double>(mStreamInfo.Stream->time_base.num);
 		auto result = avformat_seek_file(mMediaFile->mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
 		Core::Assert(result >= 0);
 		result = avformat_flush(mMediaFile->mFile);
