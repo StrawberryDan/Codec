@@ -49,9 +49,10 @@ namespace Strawberry::Codec::Audio::Playlist
 
 
 			auto currentFrames = mCurrentTrackFrames.Lock();
-			if (mCurrentPosition < currentFrames->size())
+			if (!currentFrames->empty())
 			{
-				result = (*currentFrames)[mCurrentPosition++];
+				result = currentFrames->front();
+				currentFrames->pop_front();
 				mResampler.SendFrame(result.Unwrap());
 				continue;
 			}
@@ -69,7 +70,6 @@ namespace Strawberry::Codec::Audio::Playlist
 			}
 			else if (mCurrentTrack && mCurrentTrack->repeat)
 			{
-				mCurrentPosition = 0;
 				continue;
 			}
 
@@ -109,17 +109,22 @@ namespace Strawberry::Codec::Audio::Playlist
 			}
 
 
-			frames.Lock()->reserve(channel->GetFrameCount().UnwrapOr(10 * 1024));
-
-
 			auto decoder = channel->GetDecoder();
-			for (auto packet = channel->Read(); mShouldRead && packet; packet = channel->Read())
+			while (mShouldRead)
 			{
+				while (frames.Lock()->size() > 1024 && mShouldRead)
+				{
+					std::this_thread::yield();
+				}
+
+				auto packet = channel->Read();
+				if (!packet)
+				{
+					std::this_thread::yield();
+				}
 				decoder.Send(packet.Unwrap());
 				for (auto frame : decoder.Receive()) { frames.Lock()->emplace_back(std::move(frame)); }
 			}
-
-			mShouldRead = false;
 		};
 
 
@@ -198,8 +203,6 @@ namespace Strawberry::Codec::Audio::Playlist
 				.associatedData = mCurrentTrack->associatedData,
 			});
 		}
-
-		mCurrentPosition = 0;
 	}
 
 	void Playlist::GotoNextTrack()
@@ -212,7 +215,6 @@ namespace Strawberry::Codec::Audio::Playlist
 
 			mCurrentTrack = mNextTracks.front();
 			mNextTracks.pop_front();
-			mCurrentPosition = 0;
 
 			Broadcast(SongBeganEvent{
 				.index          = mPreviousTracks.size(),

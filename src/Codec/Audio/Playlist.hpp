@@ -10,6 +10,7 @@
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Types/Variant.hpp"
+#include "Strawberry/Core/Timing/Clock.hpp"
 // Standard Library
 #include <any>
 #include <deque>
@@ -90,7 +91,7 @@ namespace Strawberry::Codec::Audio::Playlist
 
 
 	private:
-		using FrameBuffer = std::vector<Frame>;
+		using FrameBuffer = std::deque<Frame>;
 		using TrackLoader = std::function<void(Core::Mutex<FrameBuffer>&)>;
 
 
@@ -112,7 +113,6 @@ namespace Strawberry::Codec::Audio::Playlist
 		Resampler    mResampler;
 		FrameResizer mFrameResizer;
 
-		std::uint64_t            mCurrentPosition = 0;
 		std::deque<Track>        mPreviousTracks;
 		Core::Optional<Track>    mCurrentTrack;
 		Core::Mutex<FrameBuffer> mCurrentTrackFrames;
