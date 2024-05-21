@@ -55,7 +55,7 @@ namespace Strawberry::Codec::Audio::Playlist
 					mResampler.SendFrame(result.Unwrap());
 					continue;
 				}
-				else if (mReadingThread && mReadingActive)
+				else if (mShouldRead && mReadingThread && mReadingActive)
 				{
 					std::this_thread::yield();
 					continue;
