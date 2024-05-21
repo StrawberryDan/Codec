@@ -120,6 +120,7 @@ namespace Strawberry::Codec::Audio::Playlist
 
 
 		std::atomic<bool>           mShouldRead = false;
+		std::atomic<bool>           mReadingActive = false;
 		Core::Optional<std::thread> mReadingThread;
 		bool                        mHasSentPlaybackEnded = false;
 	};

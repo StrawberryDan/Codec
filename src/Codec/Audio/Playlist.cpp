@@ -29,9 +29,7 @@ namespace Strawberry::Codec::Audio::Playlist
 
 		while (true)
 		{
-			if (mReadingThread && !mShouldRead) { StopLoading(false); }
-			else if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack) { StartLoading(mCurrentTrack->loader); }
-
+			if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack) { StartLoading(mCurrentTrack->loader); }
 
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result)
@@ -48,18 +46,20 @@ namespace Strawberry::Codec::Audio::Playlist
 			}
 
 
-			auto currentFrames = mCurrentTrackFrames.Lock();
-			if (!currentFrames->empty())
 			{
-				result = currentFrames->front();
-				currentFrames->pop_front();
-				mResampler.SendFrame(result.Unwrap());
-				continue;
-			}
-			else if (mReadingThread)
-			{
-				std::this_thread::yield();
-				continue;
+				auto currentFrames = mCurrentTrackFrames.Lock();
+				if (!currentFrames->empty())
+				{
+					result = currentFrames->front();
+					currentFrames->pop_front();
+					mResampler.SendFrame(result.Unwrap());
+					continue;
+				}
+				else if (mReadingThread && mReadingActive)
+				{
+					std::this_thread::yield();
+					continue;
+				}
 			}
 
 
@@ -120,8 +120,11 @@ namespace Strawberry::Codec::Audio::Playlist
 				auto packet = channel->Read();
 				if (!packet)
 				{
+					mReadingActive = false;
 					std::this_thread::yield();
+					continue;
 				}
+				mReadingActive = true;
 				decoder.Send(packet.Unwrap());
 				for (auto frame : decoder.Receive()) { frames.Lock()->emplace_back(std::move(frame)); }
 			}
