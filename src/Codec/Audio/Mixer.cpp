@@ -28,6 +28,7 @@ namespace Strawberry::Codec::Audio
 		for (auto& channel : mInputChannels)
 		{
 			auto frame = channel->ReadFrame();
+			frame.Multiply(1.0f / static_cast<float>(mInputChannels.size()));
 			result     = result.Mix(frame);
 		}
 
