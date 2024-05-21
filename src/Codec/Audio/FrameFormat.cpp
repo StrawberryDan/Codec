@@ -6,7 +6,7 @@
 
 namespace Strawberry::Codec::Audio
 {
-	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout* channels)
+	FrameFormat::FrameFormat(int sampleRate, AVSampleFormat sampleFormat, const AVChannelLayout* channels)
 		: mSampleRate(sampleRate)
 		, mSampleFormat(sampleFormat)
 		, mChannels{}
@@ -19,14 +19,14 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	FrameFormat::FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& channels)
+	FrameFormat::FrameFormat(int sampleRate, AVSampleFormat sampleFormat, const AVChannelLayout& channels)
 		: FrameFormat(sampleRate, sampleFormat, &channels)
 	{}
 
 
 	FrameFormat::FrameFormat(const Frame& frame)
 		: mSampleRate(frame->sample_rate)
-		, mSampleFormat(frame->format)
+		, mSampleFormat(static_cast<AVSampleFormat>(frame->format))
 		, mChannels{}
 	{
 		auto result = av_channel_layout_copy(&mChannels, &frame->ch_layout);

@@ -100,7 +100,7 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat Frame::GetFormat() const
 	{
-		return {mFrame->sample_rate, mFrame->format, &mFrame->ch_layout};
+		return {mFrame->sample_rate, static_cast<AVSampleFormat>(mFrame->format), &mFrame->ch_layout};
 	}
 
 

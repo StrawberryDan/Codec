@@ -21,8 +21,8 @@ namespace Strawberry::Codec::Audio
 	class FrameFormat
 	{
 	public:
-		FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout* channels);
-		FrameFormat(int sampleRate, int sampleFormat, const AVChannelLayout& channels);
+		FrameFormat(int sampleRate, AVSampleFormat sampleFormat, const AVChannelLayout* channels);
+		FrameFormat(int sampleRate, AVSampleFormat sampleFormat, const AVChannelLayout& channels);
 		FrameFormat(const Frame& frame);
 
 		FrameFormat(const FrameFormat& rhs);
@@ -43,7 +43,7 @@ namespace Strawberry::Codec::Audio
 
 	private:
 		int             mSampleRate;
-		int             mSampleFormat;
+		AVSampleFormat  mSampleFormat;
 		AVChannelLayout mChannels;
 	};
 } // namespace Strawberry::Codec::Audio
