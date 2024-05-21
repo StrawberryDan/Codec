@@ -235,6 +235,7 @@ namespace Strawberry::Codec::Audio::Playlist
 
 
 		mShouldRead = true;
+		mReadingActive = true;
 		mReadingThread.Emplace([this, loader]() { loader(mCurrentTrackFrames); });
 	}
 
