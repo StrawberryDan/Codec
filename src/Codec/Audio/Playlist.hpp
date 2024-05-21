@@ -11,6 +11,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Types/Variant.hpp"
 #include "Strawberry/Core/Timing/Clock.hpp"
+#include "Strawberry/Core/Math/Rational.hpp"
 // Standard Library
 #include <any>
 #include <deque>
@@ -86,6 +87,10 @@ namespace Strawberry::Codec::Audio::Playlist
 		void SetTrackRepeating(size_t index, bool repeating);
 
 
+		int GetVolume() const;
+		void SetVolume(int volume);
+
+
 		void GotoPrevTrack();
 		void GotoNextTrack();
 
@@ -106,6 +111,8 @@ namespace Strawberry::Codec::Audio::Playlist
 			std::any    associatedData;
 			bool        repeat;
 		};
+
+		Core::Math::Rational<int> mVolume = (100, 100);
 
 		const Audio::FrameFormat mFormat;
 		const size_t             mFrameSize;

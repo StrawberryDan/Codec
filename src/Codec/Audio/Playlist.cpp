@@ -15,6 +15,7 @@ namespace Strawberry::Codec::Audio::Playlist
 		, mFrameSize()
 		, mResampler(format)
 		, mFrameResizer(sampleCount)
+		, mVolume(100, 100)
 	{}
 
 	Playlist::~Playlist()
@@ -35,6 +36,7 @@ namespace Strawberry::Codec::Audio::Playlist
 			if (result)
 			{
 				mHasSentPlaybackEnded = false;
+				result->Multiply(std::pow(2.0, mVolume.Evaluate()) - 1);
 				return result;
 			}
 
@@ -290,4 +292,15 @@ namespace Strawberry::Codec::Audio::Playlist
 		Core::Unreachable();
 	}
 
+
+	int Playlist::GetVolume() const
+	{
+		return mVolume.Numerator();
+	}
+
+
+	void Playlist::SetVolume(int volume)
+	{
+		mVolume.Numerator() = volume;
+	}
 } // namespace Strawberry::Codec::Audio::Playlist
