@@ -277,7 +277,7 @@ namespace Strawberry::Codec::Audio
 		T* cast = reinterpret_cast<T*>(data);
 		for (int i = 0; i < count; i++)
 		{
-			*(cast + i) = multiplier * cast[i];
+			cast[i] = multiplier * cast[i];
 		}
 	}
 
