@@ -52,7 +52,6 @@ namespace Strawberry::Codec
 
 
 	protected:
-		void                                  Seek(size_t stream, size_t pts);
 		Core::Result<Packet, Core::IO::Error> Read();
 
 

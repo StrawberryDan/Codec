@@ -123,13 +123,6 @@ namespace Strawberry::Codec
 	}
 
 
-	void MediaFile::Seek(size_t stream, size_t pts)
-	{
-		auto result = avformat_seek_file(mFile, static_cast<int>(stream), 0, static_cast<int>(pts), static_cast<int>(pts), AVSEEK_FLAG_FRAME);
-		Assert(result >= 0);
-	}
-
-
 	Core::Result<Packet, Core::IO::Error> MediaFile::Read()
 	{
 		Packet packet;
