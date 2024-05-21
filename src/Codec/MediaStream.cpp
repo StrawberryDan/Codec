@@ -22,25 +22,6 @@ namespace Strawberry::Codec
 				if (packet)
 				{
 					if ((*packet)->stream_index != mStreamInfo.Index) { continue; }
-
-					mNextPts = mNextPts + (*packet)->duration;
-					if (mNextPts > mStreamInfo.Stream->duration)
-					{
-						mIsEOF = true;
-						continue;
-					}
-
-
-					if (mLastDTS >= (*packet)->dts)
-					{
-						mIsEOF = true;
-						continue;
-					}
-
-
-					mLastDTS = (*packet)->dts;
-
-
 					mPacketBuffer.Push(packet.Unwrap());
 				}
 				else
@@ -57,6 +38,19 @@ namespace Strawberry::Codec
 		}
 
 		return mPacketBuffer.Pop();
+	}
+
+
+	void MediaStream::Seek(Core::Seconds time)
+	{
+		Core::Assert(time < GetDuration());
+		int ts = time * static_cast<double>(mStreamInfo.Stream->time_base.num) / static_cast<double>(mStreamInfo.Stream->time_base.den);
+		auto result = avformat_seek_file(mMediaFile->mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
+		Core::Assert(result >= 0);
+		result = avformat_flush(mMediaFile->mFile);
+		Core::Assert(result >= 0);
+		mIsEOF = time > GetDuration();
+		mPacketBuffer.Clear();
 	}
 
 
@@ -88,12 +82,12 @@ namespace Strawberry::Codec
 	}
 
 
-	std::chrono::duration<double> MediaStream::GetDuration() const
+	Core::Seconds MediaStream::GetDuration() const
 	{
 		auto timeBase      = GetTimeBase();
 		auto timeBaseCount = mStreamInfo.Stream->duration;
 		timeBase           = timeBase * timeBaseCount;
-		return std::chrono::duration<double>(timeBase.Evaluate());
+		return timeBase.Evaluate();
 	}
 
 	Core::Optional<size_t> MediaStream::GetFrameCount() const
@@ -121,6 +115,5 @@ namespace Strawberry::Codec
 		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
 		, mMediaFile(file)
 		, mPacketBuffer(256)
-		, mNextPts(0)
 	{}
 } // namespace Strawberry::Codec

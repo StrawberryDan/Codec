@@ -14,6 +14,7 @@
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Standard Library
 #include <chrono>
+#include <Strawberry/Core/Timing/Clock.hpp>
 
 
 namespace Strawberry::Codec
@@ -43,13 +44,14 @@ namespace Strawberry::Codec
 
 
 		[[nodiscard]] Core::Optional<Packet> Read();
+		void                                 Seek(Core::Seconds time);
 
 
 		[[nodiscard]] Core::Optional<std::string>   GetTitle() const;
 		[[nodiscard]] Core::Optional<std::string>   GetAlbum() const;
 		[[nodiscard]] Core::Optional<std::string>   GetArtist() const;
 		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase() const;
-		[[nodiscard]] std::chrono::duration<double> GetDuration() const;
+		[[nodiscard]] Core::Seconds GetDuration() const;
 		[[nodiscard]] Core::Optional<size_t>        GetFrameCount() const;
 
 
@@ -68,8 +70,6 @@ namespace Strawberry::Codec
 		MediaStreamInfo                          mStreamInfo;
 		Core::ReflexivePointer<MediaFile>        mMediaFile = nullptr;
 		bool                                     mIsEOF     = false;
-		size_t                                   mNextPts   = 0;
 		Core::Collection::CircularBuffer<Packet> mPacketBuffer;
-		Core::Optional<int>                      mLastDTS;
 	};
 } // namespace Strawberry::Codec
