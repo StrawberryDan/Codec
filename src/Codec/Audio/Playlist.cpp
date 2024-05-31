@@ -57,7 +57,8 @@ namespace Strawberry::Codec::Audio::Playlist
 					mResampler.SendFrame(result.Unwrap());
 					continue;
 				}
-				else if (mShouldRead && mReadingThread && mReadingActive)
+
+				if (mShouldRead && mReadingThread && mReadingActive)
 				{
 					std::this_thread::yield();
 					continue;
@@ -70,8 +71,11 @@ namespace Strawberry::Codec::Audio::Playlist
 				GotoNextTrack();
 				continue;
 			}
-			else if (mCurrentTrack && mCurrentTrack->repeat)
+			if (mCurrentTrack && mCurrentTrack->repeat)
 			{
+				// Restart track loader
+				StopLoading(true);
+				StartLoading(mCurrentTrack->loader);
 				continue;
 			}
 
