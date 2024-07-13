@@ -50,8 +50,12 @@ namespace Strawberry::Codec
 
 	MediaFile::~MediaFile()
 	{
-		if (mFile) { avformat_close_input(&mFile); }
+		if (mFile)
+		{
+			avformat_close_input(&mFile);
+		}
 	}
+
 
 	Core::Optional<MediaStreamInfo> MediaFile::GetStreamInfo(size_t index)
 	{
@@ -82,6 +86,7 @@ namespace Strawberry::Codec
 		return info;
 	}
 
+
 	Core::ReflexivePointer<MediaStream> MediaFile::GetStream(size_t index)
 	{
 		if (index >= mFile->nb_streams) return nullptr;
@@ -94,6 +99,7 @@ namespace Strawberry::Codec
 
 		return mOpenStreams.at(index).GetReflexivePointer();
 	}
+
 
 	Core::ReflexivePointer<MediaStream> MediaFile::GetBestStream(MediaType type)
 	{

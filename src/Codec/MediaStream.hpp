@@ -22,7 +22,8 @@ namespace Strawberry::Codec
 	class MediaFile;
 
 
-	struct MediaStreamInfo {
+	struct MediaStreamInfo
+	{
 		size_t             Index;
 		MediaType          MediaType;
 		AVStream*          Stream;
@@ -35,41 +36,41 @@ namespace Strawberry::Codec
 	{
 		friend class MediaFile;
 
-
-	public:
-		MediaStream(const MediaStream&)            = delete;
-		MediaStream& operator=(const MediaStream&) = delete;
-		MediaStream(MediaStream&&) noexcept        = default;
-		MediaStream& operator=(MediaStream&&)      = default;
-
-
-		[[nodiscard]] Core::Optional<Packet> Read();
-		void                                 Seek(Core::Seconds time);
+		public:
+			MediaStream(const MediaStream&)            = delete;
+			MediaStream& operator=(const MediaStream&) = delete;
+			MediaStream(MediaStream&&) noexcept        = default;
+			MediaStream& operator=(MediaStream&&)      = default;
 
 
-		[[nodiscard]] Core::Optional<std::string>   GetTitle() const;
-		[[nodiscard]] Core::Optional<std::string>   GetAlbum() const;
-		[[nodiscard]] Core::Optional<std::string>   GetArtist() const;
-		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase() const;
-		[[nodiscard]] Core::Seconds GetDuration() const;
-		[[nodiscard]] Core::Optional<size_t>        GetFrameCount() const;
+			[[nodiscard]] Core::Optional<Packet> Read();
+			void                                 Seek(Core::Seconds time);
 
 
-		[[nodiscard]] const AVCodec*           GetCodec() const;
-		[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
+			[[nodiscard]] Core::Optional<std::string>   GetTitle() const;
+			[[nodiscard]] Core::Optional<std::string>   GetAlbum() const;
+			[[nodiscard]] Core::Optional<std::string>   GetArtist() const;
+			[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase() const;
+			[[nodiscard]] Core::Seconds                 GetDuration() const;
+			[[nodiscard]] Core::Optional<size_t>        GetFrameCount() const;
 
 
-		[[nodiscard]] Audio::Decoder GetDecoder() const { return {GetCodec(), GetCodecParameters()}; }
+			[[nodiscard]] const AVCodec*           GetCodec() const;
+			[[nodiscard]] const AVCodecParameters* GetCodecParameters() const;
 
 
-	private:
-		MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index);
+			[[nodiscard]] Audio::Decoder GetDecoder() const
+			{
+				return {GetCodec(), GetCodecParameters()};
+			}
 
+		private:
+			MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index);
 
-	private:
-		MediaStreamInfo                          mStreamInfo;
-		Core::ReflexivePointer<MediaFile>        mMediaFile = nullptr;
-		bool                                     mIsEOF     = false;
-		Core::Collection::CircularBuffer<Packet> mPacketBuffer;
+		private:
+			MediaStreamInfo                          mStreamInfo;
+			Core::ReflexivePointer<MediaFile>        mMediaFile = nullptr;
+			bool                                     mIsEOF     = false;
+			Core::Collection::CircularBuffer<Packet> mPacketBuffer;
 	};
 } // namespace Strawberry::Codec
