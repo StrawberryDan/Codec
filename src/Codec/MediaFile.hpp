@@ -25,7 +25,7 @@ extern "C"
 namespace Strawberry::Codec
 {
 	class MediaFile
-		: public Core::EnableReflexivePointer<MediaFile>
+			: public Core::EnableReflexivePointer
 	{
 		friend class MediaStream;
 

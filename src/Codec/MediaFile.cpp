@@ -19,7 +19,7 @@ namespace Strawberry::Codec
 		if (!std::filesystem::exists(path)) return Core::NullOpt;
 
 		MediaFile file;
-		file.mPath = path;
+		file.mPath  = path;
 		auto result = avformat_open_input(&file.mFile, path.string().c_str(), nullptr, nullptr);
 		if (result != 0) return Core::NullOpt;
 
@@ -31,11 +31,9 @@ namespace Strawberry::Codec
 
 
 	MediaFile::MediaFile(MediaFile&& other) noexcept
-		: Core::EnableReflexivePointer<MediaFile>(std::move(other))
-		, mPath(std::exchange(other.mPath, {}))
+		: mPath(std::exchange(other.mPath, {}))
 		, mFile(std::exchange(other.mFile, nullptr))
-		, mOpenStreams(std::move(other.mOpenStreams))
-	{}
+		, mOpenStreams(std::move(other.mOpenStreams)) {}
 
 
 	MediaFile& MediaFile::operator=(MediaFile&& rhs) noexcept

@@ -31,7 +31,7 @@ namespace Strawberry::Codec
 
 
 	class MediaStream
-		: public Core::EnableReflexivePointer<MediaStream>
+			: public Core::EnableReflexivePointer
 	{
 		friend class MediaFile;
 
