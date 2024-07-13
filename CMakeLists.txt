@@ -82,10 +82,6 @@ target_include_directories(StrawberryCodec PUBLIC src ${FFMPEG_INCLUDE_DIRS} ${S
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
 set_target_properties(StrawberryCodec PROPERTIES CXX_STANDARD 23)
 
-if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    target_link_options(StrawberryCodec PRIVATE "-static")
-endif ()
-
 
 add_executable(StrawberryCodecTest test/Main.cpp)
 target_link_libraries(StrawberryCodecTest PRIVATE StrawberryCodec)
