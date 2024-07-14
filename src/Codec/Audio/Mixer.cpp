@@ -14,18 +14,21 @@ namespace Strawberry::Codec::Audio
 {
 	Mixer::Mixer(FrameFormat outputFormat, size_t outputFrameSize)
 		: mOutputFormat(std::move(outputFormat))
-		, mOutputFrameSize(outputFrameSize)
-	{}
+		, mOutputFrameSize(outputFrameSize) {}
 
 
 	Frame Mixer::ReadFrame()
 	{
 		// Erase dead channels
-		std::erase_if(mInputChannels, [](std::shared_ptr<InputChannel>& x) { return x.unique() && !x->IsOutputAvailable(); });
+		std::erase_if(mInputChannels,
+		              [](std::shared_ptr<InputChannel>& x)
+		              {
+			              return x.unique() && !x->IsOutputAvailable();
+		              });
 
 		// Mix Input Channels
 		Frame result = Frame::Silence(mOutputFormat, mOutputFrameSize);
-		for (auto& channel : mInputChannels)
+		for (auto& channel: mInputChannels)
 		{
 			auto frame = channel->ReadFrame();
 			result     = result.Mix(frame);
@@ -37,7 +40,12 @@ namespace Strawberry::Codec::Audio
 
 	bool Mixer::IsEmpty() const
 	{
-		return std::all_of(mInputChannels.begin(), mInputChannels.end(), [](auto& x) { return !x->IsOutputAvailable(); });
+		return std::all_of(mInputChannels.begin(),
+		                   mInputChannels.end(),
+		                   [](auto& x)
+		                   {
+			                   return !x->IsOutputAvailable();
+		                   });
 	}
 
 
@@ -53,8 +61,7 @@ namespace Strawberry::Codec::Audio
 		: mOutputFormat(outputFormat)
 		, mOutputFrameSize(outputFrameSize)
 		, mResampler(outputFormat)
-		, mFrameResizer(outputFrameSize)
-	{}
+		, mFrameResizer(outputFrameSize) {}
 
 
 	bool Mixer::InputChannel::IsOutputAvailable() const
@@ -70,7 +77,10 @@ namespace Strawberry::Codec::Audio
 	{
 		size_t sum         = 0;
 		auto   frameBuffer = mFrameBuffer.Lock();
-		for (const auto& frame : *frameBuffer) { sum += frame->nb_samples; }
+		for (const auto& frame: *frameBuffer)
+		{
+			sum += frame->nb_samples;
+		}
 		return sum;
 	}
 

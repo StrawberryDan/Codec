@@ -23,7 +23,6 @@ namespace Strawberry::Codec::Audio
 			WaitForFullFrames,
 		};
 
-
 	public:
 		/// Constructor
 		/// @param outputFrameSize The number of samples output audio frames should have
@@ -36,16 +35,15 @@ namespace Strawberry::Codec::Audio
 		/// Processes an input frame and outputs some number
 		/// output audio frames with the size given in the constructor.
 		/// @param frame The input frame
-		void          SendFrame(Frame frame);
+		void SendFrame(Frame frame);
 
 		Core::Optional<Frame> ReadFrame(Mode mode);
 
 		[[nodiscard]] bool IsOutputAvailable(Mode mode) const;
 
-
 	private:
-		size_t              mOutputFrameSize;
+		size_t                mOutputFrameSize;
 		Core::Optional<Frame> mWorkingFrame;
-		std::queue<Frame>   mInputFrames;
+		std::queue<Frame>     mInputFrames;
 	};
 } // namespace Strawberry::Codec::Audio

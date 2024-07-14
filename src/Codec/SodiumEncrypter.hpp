@@ -18,12 +18,10 @@ namespace Strawberry::Codec
 		using Encrypted       = Core::IO::DynamicByteBuffer;
 		using EncryptedPacket = std::pair<Nonce, Encrypted>;
 
-
 	public:
 		explicit SodiumEncrypter(Key key);
 
 		EncryptedPacket Encrypt(Nonce nonce, const Core::IO::DynamicByteBuffer& packet);
-
 
 	private:
 		Key mKey;

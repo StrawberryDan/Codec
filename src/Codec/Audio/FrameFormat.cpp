@@ -20,8 +20,7 @@ namespace Strawberry::Codec::Audio
 
 
 	FrameFormat::FrameFormat(int sampleRate, AVSampleFormat sampleFormat, const AVChannelLayout& channels)
-		: FrameFormat(sampleRate, sampleFormat, &channels)
-	{}
+		: FrameFormat(sampleRate, sampleFormat, &channels) {}
 
 
 	FrameFormat::FrameFormat(const Frame& frame)
@@ -46,7 +45,10 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat& FrameFormat::operator=(const FrameFormat& rhs)
 	{
-		if (this != &rhs) { std::construct_at(this, rhs); }
+		if (this != &rhs)
+		{
+			std::construct_at(this, rhs);
+		}
 
 		return *this;
 	}
@@ -64,7 +66,10 @@ namespace Strawberry::Codec::Audio
 
 	FrameFormat& FrameFormat::operator=(FrameFormat&& rhs) noexcept
 	{
-		if (this != &rhs) { std::construct_at(this, std::move(rhs)); }
+		if (this != &rhs)
+		{
+			std::construct_at(this, std::move(rhs));
+		}
 
 		return *this;
 	}
@@ -73,7 +78,7 @@ namespace Strawberry::Codec::Audio
 	bool FrameFormat::operator==(const FrameFormat& b) const
 	{
 		return mSampleRate == b.mSampleRate && mSampleFormat == b.mSampleFormat && mChannels.nb_channels == b.mChannels.nb_channels &&
-			   mChannels.order == b.mChannels.order && (mChannels.u.mask == b.mChannels.u.mask || mChannels.u.map == b.mChannels.u.map);
+				mChannels.order == b.mChannels.order && (mChannels.u.mask == b.mChannels.u.mask || mChannels.u.map == b.mChannels.u.map);
 	}
 
 

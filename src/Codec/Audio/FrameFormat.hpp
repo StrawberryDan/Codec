@@ -7,7 +7,8 @@
 #include "Strawberry/Core/Assert.hpp"
 
 
-extern "C" {
+extern "C"
+{
 #include "libavutil/channel_layout.h"
 #include "libavutil/samplefmt.h"
 }
@@ -39,7 +40,6 @@ namespace Strawberry::Codec::Audio
 		[[nodiscard]] AVSampleFormat         GetSampleFormat() const;
 		[[nodiscard]] const AVChannelLayout* GetChannels() const;
 		[[nodiscard]] int                    GetSizeInBytes() const;
-
 
 	private:
 		int             mSampleRate;

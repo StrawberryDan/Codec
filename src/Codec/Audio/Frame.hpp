@@ -11,7 +11,8 @@
 #include <vector>
 
 
-extern "C" {
+extern "C"
+{
 #include "libavcodec/avcodec.h"
 }
 
@@ -23,7 +24,6 @@ namespace Strawberry::Codec::Audio
 	public:
 		static Frame Allocate();
 		static Frame Silence(const FrameFormat& format, size_t samples);
-
 
 	public:
 		Frame();
@@ -50,21 +50,31 @@ namespace Strawberry::Codec::Audio
 		void Multiply(float multiplier);
 
 
-		inline AVFrame* operator*() { return mFrame; }
+		inline AVFrame* operator*()
+		{
+			return mFrame;
+		}
 
 
-		inline const AVFrame* operator*() const { return mFrame; }
+		inline const AVFrame* operator*() const
+		{
+			return mFrame;
+		}
 
 
-		inline AVFrame* operator->() { return mFrame; }
+		inline AVFrame* operator->()
+		{
+			return mFrame;
+		}
 
 
-		inline const AVFrame* operator->() const { return mFrame; }
-
+		inline const AVFrame* operator->() const
+		{
+			return mFrame;
+		}
 
 	private:
 		explicit Frame(AVFrame* frame);
-
 
 	private:
 		AVFrame* mFrame;

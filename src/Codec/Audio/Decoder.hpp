@@ -12,7 +12,8 @@
 #include <vector>
 
 
-extern "C" {
+extern "C"
+{
 #include "libavcodec/avcodec.h"
 }
 
@@ -34,8 +35,10 @@ namespace Strawberry::Codec::Audio
 		std::vector<Frame> Receive();
 
 
-		[[nodiscard]] inline const AVCodecParameters* Parameters() const { return mParameters; }
-
+		[[nodiscard]] inline const AVCodecParameters* Parameters() const
+		{
+			return mParameters;
+		}
 
 	private:
 		AVCodecContext*    mCodecContext;

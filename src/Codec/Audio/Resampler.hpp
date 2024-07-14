@@ -7,7 +7,8 @@
 #include <queue>
 
 
-extern "C" {
+extern "C"
+{
 #include "libavutil/channel_layout.h"
 #include "libswresample/swresample.h"
 }
@@ -26,13 +27,15 @@ namespace Strawberry::Codec::Audio
 		~Resampler();
 
 
-		[[nodiscard]] FrameFormat OutputFormat() const { return mOutputFormat; }
+		[[nodiscard]] FrameFormat OutputFormat() const
+		{
+			return mOutputFormat;
+		}
 
 
-		void                SendFrame(Frame frame);
+		void                  SendFrame(Frame frame);
 		Core::Optional<Frame> ReadFrame();
-		[[nodiscard]] bool  IsOutputAvailable() const;
-
+		[[nodiscard]] bool    IsOutputAvailable() const;
 
 	private:
 		FrameFormat       mOutputFormat;

@@ -25,7 +25,6 @@ namespace Strawberry::Codec::Audio
 	public:
 		class InputChannel;
 
-
 	public:
 		Mixer(FrameFormat outputFormat, size_t outputFrameSize);
 
@@ -38,7 +37,6 @@ namespace Strawberry::Codec::Audio
 
 		std::shared_ptr<InputChannel> CreateInputChannel();
 
-
 	private:
 		const FrameFormat                        mOutputFormat;
 		const size_t                             mOutputFrameSize;
@@ -50,7 +48,6 @@ namespace Strawberry::Codec::Audio
 	{
 		friend class Mixer;
 
-
 	public:
 		InputChannel(const FrameFormat& outputFormat, size_t outputFrameSize);
 
@@ -61,16 +58,14 @@ namespace Strawberry::Codec::Audio
 
 
 		/// Returns whether there are any queued samples in this channel.
-		bool   IsOutputAvailable() const;
+		bool IsOutputAvailable() const;
 		/// Returns the number of samples currently buffered.
 		size_t QueueLength() const;
 		/// Enqueues a frame in this channel's buffer.
-		void   EnqueueFrame(Frame frame);
-
+		void EnqueueFrame(Frame frame);
 
 	protected:
 		Frame ReadFrame();
-
 
 	private:
 		FrameFormat                    mOutputFormat;

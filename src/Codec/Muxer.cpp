@@ -26,9 +26,8 @@ namespace Strawberry::Codec
 
 	Muxer::Muxer(Muxer&& other) noexcept
 		: mAVFormatContext(std::exchange(other.mAVFormatContext, nullptr))
-		  , mStreams(std::move(other.mStreams))
-		  , mStage(std::exchange(other.mStage, Unopened))
-	{}
+		, mStreams(std::move(other.mStreams))
+		, mStage(std::exchange(other.mStage, Unopened)) {}
 
 
 	Muxer& Muxer::operator=(Muxer&& other) noexcept
@@ -56,7 +55,7 @@ namespace Strawberry::Codec
 		Assert(mStage == Opened);
 		auto encoder = avcodec_find_encoder(codecParameters->codec_id);
 
-		auto stream  = avformat_new_stream(mAVFormatContext, encoder);
+		auto stream = avformat_new_stream(mAVFormatContext, encoder);
 		Assert(stream != nullptr);
 
 		auto result = avcodec_parameters_copy(stream->codecpar, codecParameters);

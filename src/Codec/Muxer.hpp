@@ -6,7 +6,8 @@
 #include <vector>
 
 
-extern "C" {
+extern "C"
+{
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
@@ -40,6 +41,7 @@ namespace Strawberry::Codec
 			TrailerWritten,
 			Finished,
 		};
+
 
 		AVFormatContext*       mAVFormatContext;
 		std::vector<AVStream*> mStreams;

@@ -4,8 +4,10 @@
 #include "Codec/MediaStream.hpp"
 // Codec
 #include "Codec/MediaFile.hpp"
+
 // LibAV
-extern "C" {
+extern "C"
+{
 #include "libavutil/dict.h"
 }
 
@@ -21,7 +23,10 @@ namespace Strawberry::Codec
 				auto packet = mMediaFile->Read();
 				if (packet)
 				{
-					if ((*packet)->stream_index != mStreamInfo.Index) { continue; }
+					if ((*packet)->stream_index != mStreamInfo.Index)
+					{
+						continue;
+					}
 					mPacketBuffer.Push(packet.Unwrap());
 				}
 				else
@@ -43,7 +48,7 @@ namespace Strawberry::Codec
 
 	void MediaStream::Seek(Core::Seconds time)
 	{
-		int ts = time * static_cast<double>(mStreamInfo.Stream->time_base.den) / static_cast<double>(mStreamInfo.Stream->time_base.num);
+		int  ts     = time * static_cast<double>(mStreamInfo.Stream->time_base.den) / static_cast<double>(mStreamInfo.Stream->time_base.num);
 		auto result = avformat_seek_file(mMediaFile->mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
 		Core::Assert(result >= 0);
 		result = avformat_flush(mMediaFile->mFile);
@@ -56,22 +61,42 @@ namespace Strawberry::Codec
 	Core::Optional<std::string> MediaStream::GetTitle() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "title", nullptr, 0);
-		if (entry) { return std::string(entry->value); }
-		else { return Core::NullOpt; }
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
 	}
+
 
 	Core::Optional<std::string> MediaStream::GetAlbum() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "album", nullptr, 0);
-		if (entry) { return std::string(entry->value); }
-		else { return Core::NullOpt; }
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
 	}
+
 
 	Core::Optional<std::string> MediaStream::GetArtist() const
 	{
 		auto entry = av_dict_get(mStreamInfo.Stream->metadata, "artist", nullptr, 0);
-		if (entry) { return std::string(entry->value); }
-		else { return Core::NullOpt; }
+		if (entry)
+		{
+			return std::string(entry->value);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
 	}
 
 
@@ -88,6 +113,7 @@ namespace Strawberry::Codec
 		timeBase           = timeBase * timeBaseCount;
 		return timeBase.Evaluate();
 	}
+
 
 	Core::Optional<size_t> MediaStream::GetFrameCount() const
 	{
@@ -113,6 +139,5 @@ namespace Strawberry::Codec
 	MediaStream::MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index)
 		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
 		, mMediaFile(file)
-		, mPacketBuffer(256)
-	{}
+		, mPacketBuffer(256) {}
 } // namespace Strawberry::Codec

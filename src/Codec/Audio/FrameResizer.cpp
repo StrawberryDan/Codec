@@ -9,8 +9,7 @@ namespace Strawberry::Codec::Audio
 {
 	FrameResizer::FrameResizer(size_t outputFrameSize)
 		: mOutputFrameSize(outputFrameSize)
-		, mWorkingFrame()
-	{}
+		, mWorkingFrame() {}
 
 
 	void FrameResizer::SendFrame(Frame frame)
@@ -18,6 +17,7 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(*frame);
 		mInputFrames.emplace(std::move(frame));
 	}
+
 
 	Core::Optional<Frame> FrameResizer::ReadFrame(FrameResizer::Mode mode)
 	{
@@ -44,7 +44,10 @@ namespace Strawberry::Codec::Audio
 				return result;
 			}
 			// If the working frame is the right size we return it.
-			else if (mWorkingFrame->GetNumSamples() == mOutputFrameSize) { return mWorkingFrame.Unwrap(); }
+			else if (mWorkingFrame->GetNumSamples() == mOutputFrameSize)
+			{
+				return mWorkingFrame.Unwrap();
+			}
 			// If the mode is Yield Available, and we have not more input frames, then we yield what we have.
 			else if (mode == Mode::YieldAvailable && mWorkingFrame->GetNumSamples() <= mOutputFrameSize && mInputFrames.empty())
 			{

@@ -15,13 +15,14 @@ namespace Strawberry::Codec::Audio::Playlist
 		, mFrameSize()
 		, mResampler(format)
 		, mFrameResizer(sampleCount)
-		, mVolume(100, 100)
-	{}
+		, mVolume(100, 100) {}
+
 
 	Playlist::~Playlist()
 	{
 		StopLoading(true);
 	}
+
 
 	Core::Optional<Frame> Playlist::ReadFrame()
 	{
@@ -30,7 +31,10 @@ namespace Strawberry::Codec::Audio::Playlist
 
 		while (true)
 		{
-			if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack) { StartLoading(mCurrentTrack->loader); }
+			if (!mReadingThread && mCurrentTrackFrames.Lock()->empty() && mCurrentTrack)
+			{
+				StartLoading(mCurrentTrack->loader);
+			}
 
 			result = mFrameResizer.ReadFrame(FrameResizer::Mode::WaitForFullFrames);
 			if (result)
@@ -91,12 +95,14 @@ namespace Strawberry::Codec::Audio::Playlist
 		}
 	}
 
+
 	Core::Optional<size_t> Playlist::EnqueueFile(const std::filesystem::path& path, const std::any& associatedData, bool repeat)
 	{
 		Track track;
 
 
-		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable {
+		track.loader = [this, path](Core::Mutex<FrameBuffer>& frames) mutable
+		{
 			Core::Assert(frames.Lock()->empty());
 
 
@@ -132,7 +138,10 @@ namespace Strawberry::Codec::Audio::Playlist
 				}
 				mReadingActive = true;
 				decoder.Send(packet.Unwrap());
-				for (auto frame : decoder.Receive()) { frames.Lock()->emplace_back(std::move(frame)); }
+				for (auto frame: decoder.Receive())
+				{
+					frames.Lock()->emplace_back(std::move(frame));
+				}
 			}
 		};
 
@@ -144,24 +153,31 @@ namespace Strawberry::Codec::Audio::Playlist
 		mNextTracks.push_back(track);
 
 		Broadcast(SongAddedEvent{
-			.index          = Length() - 1,
+			.index = Length() - 1,
 			.associatedData = associatedData,
 		});
 
 		return Length() - 1;
 	}
 
+
 	void Playlist::RemoveTrack(size_t index)
 	{
 		Core::Assert(index < Length());
 
-		if (index < mPreviousTracks.size()) { mPreviousTracks.erase(mPreviousTracks.begin() + static_cast<long>(index)); }
+		if (index < mPreviousTracks.size())
+		{
+			mPreviousTracks.erase(mPreviousTracks.begin() + static_cast<long>(index));
+		}
 		else if (mCurrentTrack && index == mPreviousTracks.size())
 		{
 			mCurrentTrack.Reset();
 			StopLoading(true);
 		}
-		else if (!mCurrentTrack && index == mPreviousTracks.size()) { mNextTracks.pop_front(); }
+		else if (!mCurrentTrack && index == mPreviousTracks.size())
+		{
+			mNextTracks.pop_front();
+		}
 		else
 		{
 			Core::Assert(index >= mPreviousTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0));
@@ -172,47 +188,59 @@ namespace Strawberry::Codec::Audio::Playlist
 			.index = index,
 		});
 
-		if (Length() == 0) { Broadcast(PlaybackEndedEvent{}); }
+		if (Length() == 0)
+		{
+			Broadcast(PlaybackEndedEvent{});
+		}
 	}
+
 
 	size_t Playlist::GetCurrentTrackIndex() const
 	{
 		return mPreviousTracks.size();
 	}
 
+
 	size_t Playlist::Length() const
 	{
 		return mPreviousTracks.size() + mNextTracks.size() + (mCurrentTrack.HasValue() ? 1 : 0);
 	}
+
 
 	Codec::Audio::FrameFormat Playlist::GetFrameFormat() const
 	{
 		return mFormat;
 	}
 
+
 	size_t Playlist::GetFrameSize() const
 	{
 		return mFrameSize;
 	}
+
 
 	void Playlist::GotoPrevTrack()
 	{
 		if (!mPreviousTracks.empty())
 		{
 			StopLoading(true);
-			if (mCurrentTrack.HasValue()) { mNextTracks.push_front(mCurrentTrack.Unwrap()); }
+			if (mCurrentTrack.HasValue())
+			{
+				mNextTracks.push_front(mCurrentTrack.Unwrap());
+			}
 
 			mCurrentTrack = mPreviousTracks[0];
 			mPreviousTracks.pop_front();
 
 			Broadcast(SongBeganEvent{
-				.index          = mPreviousTracks.size(),
-				.offset         = -1,
-				.repeating      = mCurrentTrack->repeat,
+				.index = mPreviousTracks.size(),
+				.offset = -1,
+				.repeating = mCurrentTrack->repeat,
 				.associatedData = mCurrentTrack->associatedData,
 			});
 		}
 	}
+
 
 	void Playlist::GotoNextTrack()
 	{
@@ -226,12 +254,13 @@ namespace Strawberry::Codec::Audio::Playlist
 			mNextTracks.pop_front();
 
 			Broadcast(SongBeganEvent{
-				.index          = mPreviousTracks.size(),
-				.offset         = 1,
+				.index = mPreviousTracks.size(),
+				.offset = 1,
 				.associatedData = mCurrentTrack->associatedData,
 			});
 		}
 	}
+
 
 	void Playlist::StartLoading(const Playlist::TrackLoader& loader)
 	{
@@ -240,10 +269,14 @@ namespace Strawberry::Codec::Audio::Playlist
 		Core::Assert(!mReadingThread.HasValue());
 
 
-		mShouldRead = true;
+		mShouldRead    = true;
 		mReadingActive = true;
-		mReadingThread.Emplace([this, loader]() { loader(mCurrentTrackFrames); });
+		mReadingThread.Emplace([this, loader]()
+		{
+			loader(mCurrentTrackFrames);
+		});
 	}
+
 
 	void Playlist::StopLoading(bool clearFrames)
 	{
@@ -258,18 +291,29 @@ namespace Strawberry::Codec::Audio::Playlist
 		if (clearFrames) mCurrentTrackFrames.Lock()->clear();
 	}
 
+
 	bool Playlist::GetTrackRepeating(size_t index) const
 	{
-		if (index < mPreviousTracks.size()) { return mPreviousTracks[index].repeat; }
+		if (index < mPreviousTracks.size())
+		{
+			return mPreviousTracks[index].repeat;
+		}
 
 		index -= mPreviousTracks.size();
-		if (index == 0) { return mCurrentTrack->repeat; }
+		if (index == 0)
+		{
+			return mCurrentTrack->repeat;
+		}
 
 		index -= 1;
-		if (index < mNextTracks.size()) { return mNextTracks[index].repeat; }
+		if (index < mNextTracks.size())
+		{
+			return mNextTracks[index].repeat;
+		}
 
 		Core::Unreachable();
 	}
+
 
 	void Playlist::SetTrackRepeating(size_t index, bool repeating)
 	{

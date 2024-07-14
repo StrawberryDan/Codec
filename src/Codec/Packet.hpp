@@ -4,7 +4,8 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 
 
-extern "C" {
+extern "C"
+{
 #include "libavformat/avformat.h"
 }
 
@@ -23,23 +24,37 @@ namespace Strawberry::Codec
 		~Packet();
 
 
-		inline explicit operator bool() const { return mAVPacket && mAVPacket->data && mAVPacket->size > 0; }
+		inline explicit operator bool() const
+		{
+			return mAVPacket && mAVPacket->data && mAVPacket->size > 0;
+		}
 
 
-		inline AVPacket* operator*() { return mAVPacket; }
+		inline AVPacket* operator*()
+		{
+			return mAVPacket;
+		}
 
 
-		inline const AVPacket* operator*() const { return mAVPacket; }
+		inline const AVPacket* operator*() const
+		{
+			return mAVPacket;
+		}
 
 
-		inline AVPacket* operator->() { return mAVPacket; }
+		inline AVPacket* operator->()
+		{
+			return mAVPacket;
+		}
 
 
-		inline const AVPacket* operator->() const { return mAVPacket; }
+		inline const AVPacket* operator->() const
+		{
+			return mAVPacket;
+		}
 
 
 		[[nodiscard]] Core::IO::DynamicByteBuffer AsBytes() const;
-
 
 	private:
 		AVPacket* mAVPacket;

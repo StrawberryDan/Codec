@@ -23,16 +23,32 @@ namespace Strawberry::Codec::Audio
 		std::vector<Packet> Receive();
 		std::vector<Packet> Flush();
 
-		inline AVCodecContext* operator*() { return mContext; }
 
-		inline const AVCodecContext* operator*() const { return mContext; }
+		inline AVCodecContext* operator*()
+		{
+			return mContext;
+		}
 
-		inline AVCodecContext* operator->() { return mContext; }
 
-		inline const AVCodecContext* operator->() const { return mContext; }
+		inline const AVCodecContext* operator*() const
+		{
+			return mContext;
+		}
+
+
+		inline AVCodecContext* operator->()
+		{
+			return mContext;
+		}
+
+
+		inline const AVCodecContext* operator->() const
+		{
+			return mContext;
+		}
+
 
 		[[nodiscard]] AVCodecParameters* Parameters() const;
-
 
 	private:
 		AVCodecContext*              mContext;

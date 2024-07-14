@@ -10,7 +10,8 @@
 #include "Strawberry/Core/Util/Strings.hpp"
 
 
-extern "C" {
+extern "C"
+{
 #include "libavutil/opt.h"
 }
 
@@ -42,6 +43,7 @@ namespace Strawberry::Codec::Audio
 		mInputFrames.emplace(std::move(frame));
 	}
 
+
 	Core::Optional<Frame> Resampler::ReadFrame()
 	{
 		if (!IsOutputAvailable()) return Core::NullOpt;
@@ -51,7 +53,10 @@ namespace Strawberry::Codec::Audio
 		Frame input(std::move(mInputFrames.front()));
 		mInputFrames.pop();
 		Core::Assert(input->sample_rate > 0);
-		if (input.GetFormat() == mOutputFormat) { return input; }
+		if (input.GetFormat() == mOutputFormat)
+		{
+			return input;
+		}
 
 
 		Frame output        = Frame::Allocate();
@@ -64,7 +69,10 @@ namespace Strawberry::Codec::Audio
 		while (true)
 		{
 			auto result = swr_convert_frame(mContext, *output, *input);
-			if (result == 0) { return output; }
+			if (result == 0)
+			{
+				return output;
+			}
 			else if (result == AVERROR_INPUT_CHANGED)
 			{
 				swr_close(mContext);

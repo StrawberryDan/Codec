@@ -41,8 +41,7 @@ namespace Strawberry::Codec::Audio
 
 	Decoder::Decoder(Decoder&& other) noexcept
 		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
-		, mParameters(std::exchange(other.mParameters, nullptr))
-	{}
+		, mParameters(std::exchange(other.mParameters, nullptr)) {}
 
 
 	Decoder& Decoder::operator=(Decoder&& other) noexcept
@@ -59,7 +58,10 @@ namespace Strawberry::Codec::Audio
 
 	Decoder::~Decoder()
 	{
-		if (mParameters) { avcodec_parameters_free(&mParameters); }
+		if (mParameters)
+		{
+			avcodec_parameters_free(&mParameters);
+		}
 
 		if (mCodecContext)
 		{
@@ -90,12 +92,17 @@ namespace Strawberry::Codec::Audio
 
 		std::vector<Frame> frames;
 		int                receiveResult;
-		do {
+		do
+		{
 			Frame frame   = Frame::Allocate();
 			receiveResult = avcodec_receive_frame(mCodecContext, *frame);
 			Assert(receiveResult == 0 || receiveResult == AVERROR(EAGAIN) || receiveResult == AVERROR_EOF);
-			if (receiveResult == 0 && !(frame->flags & AV_FRAME_FLAG_DISCARD)) { frames.push_back(std::move(frame)); }
-		} while (receiveResult == 0);
+			if (receiveResult == 0 && !(frame->flags & AV_FRAME_FLAG_DISCARD))
+			{
+				frames.push_back(std::move(frame));
+			}
+		}
+		while (receiveResult == 0);
 
 		return frames;
 	}

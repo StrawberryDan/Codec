@@ -5,7 +5,8 @@
 #include "Strawberry/Core/Assert.hpp"
 
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 }
@@ -28,7 +29,7 @@ namespace Strawberry::Codec::Audio
 		mContext->sample_fmt            = codec->sample_fmts[0];
 		mContext->ch_layout             = channelLayout;
 
-		auto result                     = avcodec_open2(mContext, codec, nullptr);
+		auto result = avcodec_open2(mContext, codec, nullptr);
 		Core::Assert(result == 0);
 		Core::Assert(avcodec_is_open(mContext));
 
@@ -43,13 +44,14 @@ namespace Strawberry::Codec::Audio
 		mFrameResizer.Emplace(mContext->frame_size);
 	}
 
+
 	Encoder::Encoder(Encoder&& rhs)
 		: mContext(std::exchange(rhs.mContext, nullptr))
 		, mParameters(std::exchange(rhs.mParameters, nullptr))
 		, mFrameResampler(std::move(rhs.mFrameResampler))
 		, mFrameResizer(std::move(rhs.mFrameResizer))
-		, mFrameBuffer(std::move(rhs.mFrameBuffer))
-	{}
+		, mFrameBuffer(std::move(rhs.mFrameBuffer)) {}
+
 
 	Encoder::~Encoder()
 	{
@@ -86,13 +88,18 @@ namespace Strawberry::Codec::Audio
 				Core::Assert(send == 0);
 
 				int receive;
-				do {
+				do
+				{
 					Packet packet;
 					receive = avcodec_receive_packet(mContext, *packet);
 					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
 
-					if (receive == 0) { packets.push_back(packet); }
-				} while (receive == 0);
+					if (receive == 0)
+					{
+						packets.push_back(packet);
+					}
+				}
+				while (receive == 0);
 			}
 		}
 
@@ -113,18 +120,24 @@ namespace Strawberry::Codec::Audio
 				Core::Assert(send == 0);
 
 				int receive;
-				do {
+				do
+				{
 					Packet packet;
 					receive = avcodec_receive_packet(mContext, *packet);
 					Core::Assert(receive == 0 || receive == AVERROR(EAGAIN));
 
-					if (receive == 0) { packets.push_back(packet); }
-				} while (receive == 0);
+					if (receive == 0)
+					{
+						packets.push_back(packet);
+					}
+				}
+				while (receive == 0);
 			}
 		}
 
 		return packets;
 	}
+
 
 	AVCodecParameters* Encoder::Parameters() const
 	{
