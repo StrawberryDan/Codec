@@ -34,9 +34,7 @@ find_library(SODIUM_LIBRARY REQUIRED
 )
 
 
-if (NOT TARGET StrawberryCore AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../Core AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
-	add_subdirectory(../Core ${CMAKE_CURRENT_BINARY_DIR}/Core)
-endif ()
+find_strawberry_library(NAME Core)
 
 
 new_strawberry_library(NAME StrawberryCodec SOURCE
