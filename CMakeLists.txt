@@ -39,7 +39,7 @@ if (NOT TARGET StrawberryCore AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../Core AND
 endif ()
 
 
-add_library(StrawberryCodec STATIC
+new_strawberry_library(NAME StrawberryCodec SOURCE
 	src/Codec/Audio/Decoder.cpp
 	src/Codec/Audio/Decoder.hpp
 	src/Codec/Audio/Encoder.cpp
@@ -80,9 +80,7 @@ endif ()
 
 target_include_directories(StrawberryCodec PUBLIC src ${FFMPEG_INCLUDE_DIRS} ${SODIUM_INCLUDE_DIR})
 target_link_libraries(StrawberryCodec PUBLIC StrawberryCore ${FFMPEG_LINK_LIBRARIES} ${SODIUM_LIBRARY})
-set_target_properties(StrawberryCodec PROPERTIES CXX_STANDARD 23)
 
 
-add_executable(StrawberryCodecTest test/Main.cpp)
+new_strawberry_executable(NAME StrawberryCodecTest SOURCE test/Main.cpp)
 target_link_libraries(StrawberryCodecTest PRIVATE StrawberryCodec)
-set_target_properties(StrawberryCodecTest PROPERTIES CXX_STANDARD 23)
