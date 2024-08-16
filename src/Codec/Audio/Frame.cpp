@@ -294,7 +294,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	void Frame::Multiply(float multiplier)
+	void Frame::Multiply(double multiplier)
 	{
 		for (int i = 0; i < AV_NUM_DATA_POINTERS; i++)
 		{

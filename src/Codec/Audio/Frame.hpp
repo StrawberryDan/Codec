@@ -47,7 +47,7 @@ namespace Strawberry::Codec::Audio
 		[[nodiscard]] Frame                   Mix(const Frame& other) const;
 
 
-		void Multiply(float multiplier);
+		void Multiply(double multiplier);
 
 
 		inline AVFrame* operator*()
