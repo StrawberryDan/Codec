@@ -30,7 +30,7 @@ namespace Strawberry::Codec
 	}
 
 
-	void MediaStream::Seek(Core::Seconds time)
+	void MediaStream::Seek(double time)
 	{
 		int  ts     = time * static_cast<double>(mStreamInfo.Stream->time_base.den) / static_cast<double>(mStreamInfo.Stream->time_base.num);
 		auto result = avformat_seek_file(mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
@@ -89,7 +89,7 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Seconds MediaStream::GetDuration() const
+	double MediaStream::GetDuration() const
 	{
 		auto timeBase      = GetTimeBase();
 		auto timeBaseCount = mStreamInfo.Stream->duration;

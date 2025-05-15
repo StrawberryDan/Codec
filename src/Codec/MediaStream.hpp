@@ -11,7 +11,6 @@
 #include "Strawberry/Core/Math/Rational.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
-#include "Strawberry/Core/Timing/Clock.hpp"
 // Standard Library
 #include <chrono>
 #include <deque>
@@ -46,14 +45,14 @@ namespace Strawberry::Codec
 
 
 		[[nodiscard]] Core::Result<Packet, Error>   Read();
-		void                                        Seek(Core::Seconds time);
+		void                                        Seek(double time);
 
 
 		[[nodiscard]] Core::Optional<std::string>   GetTitle() const;
 		[[nodiscard]] Core::Optional<std::string>   GetAlbum() const;
 		[[nodiscard]] Core::Optional<std::string>   GetArtist() const;
 		[[nodiscard]] Core::Math::Rational<int64_t> GetTimeBase() const;
-		[[nodiscard]] Core::Seconds                 GetDuration() const;
+		[[nodiscard]] double                        GetDuration() const;
 
 
 		[[nodiscard]] const AVCodec*           GetCodec() const;
