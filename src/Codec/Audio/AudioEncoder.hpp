@@ -11,12 +11,12 @@
 
 namespace Strawberry::Codec::Audio
 {
-	class Encoder
+	class AudioEncoder
 	{
 	public:
-		Encoder(AVCodecID codecID, AVChannelLayout channelLayout);
-		Encoder(Encoder&& rhs);
-		~Encoder();
+		AudioEncoder(AVCodecID codecID, AVChannelLayout channelLayout);
+		AudioEncoder(AudioEncoder&& rhs);
+		~AudioEncoder();
 
 
 		void                Send(Frame frame);

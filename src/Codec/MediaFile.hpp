@@ -2,40 +2,34 @@
 
 
 // This Project
-#include "Codec/Audio/Decoder.hpp"
-#include "Codec/Audio/Resampler.hpp"
 #include "Codec/MediaStream.hpp"
 #include "Codec/Packet.hpp"
 // Strawberry Core
+#include "Error.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 
 // FFMPEG
-extern "C"
-{
-#include "libavcodec/avcodec.h"
+extern "C" {
 #include "libavformat/avformat.h"
 }
 
 // Standard Library
 #include <map>
 #include <filesystem>
-#include <memory>
-#include <string>
 
 namespace Strawberry::Codec
 {
 	class MediaFile
-			: public Core::EnableReflexivePointer
 	{
 		friend class MediaStream;
 
 	public:
-		static Core::Optional<MediaFile> Open(const std::filesystem::path& path);
+		static Core::Result<MediaFile, Error> Open(const std::filesystem::path& path);
 
 
-		MediaFile(const MediaFile& other)            = delete;
+		MediaFile(const MediaFile& other) = delete;
 		MediaFile& operator=(const MediaFile& other) = delete;
 		MediaFile(MediaFile&& other) noexcept;
 		MediaFile& operator=(MediaFile&& rhs) noexcept;
@@ -45,21 +39,19 @@ namespace Strawberry::Codec
 		const std::filesystem::path& GetPath() const;
 
 
-		Core::Optional<MediaStreamInfo>     GetStreamInfo(size_t index);
-		Core::ReflexivePointer<MediaStream> GetStream(size_t index);
+		MediaStreamInfo GetStreamInfo(size_t index) const;
+		MediaStream GetStream(size_t index) const;
 
 
-		Core::ReflexivePointer<MediaStream> GetBestStream(MediaType type);
+		Core::Optional<MediaStream> GetBestStream(MediaType type) const;
 
-	protected:
-		Core::Result<Packet, Core::IO::Error> Read();
 
 	private:
 		MediaFile() = default;
 
 	private:
-		std::filesystem::path         mPath;
-		AVFormatContext*              mFile = nullptr;
+		std::filesystem::path mPath;
+		AVFormatContext* mFile = nullptr;
 		std::map<size_t, MediaStream> mOpenStreams;
 	};
 } // namespace Strawberry::Codec

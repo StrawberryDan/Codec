@@ -39,10 +39,10 @@ if (NOT TARGET StrawberryCodec)
 
 
 	new_strawberry_library(NAME StrawberryCodec SOURCE
-		src/Codec/Audio/Decoder.cpp
-		src/Codec/Audio/Decoder.hpp
-		src/Codec/Audio/Encoder.cpp
-		src/Codec/Audio/Encoder.hpp
+		src/Codec/Audio/AudioDecoder.cpp
+		src/Codec/Audio/AudioDecoder.hpp
+		src/Codec/Audio/AudioEncoder.cpp
+		src/Codec/Audio/AudioEncoder.hpp
 		src/Codec/Audio/Frame.cpp
 		src/Codec/Audio/Frame.hpp
 		src/Codec/Audio/FrameFormat.cpp
@@ -57,16 +57,17 @@ if (NOT TARGET StrawberryCodec)
 		src/Codec/Audio/Resampler.hpp
 		src/Codec/CodecParameters.hpp
 		src/Codec/Constants.hpp
-		src/Codec/MediaFile.hpp
-		src/Codec/MediaStream.hpp
-		src/Codec/Muxer.hpp
-		src/Codec/Packet.hpp
-		src/Codec/SodiumEncrypter.hpp
+		src/Codec/Error.hpp
 		src/Codec/MediaFile.cpp
+		src/Codec/MediaFile.hpp
 		src/Codec/MediaStream.cpp
+		src/Codec/MediaStream.hpp
 		src/Codec/Muxer.cpp
+		src/Codec/Muxer.hpp
 		src/Codec/Packet.cpp
+		src/Codec/Packet.hpp
 		src/Codec/SodiumEncrypter.cpp
+		src/Codec/SodiumEncrypter.hpp
 	)
 
 

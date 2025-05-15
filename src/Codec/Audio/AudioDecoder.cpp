@@ -1,4 +1,4 @@
-#include "Codec/Audio/Decoder.hpp"
+#include "Codec/Audio/AudioDecoder.hpp"
 #include "Strawberry/Core/Util/Strings.hpp"
 
 
@@ -10,7 +10,7 @@ using Strawberry::Core::Assert;
 
 namespace Strawberry::Codec::Audio
 {
-	Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* parameters)
+	AudioDecoder::AudioDecoder(const AVCodec* codec, const AVCodecParameters* parameters)
 		: mCodecContext(nullptr)
 		, mParameters(nullptr)
 	{
@@ -39,12 +39,12 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Decoder::Decoder(Decoder&& other) noexcept
+	AudioDecoder::AudioDecoder(AudioDecoder&& other) noexcept
 		: mCodecContext(std::exchange(other.mCodecContext, nullptr))
 		, mParameters(std::exchange(other.mParameters, nullptr)) {}
 
 
-	Decoder& Decoder::operator=(Decoder&& other) noexcept
+	AudioDecoder& AudioDecoder::operator=(AudioDecoder&& other) noexcept
 	{
 		if (this != &other)
 		{
@@ -56,7 +56,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Decoder::~Decoder()
+	AudioDecoder::~AudioDecoder()
 	{
 		if (mParameters)
 		{
@@ -65,19 +65,18 @@ namespace Strawberry::Codec::Audio
 
 		if (mCodecContext)
 		{
-			avcodec_close(mCodecContext);
 			avcodec_free_context(&mCodecContext);
 		}
 	}
 
 
-	void Decoder::Send(Packet packet)
+	void AudioDecoder::Send(Packet packet)
 	{
 		mPacketBuffer.push_back(std::move(packet));
 	}
 
 
-	std::vector<Frame> Decoder::Receive()
+	std::vector<Frame> AudioDecoder::Receive()
 	{
 		if (mPacketBuffer.empty()) return {};
 

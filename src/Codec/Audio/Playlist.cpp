@@ -244,12 +244,12 @@ namespace Strawberry::Codec::Audio::Playlist
 
 	void Playlist::GotoNextTrack()
 	{
+		StopLoading(true);
+		if (mCurrentTrack.HasValue()) mPreviousTracks.push_front(std::move(mCurrentTrack.Value()));
+		mCurrentTrack.Reset();
+
 		if (!mNextTracks.empty())
 		{
-			StopLoading(true);
-			if (mCurrentTrack.HasValue()) mPreviousTracks.push_front(mCurrentTrack.Unwrap());
-
-
 			mCurrentTrack = mNextTracks.front();
 			mNextTracks.pop_front();
 

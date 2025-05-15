@@ -1,4 +1,4 @@
-#include "Codec/Audio/Encoder.hpp"
+#include "Codec/Audio/AudioEncoder.hpp"
 
 
 #include "Codec/Packet.hpp"
@@ -14,7 +14,7 @@ extern "C"
 
 namespace Strawberry::Codec::Audio
 {
-	Encoder::Encoder(AVCodecID codecID, AVChannelLayout channelLayout)
+	AudioEncoder::AudioEncoder(AVCodecID codecID, AVChannelLayout channelLayout)
 		: mContext(nullptr)
 		, mParameters(nullptr)
 	{
@@ -23,10 +23,19 @@ namespace Strawberry::Codec::Audio
 		Core::Assert(av_codec_is_encoder(codec));
 		mContext = avcodec_alloc_context3(codec);
 		Core::Assert(mContext != nullptr);
-		mContext->strict_std_compliance = -2;
-		mContext->sample_rate           = codec->supported_samplerates[0];
+		mContext->strict_std_compliance = 0;
+
+		const void* frameRates;
+		int numFramerates = 0;
+		avcodec_get_supported_config(mContext, codec, AV_CODEC_CONFIG_SAMPLE_RATE, 0, &frameRates, &numFramerates);
+
+		const void* sampleFormats;
+		int numSampleFormats = 0;
+		avcodec_get_supported_config(mContext, codec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, &sampleFormats, &numSampleFormats);
+
+		mContext->sample_rate           = static_cast<const int*>(frameRates)[0];
 		mContext->time_base             = AVRational{1, mContext->sample_rate};
-		mContext->sample_fmt            = codec->sample_fmts[0];
+		mContext->sample_fmt            = static_cast<const AVSampleFormat*>(sampleFormats)[0];
 		mContext->ch_layout             = channelLayout;
 
 		auto result = avcodec_open2(mContext, codec, nullptr);
@@ -45,7 +54,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	Encoder::Encoder(Encoder&& rhs)
+	AudioEncoder::AudioEncoder(AudioEncoder&& rhs)
 		: mContext(std::exchange(rhs.mContext, nullptr))
 		, mParameters(std::exchange(rhs.mParameters, nullptr))
 		, mFrameResampler(std::move(rhs.mFrameResampler))
@@ -53,24 +62,23 @@ namespace Strawberry::Codec::Audio
 		, mFrameBuffer(std::move(rhs.mFrameBuffer)) {}
 
 
-	Encoder::~Encoder()
+	AudioEncoder::~AudioEncoder()
 	{
 		if (mContext && mParameters)
 		{
 			avcodec_parameters_free(&mParameters);
-			avcodec_close(mContext);
 			avcodec_free_context(&mContext);
 		}
 	}
 
 
-	void Encoder::Send(Frame frame)
+	void AudioEncoder::Send(Frame frame)
 	{
 		mFrameBuffer.push_back(std::move(frame));
 	}
 
 
-	std::vector<Packet> Encoder::Receive()
+	std::vector<Packet> AudioEncoder::Receive()
 	{
 		if (mFrameBuffer.empty()) return {};
 
@@ -107,7 +115,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	std::vector<Packet> Encoder::Flush()
+	std::vector<Packet> AudioEncoder::Flush()
 	{
 		std::vector<Packet> packets;
 
@@ -139,7 +147,7 @@ namespace Strawberry::Codec::Audio
 	}
 
 
-	AVCodecParameters* Encoder::Parameters() const
+	AVCodecParameters* AudioEncoder::Parameters() const
 	{
 		return mParameters;
 	}

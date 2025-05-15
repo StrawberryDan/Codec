@@ -1,4 +1,4 @@
-#include "Codec/Audio/Encoder.hpp"
+#include "Codec/Audio/AudioEncoder.hpp"
 #include "Codec/Audio/Mixer.hpp"
 #include "Codec/MediaFile.hpp"
 #include "Codec/Muxer.hpp"
@@ -30,7 +30,7 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 
 
 	std::vector<Audio::Frame> frames;
-	Audio::Decoder            decoder = stream->GetDecoder();
+	Audio::AudioDecoder            decoder = stream->GetDecoder();
 	for (auto& packet: packets)
 	{
 		decoder.Send(std::move(packet));
@@ -74,7 +74,7 @@ void AudioMixing()
 
 
 	packets.clear();
-	Audio::Encoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
+	Audio::AudioEncoder encoder(AV_CODEC_ID_OPUS, AV_CHANNEL_LAYOUT_STEREO);
 	while (!mixer.IsEmpty())
 	{
 		encoder.Send(mixer.ReadFrame());

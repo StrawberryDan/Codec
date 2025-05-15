@@ -14,47 +14,30 @@ extern "C"
 
 namespace Strawberry::Codec
 {
-	Core::Optional<Packet> MediaStream::Read()
+	Core::Result<Packet, Error> MediaStream::Read()
 	{
-		if (mPacketBuffer.Empty() && !mIsEOF)
+		Packet packet;
+		auto   result = av_read_frame(mFile, *packet);
+		switch (result)
 		{
-			while (!mPacketBuffer.AtCapacity() && !mIsEOF)
-			{
-				auto packet = mMediaFile->Read();
-				if (packet)
-				{
-					if ((*packet)->stream_index != mStreamInfo.Index)
-					{
-						continue;
-					}
-					mPacketBuffer.Push(packet.Unwrap());
-				}
-				else
-					switch (packet.Err())
-					{
-						case Core::IO::Error::EndOfFile:
-							mIsEOF = true;
-							break;
-						default:
-							Core::DebugBreak();
-							return Core::NullOpt;
-					}
-			}
+		case 0:
+			return packet;
+		case AVERROR_EOF:
+			return ErrorEndOfFile();
+		default:
+			Core::Unreachable();
 		}
-
-		return mPacketBuffer.Pop();
 	}
 
 
 	void MediaStream::Seek(Core::Seconds time)
 	{
 		int  ts     = time * static_cast<double>(mStreamInfo.Stream->time_base.den) / static_cast<double>(mStreamInfo.Stream->time_base.num);
-		auto result = avformat_seek_file(mMediaFile->mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
+		auto result = avformat_seek_file(mFile, mStreamInfo.Index, 0, ts, ts, AVSEEK_FLAG_FRAME);
 		Core::Assert(result >= 0);
-		result = avformat_flush(mMediaFile->mFile);
+		result = avformat_flush(mFile);
 		Core::Assert(result >= 0);
 		mIsEOF = time > GetDuration();
-		mPacketBuffer.Clear();
 	}
 
 
@@ -115,12 +98,6 @@ namespace Strawberry::Codec
 	}
 
 
-	Core::Optional<size_t> MediaStream::GetFrameCount() const
-	{
-		return mPacketBuffer.Size();
-	}
-
-
 	const AVCodec* MediaStream::GetCodec() const
 	{
 		auto codec = avcodec_find_decoder(mStreamInfo.CodecParameters->codec_id);
@@ -135,9 +112,17 @@ namespace Strawberry::Codec
 		return mStreamInfo.CodecParameters;
 	}
 
+	MediaStream::MediaStream(const MediaFile& file, size_t index)
+		: mStreamInfo(file.GetStreamInfo(index))
+		, mFile(nullptr)
+	{
+		auto result = avformat_open_input(&mFile, file.GetPath().string().c_str(), nullptr, nullptr);
+		Core::AssertEQ(result, 0);
 
-	MediaStream::MediaStream(Core::ReflexivePointer<MediaFile> file, size_t index)
-		: mStreamInfo(file->GetStreamInfo(index).Unwrap())
-		, mMediaFile(file)
-		, mPacketBuffer(256) {}
+		result = avformat_find_stream_info(mFile, nullptr);
+		Core::Assert(result >= 0);
+
+		result = av_seek_frame(mFile, mStreamInfo.Index, -1, AVSEEK_FLAG_BACKWARD);
+		Core::Assert(result >= 0);
+	}
 } // namespace Strawberry::Codec

@@ -20,15 +20,15 @@ extern "C"
 
 namespace Strawberry::Codec::Audio
 {
-	class Decoder
+	class AudioDecoder
 	{
 	public:
-		Decoder(const AVCodec* codec, const AVCodecParameters* parameters);
-		Decoder(const Decoder& other)            = delete;
-		Decoder& operator=(const Decoder& other) = delete;
-		Decoder(Decoder&& other) noexcept;
-		Decoder& operator=(Decoder&& other) noexcept;
-		~Decoder();
+		AudioDecoder(const AVCodec* codec, const AVCodecParameters* parameters);
+		AudioDecoder(const AudioDecoder& other)            = delete;
+		AudioDecoder& operator=(const AudioDecoder& other) = delete;
+		AudioDecoder(AudioDecoder&& other) noexcept;
+		AudioDecoder& operator=(AudioDecoder&& other) noexcept;
+		~AudioDecoder();
 
 
 		void               Send(Packet packet);
