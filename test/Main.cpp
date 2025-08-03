@@ -2,7 +2,6 @@
 #include "Codec/Audio/Mixer.hpp"
 #include "Codec/MediaFile.hpp"
 #include "Codec/Muxer.hpp"
-#include <Strawberry/Core/Timing/ScopedTimer.hpp>
 #include <iostream>
 
 
@@ -20,7 +19,7 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 {
 	MediaFile file   = MediaFile::Open(filePath).Unwrap();
 	auto      stream = file.GetBestStream(MediaType::Audio);
-	Core::Assert(stream);
+	Core::Assert(stream.HasValue());
 
 	std::vector<Packet> packets;
 	while (auto packet = stream->Read())
@@ -47,9 +46,6 @@ std::vector<Audio::Frame> DecodeAudioFile(const std::string& filePath)
 
 void AudioMixing()
 {
-	Core::ScopedTimer timer("Audio Mixing");
-
-
 	std::vector<Audio::Frame> frames[] = {
 		// DecodeAudioFile("data/pd.wav"),
 		// DecodeAudioFile("data/girigiri.wav"),

@@ -120,7 +120,7 @@ namespace Strawberry::Codec::Audio::Playlist
 		};
 
 
-		Core::Math::Rational<int> mVolume = (100, 100);
+		Core::Math::Rational<int> mVolume = {100, 100};
 
 		const Audio::FrameFormat mFormat;
 		const size_t             mFrameSize;

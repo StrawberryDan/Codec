@@ -23,7 +23,7 @@ namespace Strawberry::Codec::Audio
 		std::erase_if(mInputChannels,
 		              [](std::shared_ptr<InputChannel>& x)
 		              {
-			              return x.unique() && !x->IsOutputAvailable();
+			              return x.use_count() == 1 && !x->IsOutputAvailable();
 		              });
 
 		// Mix Input Channels
